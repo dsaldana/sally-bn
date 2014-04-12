@@ -91,13 +91,18 @@ class WinHandler:
             elif self.mode_edit == ModeEdit.edge:
 
                 # If there is not a initial vertex selected
-                if self.vertex_1 is None:
+                if self.vertex_1 is None and self.selected_vetex is not None:
                     self.vertex_1 = self.selected_vetex
-                else:
+                elif self.vertex_1 is not None and self.selected_vetex is None:
+                    #Select anything
+                    print "anything selected"
+                    self.vertex_1 = None
+                elif self.vertex_1 is not None and self.selected_vetex is not None:
                     if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
                         self.edges.append([self.vertex_1, self.selected_vetex])
                         self.vertex_1 = None
                         self.selected_vetex = None
+                self.tmp_arrow = None
             elif self.mode_edit == ModeEdit.delete:
                 # Delete vertex
                 self.vertices.pop(self.selected_vetex)
