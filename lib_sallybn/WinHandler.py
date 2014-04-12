@@ -35,7 +35,7 @@ class WinHandler:
 
         # Temporal vertex for edge
         self.vertex_1 = None
-        self.vertex_2 = None
+        self.selected_vetex = None
         self.vertex_count = 1
 
         # Graph
@@ -74,11 +74,11 @@ class WinHandler:
         if self.mode == Mode.edit:
 
             # search if a node exist in that point
-            self.vertex_2 = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
 
             ## Mode
             if self.mode_edit == ModeEdit.vertex:
-                if self.vertex_2 is None:
+                if self.selected_vetex is None:
                     vname = 'Variable ' + str(self.vertex_count)
                     self.vertices[vname] = p
                     self.vertex_count += 1
@@ -86,17 +86,17 @@ class WinHandler:
             elif self.mode_edit == ModeEdit.edge:
                 # If there is not a initial vertex selected
                 if self.vertex_1 is None:
-                    self.vertex_1 = self.vertex_2
+                    self.vertex_1 = self.selected_vetex
                 else:
-                    if not self.vertex_1 == self.vertex_2 and self.vertex_2 is not None:
-                        self.edges.append([self.vertex_1, self.vertex_2])
+                    if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
+                        self.edges.append([self.vertex_1, self.selected_vetex])
                         self.vertex_1 = None
             elif self.mode_edit == ModeEdit.delete:
                 # Delete vertex
-                self.vertices.pop(self.vertex_2)
+                self.vertices.pop(self.selected_vetex)
                 # delete edges
                 for [v1, v2] in self.edges:
-                    if v1 == self.vertex_2 or v2 == self.vertex_2:
+                    if v1 == self.selected_vetex or v2 == self.selected_vetex:
                         self.edges.remove([v1, v2])
 
         ##### Mode run
@@ -120,11 +120,11 @@ class WinHandler:
         self.drawer.draw_background(cairo)
 
         if self.mode == Mode.edit:
+            # Draw selected nodes
+            if self.selected_vetex is not None:
+                self.drawer.draw_selected_vertices(cairo, self.selected_vetex, self.vertices)
             # Draw edges
             self.drawer.draw_directed_arrows(cairo, self.edges, self.vertices)
-            # Draw selected nodes
-            if self.vertex_2 is not None:
-                self.drawer.draw_selected_vertices(cairo, self.vertex_2, self.vertices)
             # Draw nodes
             self.drawer.draw_vertices(cairo, self.vertices)
 
