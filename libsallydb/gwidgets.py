@@ -106,7 +106,7 @@ class GraphicCptTable:
             # the column is created
             col = Gtk.TreeViewColumn(table_titles[i], cell, text=i)
     
-            # append to the treeview
+            # append to the tree view
             view.append_column(col)
     
         return view
