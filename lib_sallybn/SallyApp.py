@@ -7,6 +7,7 @@ class SallyApp(Gtk.Application):
         Gtk.Application.__init__(self)
 
     def do_startup(self):
+        print "startup"
         Gtk.Application.do_startup(self)
 
     def do_activate(self):
@@ -18,10 +19,13 @@ class SallyApp(Gtk.Application):
 
         #Get the Main Window, and connect the "destroy" event
         window = builder.get_object("MainWindow")
-        window.show_all()
         window.set_size_request(800, 600)
+        window.set_application(self)
 
         # Drawing area
         area = builder.get_object("drawingarea1")
         builder.connect_signals(drawing_area.Handler(area))
 
+        window.show_all()
+        if window:
+            window.connect("destroy", Gtk.main_quit)
