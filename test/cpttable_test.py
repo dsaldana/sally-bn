@@ -43,8 +43,8 @@ class MyApplication(Gtk.Application):
         window.add(grid)
         window.show_all()
 
-        # if window:
-        #     window.connect("destroy", Gtk.main_quit)
+        if window:
+            window.connect("destroy", Gtk.main_quit)
 
     def do_startup(self):
         Gtk.Application.do_startup(self)

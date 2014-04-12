@@ -1,5 +1,5 @@
 from gi.repository import Gtk
-from lib_sallybn import drawing_area
+from lib_sallybn import WinHandler
 
 
 class SallyApp(Gtk.Application):
@@ -24,7 +24,7 @@ class SallyApp(Gtk.Application):
 
         # Drawing area
         area = builder.get_object("drawingarea1")
-        builder.connect_signals(drawing_area.Handler(area))
+        builder.connect_signals(WinHandler.WinHandler(area))
 
         window.show_all()
         if window:
