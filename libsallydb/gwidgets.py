@@ -11,123 +11,117 @@ from gi.repository import Gtk
 from gi.repository import Pango
 
 
-def parets_states(parents, states):
-    """
-
-    :param parents: list of parent names
-    :param states: disctionary with k=vertex names and v=list of states
-    """
-    parents_matrix = []
-    for par in parents:
-        p_sts = states[par]
-
-        if not parents_matrix:
-            parents_matrix = [[s] for s in p_sts]
-        else:
-            new_par_matrix = []
-            # previous parents
-            for prev_p in parents_matrix:
-                for pstate in p_sts:
-                    tmp = list(prev_p)
-                    tmp.append(pstate)
-                    new_par_matrix.append(tmp)
-
-            parents_matrix = new_par_matrix
-    return parents_matrix
+import util
 
 
-def create_treeview_for_cpt(vertices, edges, states, query_v):
-    """
-    Create a tree view for the CPT of the node query_v
-    :param vertices:
-    :param edges:
-    :param states:
-    :param query_v:
-    :return:
-    """
-    ### Detect parents
-    parents = []
-    for v1, v2 in edges:
-        if v2 == query_v:
-            parents.append(v1)
+class GraphicCptTable:
+    def __init__(self, vertices, edges, states, query_v):
+        """
+        Create a tree view for the CPT of the node query_v
+        :param vertices:
+        :param edges:
+        :param states:
+        :param query_v:
+        :return:
+        """
+        self.query_v = query_v
+        self.states = states
+        self.vertices = vertices
+        self.edges = edges
 
-    # numeric columns
-    n_state_cols = len(states[query_v])
-    # Columns for titles
-    n_parent_cols = len(parents)
+        ### DATA MODEL
+        self.model = None
+        self.editable_cells = {}
 
-    # TODO Validate parents not zero states
-    # number of rows
-    n_rows = 1
-    for p in parents:
-        n_rows *= len(states[p])
 
-    # data taypes for parents
-    parent_types = [str for i in parents]
-    # the data in the model (three strings for each row, one for each column)
-    cpt_types = [str for i in states[query_v]]
-    # all parent + cpt types
-    all_types = parent_types + cpt_types
+        self.widget = self._create_treeview_for_cpt()
 
-    print all_types
+    def get_widget(self):
+        return self.widget
 
-    ### DATA MODEL
-    model = Gtk.ListStore(*all_types)
+    def _create_treeview_for_cpt(self):
+        """
+        Create a tree view for the CPT of the node query_v
 
-    # FILL DATA
-    parents_matrix = parets_states(parents, states)
-    state_vals = ["0.0"] * n_state_cols
+        :return: a treeview widget
+        """
+        ### Detect parents
+        parents = util.get_parents(self.query_v, self.edges)
+    
+        # numeric columns
+        n_state_cols = len(self.states[self.query_v])
+        # Columns for titles
+        n_parent_cols = len(parents)
+    
+        # TODO Validate parents not zero states
+        # number of rows
+        n_rows = 1
+        for p in parents:
+            n_rows *= len(self.states[p])
+    
+        # data taypes for parents
+        parent_types = [str for i in parents]
+        # the data in the model (three strings for each row, one for each column)
+        cpt_types = [str for i in self.states[self.query_v]]
+        # all parent + cpt types
+        all_types = parent_types + cpt_types
+    
+        print all_types
+    
+        ### DATA MODEL
+        self.model = Gtk.ListStore(*all_types)
+    
+        # FILL DATA
+        parents_matrix = util.parent_states(parents, self.states)
+        state_values = ["0.0"] * n_state_cols
 
-    print "result="
-    for l in parents_matrix:
-        model.append(l + state_vals)
+        for l in parents_matrix:
+            self.model.append(l + state_values)
+    
+        view = Gtk.TreeView(self.model)
+    
+        # Table titles
+        table_titles = parents + [s + "(%)" for s in self.states[self.query_v]]
+    
+        # Format for each column
+        for i in range(len(table_titles)):
+            # cellrenderer to render the text
+            cell = Gtk.CellRendererText()
+    
+            # Title in bold
+            if i < n_parent_cols:
+                cell.props.weight_set = True
+                cell.props.weight = Pango.Weight.BOLD
+                cell.props.background = "gray"
+    
+            else:
+                cell.props.xalign = 1.0
+                cell.props.editable = True
+                self.editable_cells[cell] = i
 
-    # self.set_model = model
-    view = Gtk.TreeView(model)
+    
+                # Call signal
+                cell.connect("edited", self.text_edited)
+    
+            # the column is created
+            col = Gtk.TreeViewColumn(table_titles[i], cell, text=i)
+    
+            # append to the treeview
+            view.append_column(col)
+    
+        return view
 
-    # Table titles
-    table_titles = parents + [s + "(%)" for s in states[query_v]]
-
-    editable_cells = {}
-
-    # Format for each column
-    for i in range(len(table_titles)):
-        # cellrenderer to render the text
-        cell = Gtk.CellRendererText()
-
-        # Title in bold
-        if i < n_parent_cols:
-            cell.props.weight_set = True
-            cell.props.weight = Pango.Weight.BOLD
-            cell.props.background = "gray"
-
-        else:
-            cell.props.xalign = 1.0
-            cell.props.editable = True
-            editable_cells[cell] = i
-            ## Event for Edited cells
-            def text_edited(widget, path, text):
-                #1 remove the % symbol and spaces
-                # text = text.replace("%","")
-                # text = text.replace(" ","")
-                print text
-                #2 validate the number between 0 and 100
-                val = float(text)
-                if val < 0 or val > 100:
-                    return
-                #3 add the text
-                # text = str(val) + "%"
-                col_number = editable_cells[widget]
-                model[path][col_number] = text
-
-            # Call signal
-            cell.connect("edited", text_edited)
-
-        print editable_cells
-        # the column is created
-        col = Gtk.TreeViewColumn(table_titles[i], cell, text=i)
-
-        # append to the treeview
-        view.append_column(col)
-
-    return view
+    ## Event for Edited cells
+    def text_edited(self, widget, path, text):
+        #1 remove the % symbol and spaces
+        # text = text.replace("%","")
+        # text = text.replace(" ","")
+        print text
+        #2 validate the number between 0 and 100
+        val = float(text)
+        if val < 0 or val > 100:
+            return
+        #3 add the text
+        # text = str(val) + "%"
+        col_number = self.editable_cells[widget]
+        self.model[path][col_number] = text

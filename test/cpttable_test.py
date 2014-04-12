@@ -22,8 +22,8 @@ class MyApplication(Gtk.Application):
                   "D": ["1", "2", "3"]}
 
         cpt_v = "B"
-        #table = gwidgets.CptTable(self, vertices, edges, states, cpt_v)
-        table = gwidgets.create_treeview_for_cpt(vertices, edges, states, cpt_v)
+        gtable = gwidgets.GraphicCptTable(vertices, edges, states, cpt_v)
+        # table = gwidgets.create_treeview_for_cpt(vertices, edges, states, cpt_v)
 
 
         ## Window
@@ -37,7 +37,7 @@ class MyApplication(Gtk.Application):
 
         # a grid to attach the widgets
         grid = Gtk.Grid()
-        grid.attach(table, 0, 0, 1, 1)
+        grid.attach(gtable.get_widget(), 0, 0, 1, 1)
         grid.attach(label, 0, 1, 1, 1)
 
         # attach the grid to the window
