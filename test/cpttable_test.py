@@ -1,8 +1,7 @@
 
 ### Graphic widgets
-from libsallydb import gwidgets
+from lib_sallybn import gwidgets
 
-import libsallydb.gwidgets
 from gi.repository import Gtk
 
 import sys
