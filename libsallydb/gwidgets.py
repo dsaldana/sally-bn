@@ -11,11 +11,7 @@ from gi.repository import Gtk
 from gi.repository import Pango
 
 
-def inIta(col, cell, model, iter, mymodel):
-    s = model.get_string_from_iter(iter)
-    niter = mymodel.get_iter_from_string(s)
-    obj = mymodel.get_value(niter, 0)
-    cell.set_property('text', obj)
+
 
 
 class CptTable(Gtk.ApplicationWindow):
@@ -31,13 +27,13 @@ class CptTable(Gtk.ApplicationWindow):
                 parents.append(v1)
 
         # numeric columns
-        n_cols = len(states[query_v])
+        n_state_cols = len(states[query_v])
         # Columns for titles
-        title_cols = len(parents)
+        n_parent_cols = len(parents)
 
         # TODO Validate parents not zero states
         # number of rows
-        rows = len(states[query_v])
+        rows = 1
         for p in parents:
             rows *= len(states[p])
         print parents, "-", states[query_v]
@@ -45,22 +41,21 @@ class CptTable(Gtk.ApplicationWindow):
         # data taypes for parents
         parent_types = [str for i in parents]
         # the data in the model (three strings for each row, one for each column)
-        cpt_types = [float for i in states[query_v]]
-
+        cpt_types = [str for i in states[query_v]]
+        # all parent + cpt types
         all_types = parent_types + cpt_types
 
         print all_types
         # cpt_models[1].append(["x"])
 
         model = Gtk.ListStore(*all_types)
-        model.append(["x", "y", 1.0, 2.0])
-        model.append(["x", "y", 1.0, 2.0])
-        model.append(["x", "y", 1.0, 2.0])
+        model.append(["x", "y", str(1.0), str(2.0)])
+
 
         view = Gtk.TreeView(model)
 
         # Table titles
-        table_titles = parents + states[query_v]
+        table_titles = parents + [s + "(%)" for s in states[query_v]]
 
         editable_cells = {}
         # for each column
@@ -69,7 +64,7 @@ class CptTable(Gtk.ApplicationWindow):
             cell = Gtk.CellRendererText()
 
             # Title in bold
-            if i < len(parents):
+            if i < n_parent_cols:
                 cell.props.weight_set = True
                 cell.props.weight = Pango.Weight.BOLD
                 cell.props.background = "gray"
@@ -82,25 +77,29 @@ class CptTable(Gtk.ApplicationWindow):
                     print "edited aa"
 
                 editable_cells[cell] = i
-                #cell.conect('edited', edited_cb, model)
-                # cell.start_editing(edited_cb)
 
+                ## Event for Edited cells
                 def text_edited(widget, path, text):
+                    #1 remove the % symbol and spaces
+                    # text = text.replace("%","")
+                    # text = text.replace(" ","")
+                    print text
+                    #2 validate the number between 0 and 100
+                    val = float(text)
+                    if val < 0 or val >100:
+                        return
+                    #3 add the text
+                    # text = str(val) + "%"
                     col_number = editable_cells[widget]
-                    model[path][col_number] = float(text)
-                cell.connect("edited", text_edited)
+                    model[path][col_number] = text
 
-            # def render_filesize(column, cell, model, iter,a):
-            #       origstr = cell.get_property('text')
-            #       sizestr = origstr + 'B' # Add a "B" for bytes after value
-            #       cell.set_property('text', sizestr)
+                # Call signal
+                cell.connect("edited", text_edited)
 
             # the column is created
             col = Gtk.TreeViewColumn(table_titles[i], cell, text=i)
-            # col.set_cell_data_func(cell, render_filesize)
 
-
-            # and it is appended to the treeview
+            # append to the treeview
             view.append_column(col)
 
 
@@ -112,8 +111,6 @@ class CptTable(Gtk.ApplicationWindow):
         # the label we use to show the selection
         self.label = Gtk.Label()
         self.label.set_text("fads")
-
-
 
         # a grid to attach the widgets
         grid = Gtk.Grid()
@@ -130,4 +127,5 @@ class CptTable(Gtk.ApplicationWindow):
         self.label.set_text("\n %s %s %s" % (model[iter][0], model[iter][1], model[iter][2]))
         print "changed"
         return True
+
 
