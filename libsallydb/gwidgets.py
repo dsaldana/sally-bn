@@ -11,18 +11,6 @@ from gi.repository import Gtk
 from gi.repository import Pango
 
 
-columns = ["First Name",
-           "Last Name",
-           "Phone Number"]
-
-phonebook = [["Jurg", "Billeter", "555-0123"],
-             ["Johannes", "Schmid", "555-1234"],
-             ["Julita", "Inca", "555-2345"],
-             ["Javier", "Jardon", "555-3456"],
-             ["Jason", "Clinton", "555-4567"],
-             ["Random J.", "Hacker", "555-5678"]]
-
-
 def inIta(col, cell, model, iter, mymodel):
     s = model.get_string_from_iter(iter)
     niter = mymodel.get_iter_from_string(s)
@@ -54,66 +42,72 @@ class CptTable(Gtk.ApplicationWindow):
             rows *= len(states[p])
         print parents, "-", states[query_v]
 
+        # data taypes for parents
+        parent_types = [str for i in parents]
         # the data in the model (three strings for each row, one for each column)
-        cpt_models = [Gtk.ListStore(str) for i in states[query_v]]
-        #FIXME other gtype non editable
-        parent_models = [Gtk.ListStore(str) for i in parents]
-        all_models = cpt_models + parent_models
+        cpt_types = [float for i in states[query_v]]
 
-        # all_models[0].append(["x"])
-        for a in all_models:
-            a.append(["x"])
-        #
-        # for a in all_models:
-        #     a.append(["y"])
-        #
-        # for a in all_models:
-        #     a.append(["z"])
+        all_types = parent_types + cpt_types
 
-        # append the values in the model
-        # for i in range(len(phonebook)):
-        #     listmodel.append(phonebook[i])
+        print all_types
+        # cpt_models[1].append(["x"])
 
-        # a treeview to see the data stored in the model
-        # cpt_views = [Gtk.TreeView(model=mod) for mod in cpt_models]
-        # parent_views = [Gtk.TreeView(model=mod) for mod in parent_models]
-        # all_views = cpt_views + parent_views
-        view = Gtk.TreeView(all_models[0])
+        model = Gtk.ListStore(*all_types)
+        model.append(["x", "y", 1.0, 2.0])
+        model.append(["x", "y", 1.0, 2.0])
+        model.append(["x", "y", 1.0, 2.0])
+
+        view = Gtk.TreeView(model)
 
         # Table titles
-        table_titles = parents + states[query_v];
+        table_titles = parents + states[query_v]
 
+        editable_cells = {}
         # for each column
         for i in range(len(table_titles)):
             # cellrenderer to render the text
             cell = Gtk.CellRendererText()
-            cell.set_property("editable", True)
 
             # Title in bold
-            if i == 0:
+            if i < len(parents):
                 cell.props.weight_set = True
                 cell.props.weight = Pango.Weight.BOLD
+                cell.props.background = "gray"
+
+            else:
+                cell.props.xalign = 1.0
+                cell.props.editable = True
+
+                def edited_cb(cell, path, new_text, user_data):
+                    print "edited aa"
+
+                editable_cells[cell] = i
+                #cell.conect('edited', edited_cb, model)
+                # cell.start_editing(edited_cb)
+
+                def text_edited(widget, path, text):
+                    col_number = editable_cells[widget]
+                    model[path][col_number] = float(text)
+                cell.connect("edited", text_edited)
+
+            # def render_filesize(column, cell, model, iter,a):
+            #       origstr = cell.get_property('text')
+            #       sizestr = origstr + 'B' # Add a "B" for bytes after value
+            #       cell.set_property('text', sizestr)
 
             # the column is created
             col = Gtk.TreeViewColumn(table_titles[i], cell, text=i)
+            # col.set_cell_data_func(cell, render_filesize)
+
 
             # and it is appended to the treeview
             view.append_column(col)
 
 
-
         # FILL the table
 
-
-
-
-
-
-
-
-
         # when a row is selected, it emits a signal
-        view.get_selection().connect("changed", self.on_changed)
+        # view.get_selection().connect("changed", self.on_changed)
 
         # the label we use to show the selection
         self.label = Gtk.Label()
@@ -134,5 +128,6 @@ class CptTable(Gtk.ApplicationWindow):
         (model, iter) = selection.get_selected()
         # set the label to a new value depending on the selection
         self.label.set_text("\n %s %s %s" % (model[iter][0], model[iter][1], model[iter][2]))
+        print "changed"
         return True
 
