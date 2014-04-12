@@ -1,8 +1,11 @@
 from gi.repository import Gtk, Gdk
+
 from enum import Enum
+
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
+
 
 
 
@@ -18,7 +21,6 @@ class ModeEdit(Enum):
     vertex = 1
     edge = 2
     delete = 3
-
 
 
 class WinHandler:
@@ -37,6 +39,9 @@ class WinHandler:
         self.vertex_1 = None
         self.selected_vetex = None
         self.vertex_count = 1
+
+        # Temporal arrow for mouse motion
+        self.tmp_arrow = None
 
         # Graph
         self.vertices = {}
@@ -84,6 +89,7 @@ class WinHandler:
                     self.vertex_count += 1
 
             elif self.mode_edit == ModeEdit.edge:
+
                 # If there is not a initial vertex selected
                 if self.vertex_1 is None:
                     self.vertex_1 = self.selected_vetex
@@ -91,6 +97,7 @@ class WinHandler:
                     if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
                         self.edges.append([self.vertex_1, self.selected_vetex])
                         self.vertex_1 = None
+                        self.selected_vetex = None
             elif self.mode_edit == ModeEdit.delete:
                 # Delete vertex
                 self.vertices.pop(self.selected_vetex)
@@ -123,6 +130,13 @@ class WinHandler:
             # Draw selected nodes
             if self.selected_vetex is not None:
                 self.drawer.draw_selected_vertices(cairo, self.selected_vetex, self.vertices)
+
+                # Draw temporal arrow
+                if self.mode_edit == ModeEdit.edge and self.tmp_arrow is not None:
+                    tmp_v = {"I": self.vertices[self.selected_vetex], "F": self.tmp_arrow}
+                    tmp_e = [["I", "F"]]
+                    self.drawer.draw_directed_arrows(cairo, tmp_e, tmp_v, headarrow_d=0)
+
             # Draw edges
             self.drawer.draw_directed_arrows(cairo, self.edges, self.vertices)
             # Draw nodes
@@ -132,7 +146,7 @@ class WinHandler:
             # Draw edges
             self.drawer.draw_arrow_box(cairo, self.vertices, self.edges)
             # Draw nodes
-            self.drawer.draw_boxes(cairo, self.vertices, self.edges, self.states)
+            self.drawer.draw_boxes(cairo, self.vertices, self.states)
 
         return False
 
@@ -148,25 +162,29 @@ class WinHandler:
 
         self.area.queue_draw()
 
-    def on_edit_mode(self, radioTool):
-        if not radioTool.get_active():
+    def on_edit_mode(self, radiotool):
+        if not radiotool.get_active():
             return True
         # Radio selected
-        if radioTool.get_label() == "bvertex":
+        if radiotool.get_label() == "bvertex":
             self.mode_edit = ModeEdit.vertex
-            print "node mode", radioTool.get_active(), self.mode_edit, radioTool.get_label()
-        elif radioTool.get_label() == "bedge":
+            print "node mode", radiotool.get_active(), self.mode_edit, radiotool.get_label()
+        elif radiotool.get_label() == "bedge":
             self.mode_edit = ModeEdit.edge
-        elif radioTool.get_label() == "bmanual":
+        elif radiotool.get_label() == "bmanual":
             self.mode_edit = ModeEdit.manual
-        elif radioTool.get_label() == "bdelete":
+        elif radiotool.get_label() == "bdelete":
             self.mode_edit = ModeEdit.delete
         else:
             print "not supported"
 
-    def motion_event(self, *arg):
-        # print "momving mouse", arg
-        pass
+    def motion_event(self, widget, event):
+        if self.mode == Mode.edit and \
+                        self.mode_edit == ModeEdit.edge and \
+                        self.selected_vetex is not None:
+            self.tmp_arrow = [event.x, event.y]
+            self.area.queue_draw()
+            # print "momving mouse", b.x
 
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)

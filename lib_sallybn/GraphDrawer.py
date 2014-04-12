@@ -1,7 +1,12 @@
 import math
 
 # Node radious
-rad = 30.0
+vertex_radious = 30.0
+
+box_width = 100
+delta_state = 30
+title_height = delta_state + 5
+
 
 class GraphDrawer:
     def __init__(self, area):
@@ -17,7 +22,7 @@ class GraphDrawer:
         cairo.rectangle(0, 0, 10000, 100000)
         cairo.fill()
 
-    def draw_directed_arrows(self, cairo, edges, vertices):
+    def draw_directed_arrows(self, cairo, edges, vertices, headarrow_d =vertex_radious):
         for edge in edges:
             x1, y1 = vertices[edge[0]]
             x2, y2 = vertices[edge[1]]
@@ -29,7 +34,7 @@ class GraphDrawer:
             cairo.stroke()
 
             #draw arrow
-            d = math.hypot(dx, dy) - rad
+            d = math.hypot(dx, dy) - headarrow_d
             theta = math.atan(dy / dx)
             # adjust for atan
             s = 1.0
@@ -37,8 +42,8 @@ class GraphDrawer:
                 s = -1.0
 
             # arrow head (triangle)
-            a = rad / 2.0
-            b = rad / 3.5
+            a = vertex_radious / 2.0
+            b = vertex_radious / 3.5
 
             xt1 = x1 + s * d * math.cos(theta)
             yt1 = y1 + s * d * math.sin(theta)
@@ -61,7 +66,7 @@ class GraphDrawer:
         ## selected node
         point = vertices[selected_vertex]
         cairo.set_source_rgb(1, 0.8, 0.0)  # yellow
-        cairo.arc(point[0], point[1], rad + 5, 0, 2 * 3.1416)
+        cairo.arc(point[0], point[1], vertex_radious + 5, 0, 2 * 3.1416)
         cairo.fill()
 
 
@@ -69,16 +74,16 @@ class GraphDrawer:
         for vname, point in vertices.items():
             ## Fill circle
             cairo.set_source_rgb(0.61, 0.75, 1.0)  # light blue
-            cairo.arc(point[0], point[1], rad, 0, 2 * 3.1416)
+            cairo.arc(point[0], point[1], vertex_radious, 0, 2 * 3.1416)
             cairo.fill()
 
             ## Draw border
             cairo.set_source_rgb(0.22, 0.30, 0.66)  # blue
-            cairo.arc(point[0], point[1], rad, 0, 2 * 3.1416)
+            cairo.arc(point[0], point[1], vertex_radious, 0, 2 * 3.1416)
             cairo.stroke()
 
             ## Draw text
-            text_position = rad + 15
+            text_position = vertex_radious + 15
             cairo.set_source_rgb(0.12, 0.20, 0.56)  # blue
             # cairo.select_font_face("Georgia", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
             cairo.select_font_face("Georgia");
@@ -104,7 +109,8 @@ class GraphDrawer:
             cairo.stroke()
 
             #draw arrow
-            d = math.hypot(dx, dy)
+            # FIXME put the headarrow in the right place
+            d = math.hypot(dx, dy)/2
             theta = math.atan(dy / dx)
             # adjust for atan
             s = 1.0
@@ -112,8 +118,8 @@ class GraphDrawer:
                 s = -1.0
 
             # arrow head (triangle)
-            a = rad / 2.0
-            b = rad / 3.5
+            a = vertex_radious / 2.0
+            b = vertex_radious / 3.5
 
             xt1 = x1 + s * d * math.cos(theta)
             yt1 = y1 + s * d * math.sin(theta)
@@ -132,46 +138,50 @@ class GraphDrawer:
 
             cairo.fill()
 
-    def draw_boxes(self, cairo, vertices, edges, states):
+    def draw_boxes(self, cairo, vertices, states):
         for vname, point in vertices.items():
             # Rectangles
             px, py = point
 
-            box_width = 100
-            delta_state = 30
-            title_heigh = delta_state + 5
-            box_heigh = title_heigh + delta_state * len(states)
+            box_heigh = self._get_box_height(states)
 
+            x_corner = px - box_width / 2.0
+            y_corner = py - box_heigh / 2.0
+
+            # Background
             cairo.set_source_rgb(230.0 / 255, 242.0 / 255, 230.0 / 255)  # light green
-            cairo.rectangle(px, py, box_width, box_heigh)
+            cairo.rectangle(x_corner, y_corner, box_width, box_heigh)
             cairo.fill()
 
+            # Border
             cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
-            cairo.rectangle(px, py, box_width, title_heigh)
+            cairo.rectangle(x_corner, y_corner, box_width, title_height)
             cairo.fill()
 
             ## Title
             cairo.select_font_face("Georgia")
             cairo.set_source_rgb(59.0 / 255, 143.0 / 255, 0.0 / 255)  # dark green
             # cairo.set_source_rgb(0.0 / 255, 0.0 / 255, 0.0 / 255)  # green
-            cairo.move_to(px + 5, py + 25)
+            cairo.move_to(x_corner + 5, y_corner + 25)
             cairo.set_font_size(17)
             cairo.show_text(vname)
 
             for i in range(len(states)):
                 ## States
-                ny = py + title_heigh + (i + 1) * delta_state
+                ny = y_corner + title_height + (i + 1) * delta_state
                 cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
-                cairo.move_to(px, ny)
-                cairo.line_to(px + box_width, ny)
+                cairo.move_to(x_corner, ny)
+                cairo.line_to(x_corner + box_width, ny)
                 cairo.stroke()
 
                 # Text for states
                 cairo.select_font_face("Georgia")
                 cairo.set_source_rgb(69.0 / 255, 163.0 / 255, 0.0 / 255)  # dark green
                 cairo.set_font_size(14)
-                cairo.move_to(px + 5, ny - 10)
+                cairo.move_to(x_corner + 5, ny - 10)
                 cairo.show_text(states[i])
 
-
+    @staticmethod
+    def _get_box_height(states):
+        return title_height + delta_state * len(states)
 
