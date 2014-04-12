@@ -23,9 +23,32 @@ class ModeEdit(Enum):
     delete = 3
 
 
+
+
+
+class AreaDrawer:
+
+    def __init__(self, area):
+        self.area = area
+        self.transform = None
+
+
+    def draw_background(self, cairo):
+        cairo.set_source_rgb(1, 1, 1.0)
+        # FIXME only white for the workspace.
+        #self.area.size_request().width
+        #self.area.size_request().height
+        cairo.rectangle(0, 0, 10000, 100000)
+        cairo.fill()
+
+
+
+
+
 class Handler:
     def __init__(self, area):
         # Scale
+        self.drawer = AreaDrawer(area)
         self.area = area
         self.scale = 1
         self.delta_zoom = 0.1
@@ -42,7 +65,6 @@ class Handler:
         self.edges = []
 
 
-        # area.draw_line(0,0, 400,300)
         #FIXME change all events for only motion
         self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
                              Gdk.EventMask.SMOOTH_SCROLL_MASK | Gdk.EventMask.ALL_EVENTS_MASK)
@@ -119,14 +141,11 @@ class Handler:
 
         self.transform = cairo.get_matrix()
         self.transform.invert()
-        print self.transform.transform_point(10, 10)
 
-        cairo.set_source_rgb(1, 1, 1.0)
-        # FIXME only white for the workspace.
-        #self.area.size_request().width
-        #self.area.size_request().height
-        cairo.rectangle(0, 0, 10000, 100000)
-        cairo.fill()
+
+        self.drawer.draw_background(cairo)
+
+
 
         if self.mode == Mode.edit:
             # Draw edges
