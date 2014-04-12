@@ -1,0 +1,17 @@
+/.idea/.name
+/.idea/Sally-BN.iml
+/.idea/encodings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/scopes/scope_settings.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/libsallydb/__init__.pyc
+/test/table2_test.py
+/test/table_test.py
+/test/temp.py
+/visual_editor (copy).glade
+/libsallydb/drawing_area.pyc
+/libsallydb/gwidgets.pyc
