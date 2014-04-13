@@ -140,10 +140,12 @@ class GraphDrawer:
 
     def draw_boxes(self, cairo, vertices, states):
         for vname, point in vertices.items():
+            var_states = states[vname]
+
             # Rectangles
             px, py = point
 
-            box_heigh = self._get_box_height(states)
+            box_heigh = self._get_box_height(var_states)
 
             x_corner = px - box_width / 2.0
             y_corner = py - box_heigh / 2.0
@@ -166,7 +168,7 @@ class GraphDrawer:
             cairo.set_font_size(17)
             cairo.show_text(vname)
 
-            for i in range(len(states)):
+            for i in range(len(var_states)):
                 ## States
                 ny = y_corner + title_height + (i + 1) * delta_state
                 cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
@@ -179,7 +181,8 @@ class GraphDrawer:
                 cairo.set_source_rgb(69.0 / 255, 163.0 / 255, 0.0 / 255)  # dark green
                 cairo.set_font_size(14)
                 cairo.move_to(x_corner + 5, ny - 10)
-                cairo.show_text(states[i])
+                print "statei", states[vname][i]
+                cairo.show_text(var_states[i])
 
     @staticmethod
     def _get_box_height(states):

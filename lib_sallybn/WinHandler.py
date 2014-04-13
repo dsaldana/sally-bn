@@ -9,6 +9,10 @@ import lib_sallybn.gutil
 import lib_sallybn.gwidgets
 
 
+
+
+
+
 # Mode for
 class Mode(Enum):
     edit = 0
@@ -55,9 +59,7 @@ class WinHandler:
         self.edges = []
         self.states = {}
 
-        # GTK builder
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file(lib_sallybn.SallyApp.glade_file)
+        self.builder = None
 
         #FIXME change all events for only motion
         self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
@@ -102,8 +104,6 @@ class WinHandler:
         self.clicked_point = None
 
     def on_button_press(self, widget, event):
-
-
         # double
         p = [event.x, event.y]
         p = self.transform.transform_point(p[0], p[1])
@@ -114,7 +114,8 @@ class WinHandler:
 
         ## Right click for edit node
         if event.button == 3 and self.selected_vetex is not None:
-
+            #Draw selected node
+            self.area.queue_draw()
             print "right click"
             menu = Gtk.Menu()
             menu_it = Gtk.MenuItem()
@@ -133,15 +134,6 @@ class WinHandler:
             menu_it.connect("button-release-event", event_edit)
             menu.append(menu_it)
 
-            # radiomenuitem1 = Gtk.RadioMenuItem(label="RadioMenuItem 1")
-            # radiomenuitem1.set_active(True)
-            # menu.append(radiomenuitem1)
-            # radiomenuitem2 = Gtk.RadioMenuItem(label="RadioMenuItem 2", group=radiomenuitem1)
-            # menu.append(radiomenuitem2)
-
-            # aMenuitem.connect("activate", command)
-
-            # popup.add_menuitem(Gtk.MenuItem("AA"))
             menu.show_all()
             menu.popup(None, None, None, None, event.button, event.time)
 
@@ -149,21 +141,32 @@ class WinHandler:
 
         ## doble click, open the dialog
         elif event.type == Gdk.EventType._2BUTTON_PRESS:
+            self.clicked_point = None
             print "doble click"
             self.selected_vetex = None
             self.show_cpt_dialog(self.selected_vetex)
             return
 
-
+        ## Click
         elif self.mode == Mode.edit:
             self.clicked_point = p
 
+    def create_widget(self, *names):
+        # GTK builder
+        builder = Gtk.Builder()
+        builder.add_from_file(lib_sallybn.SallyApp.glade_file)
+
+        return [builder.get_object(wname) for wname in names]
+
+
     def show_cpt_dialog(self, selected_vetex):
-        cpt_dialog = self.builder.get_object("dialog_cpt")
-        treeview_cpt = self.builder.get_object("treeview_cpt")
-        text_var_name = self.builder.get_object("text_var_name")
+
+        cpt_dialog, treeview_cpt, text_var_name = \
+            self.create_widget("dialog_cpt",
+                               "treeview_cpt", "text_var_name")
+        cpt_dialog.set_modal(True)
         text_var_name.set_text(selected_vetex)
-        # TODO load info for CPT
+        # load info for CPT
         gtable = lib_sallybn.gwidgets.GraphicCptTable(self.vertices,
                                                       self.edges,
                                                       self.states,
@@ -196,7 +199,6 @@ class WinHandler:
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
             self.dragged = [-dx, -dy]
             self.area.queue_draw()
-
 
     def on_drawing_area_draw(self, drawing_area, cairo):
         cairo.scale(self.scale, self.scale)

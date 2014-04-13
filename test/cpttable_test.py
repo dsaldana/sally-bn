@@ -20,7 +20,7 @@ class MyApplication(Gtk.Application):
                   "C": ["ctrue", "cfalse"],
                   "D": ["1", "2", "3"]}
 
-        cpt_v = "B"
+        cpt_v = "D"
         gtable = gwidgets.GraphicCptTable(vertices, edges, states, cpt_v, view=Gtk.TreeView())
         # table = gwidgets.create_treeview_for_cpt(vertices, edges, states, cpt_v)
 
