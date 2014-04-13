@@ -11,6 +11,7 @@ import lib_sallybn.gutil
 
 
 
+
 # Mode for
 class Mode(Enum):
     edit = 0
@@ -26,13 +27,17 @@ class ModeEdit(Enum):
 
 
 class WinHandler:
-    def __init__(self, area, edit_buttons):
-        # Scale
+    def __init__(self, area, edit_buttons, cpt_dialog):
+
         #FIXME statex from other place
         self.states = ["true", "false"]
+
         self.drawer = GraphDrawer(area)
         self.area = area
         self.edit_buttons = edit_buttons
+        self.cpt_dialog = cpt_dialog
+
+        # Scale
         self.scale = 1
         self.delta_zoom = 0.1
         self.mode_edit = ModeEdit.vertex
@@ -77,7 +82,12 @@ class WinHandler:
         return True
 
     def on_button_release(self, widget, event):
+        # Right click
+        if event.button == 3:
+            return
+
         p = [event.x, event.y]
+        p = self.transform.transform_point(p[0], p[1])
 
         dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
         click_distance = math.hypot(dx, dy)
@@ -89,16 +99,66 @@ class WinHandler:
         self.clicked_point = None
 
     def on_button_press(self, widget, event):
+
+
+        # double
         p = [event.x, event.y]
-        self.clicked_point = p
+        p = self.transform.transform_point(p[0], p[1])
+
+        self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+
         self.dragged = None
 
-        if self.mode == Mode.edit:
-            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+        ## Right click for edit node
+        if event.button == 3 and self.selected_vetex is not None:
+
+            print "right click"
+            menu = Gtk.Menu()
+            menu_it = Gtk.MenuItem()
+            menu_it.set_label("Edit")
+
+
+            menu = Gtk.Menu()
+            menuitem = Gtk.MenuItem(label="RadioMenuItem")
+            menuitem.set_submenu(menu)
+            menu_it = Gtk.MenuItem("Edit Variable")
+
+            def event_edit(widget, event):
+                menu.set_visible(False)
+                self.cpt_dialog.run()
+
+            menu_it.connect("button-release-event", event_edit)
+            menu.append(menu_it)
+
+            # radiomenuitem1 = Gtk.RadioMenuItem(label="RadioMenuItem 1")
+            # radiomenuitem1.set_active(True)
+            # menu.append(radiomenuitem1)
+            # radiomenuitem2 = Gtk.RadioMenuItem(label="RadioMenuItem 2", group=radiomenuitem1)
+            # menu.append(radiomenuitem2)
+
+            # aMenuitem.connect("activate", command)
+
+            # popup.add_menuitem(Gtk.MenuItem("AA"))
+            menu.show_all()
+            menu.popup(None, None, None, None, event.button, event.time)
+
+            return True
+
+        ## doble click, open the dialog
+        elif event.type == Gdk.EventType._2BUTTON_PRESS:
+            print "doble click"
+            self.selected_vetex = None
+            self.cpt_dialog.run()
+            return
+
+
+        elif self.mode == Mode.edit:
+            self.clicked_point = p
+
 
     def motion_event(self, widget, event):
         p = [event.x, event.y]
-
+        p = self.transform.transform_point(p[0], p[1])
 
         ## Dynamic headarrow
         if self.mode == Mode.edit and \
@@ -109,12 +169,14 @@ class WinHandler:
 
         # translate node
         elif self.clicked_point is not None and self.mode == Mode.edit and self.selected_vetex is not None:
-                self.vertices[self.selected_vetex] = p
-                self.area.queue_draw()
+            self.vertices[self.selected_vetex] = p
+            self.area.queue_draw()
 
         # translate world
         elif self.clicked_point is not None:
             p = [event.x, event.y]
+            p = self.transform.transform_point(p[0], p[1])
+
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
             self.dragged = [-dx, -dy]
             self.area.queue_draw()
@@ -200,8 +262,8 @@ class WinHandler:
         print("Hello World!")
 
     def edition_action(self, p):
-        if self.transform is not None:
-            p = self.transform.transform_point(p[0], p[1])
+        # if self.transform is not None:
+        # p = self.transform.transform_point(p[0], p[1])
 
         #### Mode Edit #####
         if self.mode == Mode.edit:
