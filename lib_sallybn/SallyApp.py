@@ -1,6 +1,11 @@
 from gi.repository import Gtk
+
 from lib_sallybn import WinHandler
 
+
+glade_file = 'visual_editor.glade'
+
+# FIXME Not here
 
 class SallyApp(Gtk.Application):
     def __init__(self):
@@ -12,7 +17,6 @@ class SallyApp(Gtk.Application):
 
     def do_activate(self):
         # Set the Glade file
-        glade_file = 'visual_editor.glade'
 
         builder = Gtk.Builder()
         builder.add_from_file(glade_file)
@@ -24,8 +28,14 @@ class SallyApp(Gtk.Application):
 
         # Drawing area
         area = builder.get_object("drawingarea1")
-        builder.connect_signals(WinHandler.WinHandler(area))
+        edit_buttons = [builder.get_object("bvertex"),
+                        builder.get_object("bdelete"),
+                        builder.get_object("bedge")]
+
+        builder.connect_signals(WinHandler.WinHandler(area, edit_buttons))
 
         window.show_all()
+
         if window:
             window.connect("destroy", Gtk.main_quit)
+

@@ -86,7 +86,7 @@ class GraphDrawer:
             text_position = vertex_radious + 15
             cairo.set_source_rgb(0.12, 0.20, 0.56)  # blue
             # cairo.select_font_face("Georgia", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-            cairo.select_font_face("Georgia");
+            cairo.select_font_face("Georgia")
 
             cairo.set_font_size(14)
 

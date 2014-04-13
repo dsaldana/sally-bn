@@ -11,8 +11,6 @@ import lib_sallybn.gutil
 
 
 
-
-
 # Mode for
 class Mode(Enum):
     edit = 0
@@ -28,12 +26,13 @@ class ModeEdit(Enum):
 
 
 class WinHandler:
-    def __init__(self, area):
+    def __init__(self, area, edit_buttons):
         # Scale
         #FIXME statex from other place
         self.states = ["true", "false"]
         self.drawer = GraphDrawer(area)
         self.area = area
+        self.edit_buttons = edit_buttons
         self.scale = 1
         self.delta_zoom = 0.1
         self.mode_edit = ModeEdit.vertex
@@ -94,13 +93,26 @@ class WinHandler:
         self.clicked_point = p
         self.dragged = None
 
+        if self.mode == Mode.edit:
+            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+
     def motion_event(self, widget, event):
+        p = [event.x, event.y]
+
+
+        ## Dynamic headarrow
         if self.mode == Mode.edit and \
                         self.mode_edit == ModeEdit.edge and \
                         self.selected_vetex is not None:
-            self.tmp_arrow = [event.x, event.y]
+            self.tmp_arrow = p
             self.area.queue_draw()
 
+        # translate node
+        elif self.clicked_point is not None and self.mode == Mode.edit and self.selected_vetex is not None:
+                self.vertices[self.selected_vetex] = p
+                self.area.queue_draw()
+
+        # translate world
         elif self.clicked_point is not None:
             p = [event.x, event.y]
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
@@ -116,16 +128,14 @@ class WinHandler:
         #     tx, ty = self.transform.transform_point(self.trans_point[0], self.trans_point[1])
         #     cairo.translate(tx, ty)
         if self.dragged is not None:
-            print "plog"
             cairo.translate(self.dragged[0], self.dragged[1])
             self.dragged = None
-
 
         print cairo.get_matrix()
         self.transform = cairo.get_matrix()
         self.transform.invert()
 
-        print self.transform
+        # print self.transform
 
         self.drawer.draw_background(cairo)
 
@@ -159,9 +169,10 @@ class WinHandler:
 
         if radio_tool.get_label() == "bedit":
             self.mode = Mode.edit
+            self.set_edit_buttons_visible(True)
         if radio_tool.get_label() == "brun":
             self.mode = Mode.run
-            #TODO edit buttons must be invisible
+            self.set_edit_buttons_visible(False)
 
         self.area.queue_draw()
 
@@ -180,6 +191,7 @@ class WinHandler:
             self.mode_edit = ModeEdit.delete
         else:
             print "not supported"
+        self.selected_vetex = None
 
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)
@@ -232,3 +244,8 @@ class WinHandler:
             pass
 
         self.area.queue_draw()
+
+    def set_edit_buttons_visible(self, visible):
+        for eb in self.edit_buttons:
+            eb.set_visible(visible)
+
