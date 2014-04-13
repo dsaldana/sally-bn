@@ -15,7 +15,7 @@ import util
 
 
 class GraphicCptTable:
-    def __init__(self, vertices, edges, states, query_v):
+    def __init__(self, vertices, edges, states, query_v, view=Gtk.TreeView()):
         """
         Create a tree view for the CPT of the node query_v
         :param vertices:
@@ -34,12 +34,12 @@ class GraphicCptTable:
         self.editable_cells = {}
 
 
-        self.widget = self._create_treeview_for_cpt()
+        self.widget = self._create_treeview_for_cpt(view)
 
     def get_widget(self):
         return self.widget
 
-    def _create_treeview_for_cpt(self):
+    def _create_treeview_for_cpt(self, view):
         """
         Create a tree view for the CPT of the node query_v
 
@@ -77,8 +77,11 @@ class GraphicCptTable:
 
         for l in parents_matrix:
             self.model.append(l + state_values)
+
+        if len(parents) == 0:
+            self.model.append(state_values)
     
-        view = Gtk.TreeView(self.model)
+        view.set_model(self.model)
     
         # Table titles
         table_titles = parents + [s + "(%)" for s in self.states[self.query_v]]

@@ -21,7 +21,7 @@ class MyApplication(Gtk.Application):
                   "D": ["1", "2", "3"]}
 
         cpt_v = "B"
-        gtable = gwidgets.GraphicCptTable(vertices, edges, states, cpt_v)
+        gtable = gwidgets.GraphicCptTable(vertices, edges, states, cpt_v, view=Gtk.TreeView())
         # table = gwidgets.create_treeview_for_cpt(vertices, edges, states, cpt_v)
 
 

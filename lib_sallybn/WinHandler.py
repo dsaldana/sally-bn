@@ -6,6 +6,7 @@ from enum import Enum
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
+import lib_sallybn.gwidgets
 
 
 # Mode for
@@ -20,6 +21,7 @@ class ModeEdit(Enum):
     vertex = 1
     edge = 2
     delete = 3
+
 
 default_states = ["true", "false"]
 
@@ -118,7 +120,6 @@ class WinHandler:
             menu_it = Gtk.MenuItem()
             menu_it.set_label("Edit")
 
-
             menu = Gtk.Menu()
             menuitem = Gtk.MenuItem(label="RadioMenuItem")
             menuitem.set_submenu(menu)
@@ -159,7 +160,16 @@ class WinHandler:
 
     def show_cpt_dialog(self, selected_vetex):
         cpt_dialog = self.builder.get_object("dialog_cpt")
+        treeview_cpt = self.builder.get_object("treeview_cpt")
+        text_var_name = self.builder.get_object("text_var_name")
+        text_var_name.set_text(selected_vetex)
         # TODO load info for CPT
+        gtable = lib_sallybn.gwidgets.GraphicCptTable(self.vertices,
+                                                      self.edges,
+                                                      self.states,
+                                                      self.selected_vetex,
+                                                      view=treeview_cpt)
+
         cpt_dialog.run()
 
     def motion_event(self, widget, event):
