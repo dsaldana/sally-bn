@@ -13,6 +13,8 @@ import lib_sallybn.gwidgets
 
 
 
+
+
 # Mode for
 class Mode(Enum):
     edit = 0
@@ -127,7 +129,7 @@ class WinHandler:
             menu_it = Gtk.MenuItem("Edit Variable")
 
             def event_edit(widget, event):
-                menu.set_visible(False)
+                menu.destroy()
                 self.show_cpt_dialog(self.selected_vetex)
 
 
@@ -140,15 +142,15 @@ class WinHandler:
             return True
 
         ## doble click, open the dialog
-        elif event.type == Gdk.EventType._2BUTTON_PRESS:
+        elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
             self.clicked_point = None
             print "doble click"
             self.selected_vetex = None
             self.show_cpt_dialog(self.selected_vetex)
             return
 
-        ## Click
-        elif self.mode == Mode.edit:
+        ## Click on edit area
+        elif event.button == 1 and self.mode == Mode.edit:
             self.clicked_point = p
 
     def create_widget(self, *names):
@@ -158,12 +160,17 @@ class WinHandler:
 
         return [builder.get_object(wname) for wname in names]
 
-
     def show_cpt_dialog(self, selected_vetex):
-
-        cpt_dialog, treeview_cpt, text_var_name = \
+        # Get widgets from dialog.
+        cpt_dialog, treeview_cpt, text_var_name, button_cancel,\
+            button_ok, button_rand = \
             self.create_widget("dialog_cpt",
-                               "treeview_cpt", "text_var_name")
+                               "treeview_cpt",
+                               "text_var_name",
+                               "button_cancel",
+                               "button_ok",
+                               "button_rand")
+
         cpt_dialog.set_modal(True)
         text_var_name.set_text(selected_vetex)
         # load info for CPT
@@ -172,6 +179,24 @@ class WinHandler:
                                                       self.states,
                                                       self.selected_vetex,
                                                       view=treeview_cpt)
+        # Quit
+        cpt_dialog.connect("delete-event", Gtk.main_quit)
+        # Cancel
+        def cancel_ev(widget):
+            cpt_dialog.destroy()
+
+        button_cancel.connect("clicked", cancel_ev)
+
+        # Fill rand
+        def fill_rand(widget):
+            print gtable.fill_random()
+        button_rand.connect("clicked", fill_rand)
+        # OK
+        def ok_ev(widget):
+            print "ok"
+        button_ok.connect("clicked", ok_ev)
+
+        # Get new Node name
 
         cpt_dialog.run()
 

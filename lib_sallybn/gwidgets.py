@@ -9,7 +9,7 @@
 
 from gi.repository import Gtk
 from gi.repository import Pango
-
+import random
 
 import util
 
@@ -29,10 +29,10 @@ class GraphicCptTable:
         self.vertices = vertices
         self.edges = edges
 
+
         ### DATA MODEL
         self.model = None
         self.editable_cells = {}
-
 
         self.widget = self._create_treeview_for_cpt(view)
 
@@ -47,30 +47,27 @@ class GraphicCptTable:
         """
         ### Detect parents
         parents = util.get_parents(self.query_v, self.edges)
-    
-        # numeric columns
+
+        # number of columns
         n_state_cols = len(self.states[self.query_v])
         # Columns for titles
         n_parent_cols = len(parents)
-    
+
         # TODO Validate parents not zero states
-        # number of rows
-        n_rows = 1
-        for p in parents:
-            n_rows *= len(self.states[p])
-    
+
         # data taypes for parents
         parent_types = [str for i in parents]
         # the data in the model (three strings for each row, one for each column)
         cpt_types = [str for i in self.states[self.query_v]]
         # all parent + cpt types
         all_types = parent_types + cpt_types
-    
+
         print all_types
-    
+
         ### DATA MODEL
         self.model = Gtk.ListStore(*all_types)
-    
+        view.set_model(self.model)
+
         # FILL DATA
         parents_matrix = util.parent_states(parents, self.states)
         state_values = ["0.0"] * n_state_cols
@@ -78,40 +75,40 @@ class GraphicCptTable:
         for l in parents_matrix:
             self.model.append(l + state_values)
 
+        # Fill for no parents
         if len(parents) == 0:
             self.model.append(state_values)
-    
-        view.set_model(self.model)
-    
+
+
         # Table titles
         table_titles = parents + [s + "(%)" for s in self.states[self.query_v]]
-    
+
         # Format for each column
         for i in range(len(table_titles)):
             # cellrenderer to render the text
             cell = Gtk.CellRendererText()
-    
+
             # Title in bold
             if i < n_parent_cols:
                 cell.props.weight_set = True
                 cell.props.weight = Pango.Weight.BOLD
                 cell.props.background = "gray"
-    
+
             else:
                 cell.props.xalign = 1.0
                 cell.props.editable = True
                 self.editable_cells[cell] = i
 
-    
+
                 # Call signal
                 cell.connect("edited", self.text_edited)
-    
+
             # the column is created
             col = Gtk.TreeViewColumn(table_titles[i], cell, text=i)
-    
+
             # append to the tree view
             view.append_column(col)
-    
+
         return view
 
     ## Event for Edited cells
@@ -128,3 +125,27 @@ class GraphicCptTable:
         # text = str(val) + "%"
         col_number = self.editable_cells[widget]
         self.model[path][col_number] = text
+
+    def fill_random(self):
+        ### Detect parents
+        parents = util.get_parents(self.query_v, self.edges)
+        # number of  columns
+        n_state_cols = len(self.states[self.query_v])
+
+        # FILL DATA
+        parents_matrix = util.parent_states(parents, self.states)
+
+        for i in range(len(parents_matrix)):
+            state_values = [random.random() for j in range(n_state_cols)]
+            total_sum = sum(state_values)
+            state_values = [str(v / total_sum) for v in state_values]
+            self.model[i] = parents_matrix[i] + state_values
+
+        # Fill for no parents
+        if len(parents) == 0:
+            state_values = [random.random() for i in range(n_state_cols)]
+            total_sum = sum(state_values)
+            state_values = [str(v / total_sum) for v in state_values]
+            self.model[0] = state_values
+
+        pass
