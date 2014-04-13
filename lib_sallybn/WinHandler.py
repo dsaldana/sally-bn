@@ -1,10 +1,14 @@
 from gi.repository import Gtk, Gdk
+import math
 
 from enum import Enum
 
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
+
+
+
 
 
 
@@ -54,12 +58,16 @@ class WinHandler:
         self.area.connect('draw', self.on_drawing_area_draw)
 
         self.area.connect("motion_notify_event", self.motion_event)
-        self.area.connect('button-press-event', self.on_drawing_area_button_press)
+        self.area.connect('button-press-event', self.on_button_press)
         self.area.connect('scroll-event', self.on_scroll)
+        self.area.connect('button-release-event', self.on_button_release)
+
         self.clicks = []
         self.transform = None
         self.trans_point = None
 
+        self.clicked_point = None
+        self.dragged = None
 
     def on_scroll(self, widget, event):
         #print event.direction, event.delta_x, event.delta_y
@@ -69,54 +77,36 @@ class WinHandler:
         self.area.queue_draw()
         return True
 
-
-    def on_drawing_area_button_press(self, widget, event):
+    def on_button_release(self, widget, event):
         p = [event.x, event.y]
-        if self.transform is not None:
-            p = self.transform.transform_point(event.x, event.y)
 
-        #### Mode Edit #####
-        if self.mode == Mode.edit:
+        dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
+        click_distance = math.hypot(dx, dy)
+        # normal click
+        if click_distance < 10.0:
+            self.dragged = None
+            self.edition_action(p)
 
-            # search if a node exist in that point
-            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+        self.clicked_point = None
 
-            ## Mode
-            if self.mode_edit == ModeEdit.vertex:
-                if self.selected_vetex is None:
-                    vname = 'Variable ' + str(self.vertex_count)
-                    self.vertices[vname] = p
-                    self.vertex_count += 1
+    def on_button_press(self, widget, event):
+        p = [event.x, event.y]
+        self.clicked_point = p
+        self.dragged = None
 
-            elif self.mode_edit == ModeEdit.edge:
+    def motion_event(self, widget, event):
+        if self.mode == Mode.edit and \
+                        self.mode_edit == ModeEdit.edge and \
+                        self.selected_vetex is not None:
+            self.tmp_arrow = [event.x, event.y]
+            self.area.queue_draw()
 
-                # If there is not a initial vertex selected
-                if self.vertex_1 is None and self.selected_vetex is not None:
-                    self.vertex_1 = self.selected_vetex
-                elif self.vertex_1 is not None and self.selected_vetex is None:
-                    #Select anything
-                    print "anything selected"
-                    self.vertex_1 = None
-                elif self.vertex_1 is not None and self.selected_vetex is not None:
-                    if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
-                        self.edges.append([self.vertex_1, self.selected_vetex])
-                        self.vertex_1 = None
-                        self.selected_vetex = None
-                self.tmp_arrow = None
-            elif self.mode_edit == ModeEdit.delete:
-                # Delete vertex
-                self.vertices.pop(self.selected_vetex)
-                # delete edges
-                for [v1, v2] in self.edges:
-                    if v1 == self.selected_vetex or v2 == self.selected_vetex:
-                        self.edges.remove([v1, v2])
+        elif self.clicked_point is not None:
+            p = [event.x, event.y]
+            dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
+            self.dragged = [-dx, -dy]
+            self.area.queue_draw()
 
-        ##### Mode run
-        elif self.mode == Mode.run:
-            pass
-
-        self.area.queue_draw()
-        return True
 
     def on_drawing_area_draw(self, drawing_area, cairo):
         cairo.scale(self.scale, self.scale)
@@ -125,9 +115,17 @@ class WinHandler:
         # if self.trans_point is not None:
         #     tx, ty = self.transform.transform_point(self.trans_point[0], self.trans_point[1])
         #     cairo.translate(tx, ty)
+        if self.dragged is not None:
+            print "plog"
+            cairo.translate(self.dragged[0], self.dragged[1])
+            self.dragged = None
 
+
+        print cairo.get_matrix()
         self.transform = cairo.get_matrix()
         self.transform.invert()
+
+        print self.transform
 
         self.drawer.draw_background(cairo)
 
@@ -183,16 +181,54 @@ class WinHandler:
         else:
             print "not supported"
 
-    def motion_event(self, widget, event):
-        if self.mode == Mode.edit and \
-                        self.mode_edit == ModeEdit.edge and \
-                        self.selected_vetex is not None:
-            self.tmp_arrow = [event.x, event.y]
-            self.area.queue_draw()
-            # print "momving mouse", b.x
-
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)
 
     def onButtonPressed(self, button):
         print("Hello World!")
+
+    def edition_action(self, p):
+        if self.transform is not None:
+            p = self.transform.transform_point(p[0], p[1])
+
+        #### Mode Edit #####
+        if self.mode == Mode.edit:
+
+            # search if a node exist in that point
+            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+
+            ## Mode
+            if self.mode_edit == ModeEdit.vertex:
+                if self.selected_vetex is None:
+                    vname = 'Variable ' + str(self.vertex_count)
+                    self.vertices[vname] = p
+                    self.vertex_count += 1
+
+            elif self.mode_edit == ModeEdit.edge:
+
+                # If there is not a initial vertex selected
+                if self.vertex_1 is None and self.selected_vetex is not None:
+                    self.vertex_1 = self.selected_vetex
+                elif self.vertex_1 is not None and self.selected_vetex is None:
+                    #Select anything
+                    print "anything selected"
+                    self.vertex_1 = None
+                elif self.vertex_1 is not None and self.selected_vetex is not None:
+                    if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
+                        self.edges.append([self.vertex_1, self.selected_vetex])
+                        self.vertex_1 = None
+                        self.selected_vetex = None
+                self.tmp_arrow = None
+            elif self.mode_edit == ModeEdit.delete:
+                # Delete vertex
+                self.vertices.pop(self.selected_vetex)
+                # delete edges
+                for [v1, v2] in self.edges:
+                    if v1 == self.selected_vetex or v2 == self.selected_vetex:
+                        self.edges.remove([v1, v2])
+
+        ##### Mode run
+        elif self.mode == Mode.run:
+            pass
+
+        self.area.queue_draw()
