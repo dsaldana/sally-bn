@@ -181,19 +181,23 @@ class WinHandler:
                                                       view=treeview_cpt)
         # Quit
         cpt_dialog.connect("delete-event", Gtk.main_quit)
+
         # Cancel
         def cancel_ev(widget):
             cpt_dialog.destroy()
-
         button_cancel.connect("clicked", cancel_ev)
 
         # Fill rand
         def fill_rand(widget):
-            print gtable.fill_random()
+            gtable.fill_random()
         button_rand.connect("clicked", fill_rand)
+
         # OK
         def ok_ev(widget):
-            print "ok"
+            # validate CPT
+
+            # Save
+            cpt_dialog.destroy()
         button_ok.connect("clicked", ok_ev)
 
         # Get new Node name
