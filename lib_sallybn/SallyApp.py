@@ -32,9 +32,9 @@ class SallyApp(Gtk.Application):
                         builder.get_object("bdelete"),
                         builder.get_object("bedge")]
 
-        cpt_dialog = builder.get_object("dialog_cpt")
 
-        builder.connect_signals(WinHandler.WinHandler(area, edit_buttons, cpt_dialog))
+
+        builder.connect_signals(WinHandler.WinHandler(area, edit_buttons))
 
         window.show_all()
 

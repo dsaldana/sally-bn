@@ -8,10 +8,6 @@ from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
 
 
-
-
-
-
 # Mode for
 class Mode(Enum):
     edit = 0
@@ -25,9 +21,11 @@ class ModeEdit(Enum):
     edge = 2
     delete = 3
 
+default_states = ["true", "false"]
+
 
 class WinHandler:
-    def __init__(self, area, edit_buttons, cpt_dialog):
+    def __init__(self, area, edit_buttons):
 
         #FIXME statex from other place
         self.states = ["true", "false"]
@@ -35,7 +33,6 @@ class WinHandler:
         self.drawer = GraphDrawer(area)
         self.area = area
         self.edit_buttons = edit_buttons
-        self.cpt_dialog = cpt_dialog
 
         # Scale
         self.scale = 1
@@ -54,7 +51,11 @@ class WinHandler:
         # Graph
         self.vertices = {}
         self.edges = []
+        self.states = {}
 
+        # GTK builder
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(lib_sallybn.SallyApp.glade_file)
 
         #FIXME change all events for only motion
         self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
@@ -125,7 +126,8 @@ class WinHandler:
 
             def event_edit(widget, event):
                 menu.set_visible(False)
-                self.cpt_dialog.run()
+                self.show_cpt_dialog(self.selected_vetex)
+
 
             menu_it.connect("button-release-event", event_edit)
             menu.append(menu_it)
@@ -148,13 +150,17 @@ class WinHandler:
         elif event.type == Gdk.EventType._2BUTTON_PRESS:
             print "doble click"
             self.selected_vetex = None
-            self.cpt_dialog.run()
+            self.show_cpt_dialog(self.selected_vetex)
             return
 
 
         elif self.mode == Mode.edit:
             self.clicked_point = p
 
+    def show_cpt_dialog(self, selected_vetex):
+        cpt_dialog = self.builder.get_object("dialog_cpt")
+        # TODO load info for CPT
+        cpt_dialog.run()
 
     def motion_event(self, widget, event):
         p = [event.x, event.y]
@@ -273,9 +279,12 @@ class WinHandler:
 
             ## Mode
             if self.mode_edit == ModeEdit.vertex:
+                # Create new Vertex
                 if self.selected_vetex is None:
                     vname = 'Variable ' + str(self.vertex_count)
+                    # new vertex
                     self.vertices[vname] = p
+                    self.states[vname] = list(default_states)
                     self.vertex_count += 1
 
             elif self.mode_edit == ModeEdit.edge:
