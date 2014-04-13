@@ -34,7 +34,7 @@ class SallyApp(Gtk.Application):
 
 
 
-        builder.connect_signals(WinHandler.WinHandler(area, edit_buttons))
+        builder.connect_signals(WinHandler.WinHandler(window, area, edit_buttons))
 
         window.show_all()
 
