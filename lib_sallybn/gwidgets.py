@@ -15,7 +15,7 @@ import util
 
 
 class GraphicCptTable:
-    def __init__(self, vertices, edges, states, query_v, view=Gtk.TreeView()):
+    def __init__(self, vertices, edges, states, cpts, query_v, view=Gtk.TreeView()):
         """
         Create a tree view for the CPT of the node query_v
         :param vertices:
@@ -24,6 +24,8 @@ class GraphicCptTable:
         :param query_v:
         :return:
         """
+        self.cpts = cpts
+        self.cpt = None
         self.query_v = query_v
         self.states = states
         self.vertices = vertices
@@ -56,6 +58,11 @@ class GraphicCptTable:
 
         # TODO Validate parents not zero states
 
+        # number of rows
+        n_rows = 1
+        for p in self.parents:
+            n_rows *= len(self.states[p])
+
         # data taypes for parents
         parent_types = [str for i in self.parents]
         # the data in the model (three strings for each row, one for each column)
@@ -69,17 +76,37 @@ class GraphicCptTable:
         self.model = Gtk.ListStore(*all_types)
         view.set_model(self.model)
 
-        # FILL DATA
+
+        # FILL CLEAN CPT
         parents_matrix = util.parent_states(self.parents, self.states)
-        state_values = ["0.0"] * n_state_cols
 
-        for l in parents_matrix:
-            self.model.append(l + state_values)
+        # Use the loaded CPT
+        if self.query_v in self.cpts:
+            print "rows", self.cpts and len(self.cpts[self.query_v]) == n_rows
+            print "cols", len(self.cpts[self.query_v][0])
+            print "cos2",  n_state_cols
+        # if the table already exists, if nxm is right
+        if self.query_v in self.cpts and len(self.cpts[self.query_v]) == n_rows and \
+            len(self.cpts[self.query_v][0]) == n_state_cols:
+            self.cpt = self.cpts[self.query_v]
+        ## Create a new CPT
+        else:
+            print "new cpt"
+            self.cpt = [["0.0"] * n_state_cols for i in range(n_rows)]
 
-        # Fill for no parents
-        if len(self.parents) == 0:
-            self.model.append(state_values)
+        # PUT CPT
+        for l in range(n_rows):
+            line = self.cpt[l]
+            line = [str(v) for v in line]
+            # Fill for no parents
+            if len(self.parents) == 0:
+                self.model.append(line)
+            # With parents
+            else:
+                self.model.append(parents_matrix[l] + line)
 
+
+        ### end fill data
 
         # Table titles
         table_titles = self.parents + [s + "(%)" for s in self.states[self.query_v]]
@@ -157,3 +184,10 @@ class GraphicCptTable:
                 return False
         return True
 
+    def get_cpt(self):
+        cpt =[]
+        for line in self.model:
+            svals = line[len(self.parents):]
+            fvals = [float(s) for s in svals]
+            cpt.append(fvals)
+        return cpt

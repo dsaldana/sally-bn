@@ -54,7 +54,7 @@ class WinHandler:
         self.vertices = {}
         self.edges = []
         self.states = {}
-        self.cprob = {}
+        self.cpts = {}
 
         self.builder = None
 
@@ -150,6 +150,7 @@ class WinHandler:
         gtable = lib_sallybn.gwidgets.GraphicCptTable(self.vertices,
                                                       self.edges,
                                                       self.states,
+                                                      self.cpts,
                                                       self.selected_vetex,
                                                       view=treeview_cpt)
         # Quit
@@ -180,13 +181,15 @@ class WinHandler:
                 dialog.destroy()
 
                 return
-            # Save name
+
+            # Save cpt in current name
+            cpt = gtable.get_cpt()
+            self.cpts[self.selected_vetex] = cpt
+
+            # New vertex name
             new_vertex_name = text_var_name.get_text()
+            # Change vertex name
             self.change_vertex_name(new_vertex_name, self.selected_vetex)
-
-            # TODO Save cpt
-
-
 
             cpt_dialog.destroy()
 
@@ -358,8 +361,8 @@ class WinHandler:
         self.vertices[new_vertex_name] = self.vertices.pop(current_name)
 
         # CPT
-        if current_name in self.cprob:
-            self.cprob[new_vertex_name] = self.cprob.pop(current_name)
+        if current_name in self.cpts:
+            self.cpts[new_vertex_name] = self.cpts.pop(current_name)
 
         # Edges
         for i in range(len(self.edges)):
@@ -378,7 +381,7 @@ class WinHandler:
     def show_edit_popup(self, event):
         #Draw selected node
         self.area.queue_draw()
-        print "right click"
+
         menu = Gtk.Menu()
         menu_it = Gtk.MenuItem()
         menu_it.set_label("Edit")
