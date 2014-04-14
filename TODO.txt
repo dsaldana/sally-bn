@@ -1,0 +1,15 @@
+
+--- Priority TODO ---
+Edit States
+Solve the BN
+Save
+Open
+New
+
+--- Next release ---
+Edit Color for node
+
+----FIX----
+* CPT dialog size
+* Zoom and translate
+*
