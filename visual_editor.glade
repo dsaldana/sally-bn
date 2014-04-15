@@ -199,9 +199,11 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
+                <property name="visible_horizontal">False</property>
                 <property name="label" translatable="yes">bnew</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-new</property>
+                <signal name="clicked" handler="on_new" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -217,6 +219,7 @@
                 <property name="label" translatable="yes">bopen</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-open</property>
+                <signal name="clicked" handler="on_open" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -224,7 +227,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbutton3">
+              <object class="GtkToolButton" id="bsave">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -232,6 +235,7 @@
                 <property name="label" translatable="yes">bsave</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-save</property>
+                <signal name="clicked" handler="on_save" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

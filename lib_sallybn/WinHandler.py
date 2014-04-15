@@ -1,5 +1,6 @@
 from gi.repository import Gtk, Gdk
 import math
+import json
 
 from enum import Enum
 
@@ -8,6 +9,8 @@ from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
 import lib_sallybn.gwidgets
 from lib_sallybn.gwidgets import GraphicCptTable, StatesTable
+
+
 
 
 
@@ -26,6 +29,7 @@ class ModeEdit(Enum):
 
 
 default_states = ["true", "false"]
+FILE_EXTENSION = ".sly"
 
 
 class WinHandler:
@@ -85,6 +89,59 @@ class WinHandler:
 
         self.area.queue_draw()
         return True
+
+    def on_save(self, widget):
+        dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
+                                       Gtk.FileChooserAction.SAVE,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+
+        filter_py = Gtk.FileFilter()
+        filter_py.set_name("Sally files")
+        filter_py.add_pattern("*" + FILE_EXTENSION)
+        dialog.add_filter(filter_py)
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            bn = {
+                "V": self.vertices,
+                "E": self.edges,
+                "S": self.states,
+                "CPT": self.cpts
+            }
+            file_name = dialog.get_filename()
+            if not file_name.endswith(FILE_EXTENSION):
+                file_name += FILE_EXTENSION
+            with open(file_name, 'w') as outfile:
+                json.dump(bn, outfile)
+
+        dialog.destroy()
+
+
+    def on_open(self, widget):
+        dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
+                                       Gtk.FileChooserAction.OPEN,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+        # Filter
+        filter_py = Gtk.FileFilter()
+        filter_py.set_name("Sally files")
+        filter_py.add_pattern("*"+ FILE_EXTENSION)
+        dialog.add_filter(filter_py)
+
+        #RUN
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            print("File selected: " + dialog.get_filename())
+            ## TODO leer json
+
+        dialog.destroy()
+
+    def on_new(self, widget):
+        print "new"
 
     def on_button_release(self, widget, event):
         # Right click
@@ -157,11 +214,11 @@ class WinHandler:
         text_var_name.set_text(selected_vetex)
         # load info for CPT
         gcpt_table = GraphicCptTable(self.vertices,
-                                 self.edges,
-                                 self.states,
-                                 self.cpts,
-                                 self.selected_vetex,
-                                 treeview_cpt)
+                                     self.edges,
+                                     self.states,
+                                     self.cpts,
+                                     self.selected_vetex,
+                                     treeview_cpt)
 
         def state_changed_func():
             gcpt_table.modify_treeview_for_cpt()
@@ -210,7 +267,6 @@ class WinHandler:
             cpt_dialog.destroy()
 
         button_ok.connect("clicked", ok_ev)
-
 
         cpt_dialog.run()
         # cpt_dialog.destroy()

@@ -1,7 +1,6 @@
 
 --- Priority TODO ---
-* Save
-* Open
+* adapt Save and Open to the libpgm structure for json objects.
 * Solve the BN
 
 ----TO FIX----
@@ -16,6 +15,7 @@
 --- FIXED -----
 * Edit States
 * CPT dialog size
-
+* Save
+* Open
 
 
