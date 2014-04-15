@@ -14,6 +14,75 @@ import random
 import util
 
 
+NEW_STATE_NAME = "-Click here for new state-"
+
+
+class StatesTable:
+    def __init__(self, states, state_changed_func, view, badd_state, bremove_state):
+        self.states = states
+        self.view = view
+        self.state_changed_func = state_changed_func
+        self.model = None
+        self._modify_treeview_for_states()
+
+        badd_state.connect("clicked", self._add_state)
+        bremove_state.connect("clicked", self._remove_state)
+
+    def _add_state(self, widget):
+        self.model.append(["New state"])
+
+    def _remove_state(self, widget):
+        if len(self.model) != 0:
+            (model, selected_rows) = self.view.get_selection().get_selected()
+            if selected_rows is not None:
+                print "%s has been removed" %(self.model[selected_rows][0])
+                self.model.remove(selected_rows)
+
+    def _modify_treeview_for_states(self):
+        ### MODEL
+        self.model = Gtk.ListStore(str)
+        self.view.set_model(self.model)
+
+        # fill states
+        for state in self.states:
+            self.model.append([state])
+        # New state
+        # self.model.append([NEW_STATE_NAME, Gtk.STOCK_ADD])
+
+        ### VIEW
+        cell = Gtk.CellRendererText()
+        cell.props.editable = True
+        # Call signal
+        cell.connect("edited", self.text_edited)
+
+        # the column is created
+        col = Gtk.TreeViewColumn("States", cell, text=0)
+
+        # append to the tree view
+        self.view.append_column(col)
+
+        ## Icon
+        # renderer_pixbuf = Gtk.CellRendererPixbuf()
+        # column_pixbuf = Gtk.TreeViewColumn("", renderer_pixbuf, stock_id=1)
+        # self.view.append_column(column_pixbuf)
+        # Call signal
+        # renderer_pixbuf.connect("clicked", self.text_edited)
+
+    def text_edited(self, widget, path, text):
+        #1 remove the % symbol and spaces
+        # text = text.replace("%","")
+        # text = text.replace(" ","")
+        print text
+        # #2 validate the number between 0 and 100
+        # val = float(text)
+        # if val < 0 or val > 100:
+        #     return
+        # #3 add the text
+        # # text = str(val) + "%"
+        # col_number = self.editable_cells[widget]
+        self.model[path][0] = text
+
+
 class GraphicCptTable:
     def __init__(self, vertices, edges, states, cpts, query_v, view=Gtk.TreeView()):
         """
@@ -37,12 +106,10 @@ class GraphicCptTable:
         self.editable_cells = {}
         self.parents
 
-        self.widget = self._create_treeview_for_cpt(view)
+        self.widget = self._modify_treeview_for_cpt(view)
 
-    def get_widget(self):
-        return self.widget
 
-    def _create_treeview_for_cpt(self, view):
+    def _modify_treeview_for_cpt(self, view):
         """
         Create a tree view for the CPT of the node query_v
 
@@ -63,7 +130,7 @@ class GraphicCptTable:
         for p in self.parents:
             n_rows *= len(self.states[p])
 
-        # data taypes for parents
+        # data types for parents
         parent_types = [str for i in self.parents]
         # the data in the model (three strings for each row, one for each column)
         cpt_types = [str for i in self.states[self.query_v]]
@@ -84,10 +151,10 @@ class GraphicCptTable:
         if self.query_v in self.cpts:
             print "rows", self.cpts and len(self.cpts[self.query_v]) == n_rows
             print "cols", len(self.cpts[self.query_v][0])
-            print "cos2",  n_state_cols
+            print "cos2", n_state_cols
         # if the table already exists, if nxm is right
         if self.query_v in self.cpts and len(self.cpts[self.query_v]) == n_rows and \
-            len(self.cpts[self.query_v][0]) == n_state_cols:
+                        len(self.cpts[self.query_v][0]) == n_state_cols:
             self.cpt = self.cpts[self.query_v]
         ## Create a new CPT
         else:
@@ -104,8 +171,6 @@ class GraphicCptTable:
             # With parents
             else:
                 self.model.append(parents_matrix[l] + line)
-
-
         ### end fill data
 
         # Table titles
@@ -126,7 +191,6 @@ class GraphicCptTable:
                 cell.props.xalign = 1.0
                 cell.props.editable = True
                 self.editable_cells[cell] = i
-
 
                 # Call signal
                 cell.connect("edited", self.text_edited)
@@ -185,9 +249,20 @@ class GraphicCptTable:
         return True
 
     def get_cpt(self):
-        cpt =[]
+        cpt = []
         for line in self.model:
             svals = line[len(self.parents):]
             fvals = [float(s) for s in svals]
             cpt.append(fvals)
         return cpt
+
+
+# class CellRendererClickablePixbuf(Gtk.CellRendererPixbuf):
+#     g_signal('clicked', str)
+#
+#     def __init__(self):
+#         Gtk.CellRendererPixbuf.__init__(self)
+#         self.set_property('mode', gtk.CELL_RENDERER_MODE_ACTIVATABLE)
+#
+#     def do_activate(self, event, widget, path, background_area, cell_area, flags):
+#         self.emit('clicked', path)

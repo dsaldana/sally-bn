@@ -6,10 +6,13 @@ Save
 Open
 New
 
---- Next release ---
-Edit Color for node
-
-----FIX----
+----TO FIX----
 * CPT dialog size
 * Zoom and translate
-*
+
+--- Next release ---
+* Edit Color for node
+* Complete empty spaces in CPT
+
+
+

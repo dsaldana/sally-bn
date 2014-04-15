@@ -7,6 +7,9 @@ import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
 import lib_sallybn.gwidgets
+from lib_sallybn.gwidgets import GraphicCptTable, StatesTable
+
+
 
 # Mode for
 class Mode(Enum):
@@ -126,33 +129,43 @@ class WinHandler:
         elif event.button == 1 and self.mode == Mode.edit:
             self.clicked_point = p
 
-    def create_widget(self, *names):
+    @staticmethod
+    def create_widget(*widget_names):
         # GTK builder
         builder = Gtk.Builder()
         builder.add_from_file(lib_sallybn.SallyApp.glade_file)
 
-        return [builder.get_object(wname) for wname in names]
+        return [builder.get_object(wname) for wname in widget_names]
 
     def show_cpt_dialog(self, selected_vetex):
         # Get widgets from dialog.
         cpt_dialog, treeview_cpt, text_var_name, button_cancel, \
-        button_ok, button_rand = \
+        button_ok, button_rand, treeview_states, badd_state, bremove_state = \
             self.create_widget("dialog_cpt",
                                "treeview_cpt",
                                "text_var_name",
                                "button_cancel",
                                "button_ok",
-                               "button_rand")
+                               "button_rand",
+                               "treeview_states",
+                               "badd_state",
+                               "bremove_state")
 
         cpt_dialog.set_modal(True)
+        cpt_dialog.set_parent(self.window)
+        # cpt_dialog.set_default_size(250, 100)
         text_var_name.set_text(selected_vetex)
         # load info for CPT
-        gtable = lib_sallybn.gwidgets.GraphicCptTable(self.vertices,
-                                                      self.edges,
-                                                      self.states,
-                                                      self.cpts,
-                                                      self.selected_vetex,
-                                                      view=treeview_cpt)
+        gcpt_table = GraphicCptTable(self.vertices,
+                                 self.edges,
+                                 self.states,
+                                 self.cpts,
+                                 self.selected_vetex,
+                                 view=treeview_cpt)
+
+        gstates_table = StatesTable(self.states[selected_vetex],
+                                    None, treeview_states,
+                                    badd_state, bremove_state)
         # Quit
         cpt_dialog.connect("delete-event", Gtk.main_quit)
 
@@ -173,7 +186,7 @@ class WinHandler:
             # validate CPT
             if not gtable.validate_cpt():
                 dialog = Gtk.MessageDialog(cpt_dialog, 0, Gtk.MessageType.WARNING,
-                     Gtk.ButtonsType.OK, "Invalid CPT")
+                                           Gtk.ButtonsType.OK, "Invalid CPT")
                 dialog.format_secondary_text(
                     "Every row must sum 100 %")
                 dialog.set_modal(True)
@@ -195,9 +208,9 @@ class WinHandler:
 
         button_ok.connect("clicked", ok_ev)
 
-        # Get new Node name
 
         cpt_dialog.run()
+        cpt_dialog.destroy()
 
     def motion_event(self, widget, event):
         p = [event.x, event.y]
