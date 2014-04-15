@@ -1,18 +1,21 @@
 
 --- Priority TODO ---
-Edit States
-Solve the BN
-Save
-Open
-New
+* Save
+* Open
+* Solve the BN
 
 ----TO FIX----
-* CPT dialog size
 * Zoom and translate
 
 --- Next release ---
+* New BN, multiple BNs with tabs
 * Edit Color for node
 * Complete empty spaces in CPT
+* Cancel in CPT dialog should not modify anything.
+
+--- FIXED -----
+* Edit States
+* CPT dialog size
 
 
 

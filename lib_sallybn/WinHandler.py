@@ -161,10 +161,13 @@ class WinHandler:
                                  self.states,
                                  self.cpts,
                                  self.selected_vetex,
-                                 view=treeview_cpt)
+                                 treeview_cpt)
+
+        def state_changed_func():
+            gcpt_table.modify_treeview_for_cpt()
 
         gstates_table = StatesTable(self.states[selected_vetex],
-                                    None, treeview_states,
+                                    state_changed_func, treeview_states,
                                     badd_state, bremove_state)
         # Quit
         cpt_dialog.connect("delete-event", Gtk.main_quit)
@@ -177,14 +180,14 @@ class WinHandler:
 
         # Fill rand
         def fill_rand(widget):
-            gtable.fill_random()
+            gcpt_table.fill_random()
 
         button_rand.connect("clicked", fill_rand)
 
         # OK
         def ok_ev(widget):
             # validate CPT
-            if not gtable.validate_cpt():
+            if not gcpt_table.validate_cpt():
                 dialog = Gtk.MessageDialog(cpt_dialog, 0, Gtk.MessageType.WARNING,
                                            Gtk.ButtonsType.OK, "Invalid CPT")
                 dialog.format_secondary_text(
@@ -196,7 +199,7 @@ class WinHandler:
                 return
 
             # Save cpt in current name
-            cpt = gtable.get_cpt()
+            cpt = gcpt_table.get_cpt()
             self.cpts[self.selected_vetex] = cpt
 
             # New vertex name
@@ -210,7 +213,7 @@ class WinHandler:
 
 
         cpt_dialog.run()
-        cpt_dialog.destroy()
+        # cpt_dialog.destroy()
 
     def motion_event(self, widget, event):
         p = [event.x, event.y]
