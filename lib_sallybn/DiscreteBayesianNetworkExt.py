@@ -5,13 +5,14 @@ DEFAULT_STATES = ["true", "false"]
 
 
 class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
-    def __init__(self):
-
-        # Create a clean graph
-        self.E = []
-        self.V = []
-        self.Vdata = {}
-        # super(DiscreteBayesianNetworkExt, self).__init__(skel, nd)
+    def __init__(self, skel=None, nd=None):
+        if skel is None and nd is None:
+            # Create a clean graph
+            self.E = []
+            self.V = []
+            self.Vdata = {}
+        else:
+            super(DiscreteBayesianNetworkExt, self).__init__(skel, nd)
 
 
     def get_edges(self):
@@ -198,7 +199,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         self.Vdata[child]["parents"].append(parent)
 
         # add child
-        self.Vdata[parent]["parents"].append(child)
+        self.Vdata[parent]["children"].append(child)
 
         #  Modify CPT in v
         parents_matrix = self.get_parent_states(child)
@@ -253,6 +254,12 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
             new_cprob[s] = [0.0] * n_outcomes
 
         self.Vdata[child]["cprob"] = new_cprob
+
+    def get_vertices(self):
+        return self.V
+
+    def get_vdata(self):
+        return self.Vdata
 
 
 

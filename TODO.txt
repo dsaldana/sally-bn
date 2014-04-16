@@ -1,6 +1,5 @@
 
 --- Priority TODO ---
-* Save and Open json.
 * Solve the BN
 
 
@@ -17,6 +16,7 @@
 
 
 --- FIXED -----
+* Save and Open json.
 - CPT is not modal
 - add state for children
 - adding new state

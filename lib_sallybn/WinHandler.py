@@ -1,14 +1,19 @@
 from gi.repository import Gtk, Gdk
+import json
 import math
 
 from enum import Enum
 
+from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
+from libpgm.graphskeleton import GraphSkeleton
+from libpgm.nodedata import NodeData
 from lib_sallybn.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 from lib_sallybn.WinDiscBN import WinDiscBN
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
 import lib_sallybn.gwidgets
+
 
 
 
@@ -106,22 +111,12 @@ class WinHandler:
         filter_py.add_pattern("*" + FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
-        # response = dialog.run()
-        #
-        # if response == Gtk.ResponseType.OK:
-        #     bn = {
-        #         "V": self.vertex_locations,
-        #         "E": self.edges,
-        #         "S": self.states,
-        #         "CPT": self.cpts
-        #     }
-        #     file_name = dialog.get_filename()
-        #     if not file_name.endswith(FILE_EXTENSION):
-        #         file_name += FILE_EXTENSION
-        #     with open(file_name, 'w') as outfile:
-        #         json.dump(bn, outfile)
-        #
-        # dialog.destroy()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            self.save_bn_to_file(self.disc_bn, self.vertex_locations, dialog.get_filename())
+
+        dialog.destroy()
 
 
     def on_open(self, widget):
@@ -141,8 +136,9 @@ class WinHandler:
 
         if response == Gtk.ResponseType.OK:
             print("File selected: " + dialog.get_filename())
-            ## TODO leer json
-
+            self.disc_bn, self.vertex_locations = self.load_bn_from_file(dialog.get_filename())
+            self.win_discbn.disc_bn = self.disc_bn
+            # TODO create an alg to show the nodes if vertex locations does not exist
         dialog.destroy()
 
     def on_new(self, widget):
@@ -381,7 +377,7 @@ class WinHandler:
             menu.destroy()
             self.win_discbn.show_cpt_dialog(self.window, self.selected_vetex)
 
-            new_var_name =self.win_discbn.get_var_name()
+            new_var_name = self.win_discbn.get_var_name()
 
             if not new_var_name == self.selected_vetex:
                 self.change_vertex_name_h(self.selected_vetex, new_var_name)
@@ -392,3 +388,43 @@ class WinHandler:
 
         menu.show_all()
         menu.popup(None, None, None, None, event.button, event.time)
+
+
+    @staticmethod
+    def save_bn_to_file(disc_bn, vertex_locations, file_name):
+        bn = {
+            "vertex_loc": vertex_locations,
+            "E": disc_bn.get_edges(),
+            "V": disc_bn.get_vertices(),
+            "Vdata": disc_bn.get_vdata()}
+
+        if not file_name.endswith(FILE_EXTENSION):
+            file_name += FILE_EXTENSION
+        with open(file_name, 'w') as outfile:
+            json.dump(bn, outfile)
+
+    def load_bn_from_file(self, file_name):
+        nd = NodeData()
+        skel = GraphSkeleton()
+        nd.load(file_name)  # any input file
+        skel.load(file_name)
+
+        # topologically order graphskeleton
+        skel.toporder()
+
+        # load bayesian network
+        disc_bn = DiscreteBayesianNetworkExt(skel, nd)
+        vertex_locations = None
+        ## load vertex locations (if exist)
+        with open(file_name) as json_file:
+            json_data = json.load(json_file)
+
+            if "vertex_loc" in json_data.keys():
+                vertex_locations = json_data["vertex_loc"]
+            # disc_bn.V = json_data["V"]
+            # disc_bn.E = json_data["E"]
+            # disc_bn.Vdata = json_data["Vdata"]
+            json_file.close()
+
+        return disc_bn, vertex_locations
+
