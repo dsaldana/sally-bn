@@ -3,7 +3,10 @@
 * Save and Open json.
 * Solve the BN
 
+
 ----TO FIX----
+* add state puts in zeros
+* not adding new state
 * Zoom and translate
 
 --- Next release ---

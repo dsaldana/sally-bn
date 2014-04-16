@@ -26,9 +26,12 @@ class WinDiscBN:
                                 "badd_state",
                                 "bremove_state")
 
-        cpt_dialog.set_modal(True)
+        # cpt_dialog.set_modal(True)
         cpt_dialog.set_parent(window)
         text_var_name.set_text(selected_vetex)
+
+        #TODO clone disc_bn and assign only if accept
+
         # load info for CPT
         gcpt_table = GraphicCptTable(self.disc_bn,
                                      selected_vetex,
@@ -37,7 +40,8 @@ class WinDiscBN:
         def state_changed_func():
             gcpt_table.modify_treeview_for_cpt()
 
-        gstates_table = StatesTable(self.disc_bn.get_states(selected_vetex),
+
+        gstates_table = StatesTable(self.disc_bn, selected_vetex,
                                     state_changed_func, treeview_states,
                                     badd_state, bremove_state)
         # Quit
@@ -57,25 +61,24 @@ class WinDiscBN:
 
         # OK
         def ok_ev(widget):
+            self.var_name = text_var_name.get_text()
+
             # validate CPT
             if not gcpt_table.validate_cpt():
                 dialog = Gtk.MessageDialog(cpt_dialog, 0, Gtk.MessageType.WARNING,
                                            Gtk.ButtonsType.OK, "Invalid CPT")
-                dialog.format_secondary_text(
-                    "Every row must sum 100 %")
+                dialog.format_secondary_text("Every row must sum 100 %")
                 dialog.set_modal(True)
                 dialog.run()
                 dialog.destroy()
 
                 return
+            else:
+                # Save cpt in current name
+                cprob = gcpt_table.get_cprob_from_table()
+                self.disc_bn.set_cprob(selected_vetex, cprob)
 
-            # Save cpt in current name
-            cprob = gcpt_table.get_cprob_from_table()
-            self.disc_bn.set_cprob(selected_vetex, cprob)
-
-            self.var_name = text_var_name.get_text()
-
-            cpt_dialog.destroy()
+                cpt_dialog.destroy()
 
         button_ok.connect("clicked", ok_ev)
 
@@ -83,4 +86,4 @@ class WinDiscBN:
         # cpt_dialog.destroy()
 
     def get_var_name(self):
-         return self.var_name
+        return self.var_name

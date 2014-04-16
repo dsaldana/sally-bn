@@ -239,7 +239,7 @@ class WinHandler:
 
         if self.mode == Mode.edit:
             # Draw selected nodes
-            print "selected vertex:", self.selected_vetex
+            # print "selected vertex:", self.selected_vetex
             if self.selected_vetex is not None:
                 self.drawer.draw_selected_vertices(cairo, self.selected_vetex, self.vertex_locations)
 

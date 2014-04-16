@@ -19,8 +19,20 @@ NEW_STATE_NAME = "-Click here for new state-"
 
 
 class StatesTable:
-    def __init__(self, states, state_changed_func, view, badd_state, bremove_state):
-        self.states = states
+    def __init__(self, disc_bn, selected_vetex,
+                 state_changed_func, view, badd_state, bremove_state):
+
+        """
+
+        :param disc_bn:
+        :param selected_vetex:
+        :param state_changed_func:
+        :param view:
+        :param badd_state:
+        :param bremove_state:
+        """
+        self.selected_vetex = selected_vetex
+        self.disc_bn = disc_bn
         self.view = view
         self.state_changed_func = state_changed_func
         self.model = None
@@ -31,7 +43,7 @@ class StatesTable:
 
     def _add_state(self, widget):
         self.model.append(["New state"])
-        self.states.append("New state")
+        self.disc_bn.add_state(self.selected_vetex, "New state")
         self.state_changed_func()
 
     def _remove_state(self, widget):
@@ -42,15 +54,16 @@ class StatesTable:
                 # Graphic remove
                 self.model.remove(selected_rows)
                 # remove from graph
-                self.states.remove(del_state)
+                self.disc_bn.add_state(self.selected_vetex, del_state)
 
     def _modify_treeview_for_states(self):
         ### MODEL
         self.model = Gtk.ListStore(str)
         self.view.set_model(self.model)
 
+        states = self.disc_bn.get_states(self.selected_vetex)
         # fill states
-        for state in self.states:
+        for state in states:
             self.model.append([state])
         # New state
         # self.model.append([NEW_STATE_NAME, Gtk.STOCK_ADD])
@@ -68,13 +81,10 @@ class StatesTable:
         self.view.append_column(col)
 
     def text_edited(self, widget, path, new_text):
-        print new_text
         # Current name
         current_state = self.model[path][0]
 
-        for i in range(len(self.states)):
-            if self.states[i] == current_state:
-                self.states[i] = new_text
+        self.disc_bn.change_state_name(self.selected_vetex, current_state, new_text)
         # TODO validate non repeated names
 
         # modify gui

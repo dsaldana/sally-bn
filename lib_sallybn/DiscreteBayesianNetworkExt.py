@@ -81,11 +81,68 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
     def remove_vertex(self, name):
         pass  #todo
 
-    def add_state(self, vertex_name):
-        pass  #todo
+    def add_state(self, vertex_name, new_state):
+        ## Outcomes
+        n_outcomes = len(self.get_states(vertex_name))
+        self.Vdata[vertex_name]["numoutcomes"] = n_outcomes + 1
+
+        ## states (vals)
+        self.Vdata[vertex_name]["vals"].append(new_state)
+
+        ## cprob
+        parents_matrix = self.get_parent_states(vertex_name)
+        str_parent_matrix = self.str_parent_states(parents_matrix)
+
+        new_cprob = {}
+        for s in str_parent_matrix:
+            new_cprob[s] = [0.0] * n_outcomes
+        self.Vdata[vertex_name]["cprob"] = new_cprob
 
     def change_state_name(self, vertex_name, old_name, new_name):
-        pass  #todo
+        # state name
+        l_vals = self.Vdata[vertex_name]["vals"]
+        self.Vdata[vertex_name]["vals"] = \
+            util.change_element_in_list(l_vals, old_name, new_name)
+
+        # CPT in children
+        children = self.getchildren(vertex_name)
+        for child in children:
+            cprob = self.Vdata[child]["cprob"]
+
+            cpt = [cprob[k] for k in cprob.keys()]
+            parents_mtx = self.get_parent_states(child)
+            str_parent_mtx = self.str_parent_states(parents_mtx)
+
+            new_cprob = {}
+
+            for j in range(len(str_parent_mtx)):
+                new_cprob[str_parent_mtx[j]] = cpt[j]
+
+            self.Vdata[child]["cprob"]= new_cprob
+
+            # parents = self.getparents(child)
+
+            # index
+            # idx = parents.index(vertex_name)
+            # old parents matrix
+            # parents_mtx = self.get_parent_states(child)
+            # old_str_parent_mtx = self.str_parent_states(parents_mtx)
+            #
+            # for i in range(len(parents_mtx)):
+            #     if parents_mtx[i][idx] == old_name:
+            #         parents_mtx[i][idx] = new_name
+            #
+            # new_str_parent_mtx = self.str_parent_states(parents_mtx)
+            #
+            # for j in range(len(old_str_parent_mtx)):
+            #     new_cprob[new_str_parent_mtx[i]] = new_cprob.pop(old_str_parent_mtx[i])
+            #
+            # self.Vdata[child]["cprob"] = new_cprob
+
+
+
+
+
 
     def change_vertex_name(self, old_name, new_name):
         # change in edges
@@ -111,8 +168,13 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         self.V = util.change_element_in_list(self.V, old_name, new_name)
 
     def add_edge(self, edge):
-        # todo validate if exits in the contrary orientation
         parent, child = edge
+
+        # validate if exits in the contrary orientation
+        if [ child, parent] in self.E:
+            return
+        elif edge in self.E:
+            return
 
         self.E.append(edge)
 
