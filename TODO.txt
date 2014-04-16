@@ -5,7 +5,6 @@
 
 
 ----TO FIX----
-- add state for
 - gui bugs
 - CPT is not modal
 * Zoom and translate
@@ -19,6 +18,7 @@
 
 
 --- FIXED -----
+- add state for children
 - adding new state
 - add state puts in zeros
 * adapt to libpgm model
