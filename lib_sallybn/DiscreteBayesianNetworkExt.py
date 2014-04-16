@@ -103,6 +103,21 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         self.Vdata[vertex_name]["cprob"] = new_cprob
 
+        # For children
+        children = self.getchildren(vertex_name)
+
+        for child in children:
+            #  Modify CPT in v
+            parents_matrix = self.get_parent_states(child)
+            str_parent_matrix = self.str_parent_states(parents_matrix)
+
+            new_cprob = {}
+            n_outcomes = len(self.get_states(child))
+            for s in str_parent_matrix:
+                new_cprob[s] = [0.0] * n_outcomes
+
+            self.Vdata[child]["cprob"] = new_cprob
+
     def change_state_name(self, vertex_name, old_name, new_name):
         # state name
         l_vals = self.Vdata[vertex_name]["vals"]

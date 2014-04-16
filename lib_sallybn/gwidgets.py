@@ -156,6 +156,8 @@ class GraphicCptTable:
                 self.model.append(str_prob)
 
             else:
+                print l
+                print str_parent_matrix[l]
                 cprob_line = cprob[str_parent_matrix[l]]
                 str_cprob_line = util.list_to_str_list(cprob_line)
                 self.model.append(parents_matrix[l] + str_cprob_line)

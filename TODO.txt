@@ -5,7 +5,9 @@
 
 
 ----TO FIX----
-
+- add state for
+- gui bugs
+- CPT is not modal
 * Zoom and translate
 
 --- Next release ---
