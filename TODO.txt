@@ -6,7 +6,6 @@
 
 ----TO FIX----
 - gui bugs
-- CPT is not modal
 * Zoom and translate
 
 --- Next release ---
@@ -18,6 +17,7 @@
 
 
 --- FIXED -----
+- CPT is not modal
 - add state for children
 - adding new state
 - add state puts in zeros

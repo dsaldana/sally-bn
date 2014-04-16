@@ -26,8 +26,9 @@ class WinDiscBN:
                                 "badd_state",
                                 "bremove_state")
 
-        # cpt_dialog.set_modal(True)
+
         cpt_dialog.set_parent(window)
+        cpt_dialog.set_modal(True)
         text_var_name.set_text(selected_vetex)
 
         #TODO clone disc_bn and assign only if accept
