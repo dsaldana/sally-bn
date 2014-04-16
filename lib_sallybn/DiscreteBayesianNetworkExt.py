@@ -83,8 +83,8 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
     def add_state(self, vertex_name, new_state):
         ## Outcomes
-        n_outcomes = len(self.get_states(vertex_name))
-        self.Vdata[vertex_name]["numoutcomes"] = n_outcomes + 1
+        n_outcomes = len(self.get_states(vertex_name)) + 1
+        self.Vdata[vertex_name]["numoutcomes"] = n_outcomes
 
         ## states (vals)
         self.Vdata[vertex_name]["vals"].append(new_state)
@@ -96,6 +96,11 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         new_cprob = {}
         for s in str_parent_matrix:
             new_cprob[s] = [0.0] * n_outcomes
+
+        # if no parents
+        if not parents_matrix:
+            new_cprob = [0.0] * n_outcomes
+
         self.Vdata[vertex_name]["cprob"] = new_cprob
 
     def change_state_name(self, vertex_name, old_name, new_name):
@@ -114,11 +119,11 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
             str_parent_mtx = self.str_parent_states(parents_mtx)
 
             new_cprob = {}
-
+            # Maybe this is not the best way
             for j in range(len(str_parent_mtx)):
                 new_cprob[str_parent_mtx[j]] = cpt[j]
 
-            self.Vdata[child]["cprob"]= new_cprob
+            self.Vdata[child]["cprob"] = new_cprob
 
             # parents = self.getparents(child)
 
@@ -138,10 +143,6 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
             #     new_cprob[new_str_parent_mtx[i]] = new_cprob.pop(old_str_parent_mtx[i])
             #
             # self.Vdata[child]["cprob"] = new_cprob
-
-
-
-
 
 
     def change_vertex_name(self, old_name, new_name):
@@ -171,7 +172,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         parent, child = edge
 
         # validate if exits in the contrary orientation
-        if [ child, parent] in self.E:
+        if [child, parent] in self.E:
             return
         elif edge in self.E:
             return
