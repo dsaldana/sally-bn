@@ -138,9 +138,9 @@ class GraphDrawer:
 
             cairo.fill()
 
-    def draw_boxes(self, cairo, vertices, states):
+    def draw_boxes(self, cairo, vertices, disc_bn):
         for vname, point in vertices.items():
-            var_states = states[vname]
+            var_states = disc_bn.get_states(vname)
 
             # Rectangles
             px, py = point
@@ -181,7 +181,6 @@ class GraphDrawer:
                 cairo.set_source_rgb(69.0 / 255, 163.0 / 255, 0.0 / 255)  # dark green
                 cairo.set_font_size(14)
                 cairo.move_to(x_corner + 5, ny - 10)
-                print "statei", states[vname][i]
                 cairo.show_text(var_states[i])
 
     @staticmethod

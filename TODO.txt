@@ -1,6 +1,6 @@
 
 --- Priority TODO ---
-* adapt Save and Open to the libpgm structure for json objects.
+* Save and Open json.
 * Solve the BN
 
 ----TO FIX----
@@ -11,8 +11,11 @@
 * Edit Color for node
 * Complete empty spaces in CPT
 * Cancel in CPT dialog should not modify anything.
+* Plugins or another way to extend to other bns.
+
 
 --- FIXED -----
+* adapt to libpgm model
 * Edit States
 * CPT dialog size
 * Save

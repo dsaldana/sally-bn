@@ -1,31 +1,16 @@
+def statelist_to_string(states):
+    tmp = "["
+    for i in range(len(states)):
+        tmp += "'" + states[i] + "'"
+
+        # put comma if it is not the last one
+        if i < len(states) - 1:
+            tmp += ", "
+    tmp += "]"
+    return tmp
 
 
-
-def parent_states(parents, states):
-    """
-
-    :param parents: list of parent names
-    :param states: disctionary with k=vertex names and v=list of states
-    """
-    parents_matrix = []
-    for par in parents:
-        p_sts = states[par]
-
-        if not parents_matrix:
-            parents_matrix = [[s] for s in p_sts]
-        else:
-            new_par_matrix = []
-            # previous parents
-            for prev_p in parents_matrix:
-                for pstate in p_sts:
-                    tmp = list(prev_p)
-                    tmp.append(pstate)
-                    new_par_matrix.append(tmp)
-
-            parents_matrix = new_par_matrix
-    return parents_matrix
-
-
+##TODO remove, it is implemented in DBN
 def get_parents(vertex, edges):
     """
     get the parents for a vertex in a list of edges
@@ -38,3 +23,18 @@ def get_parents(vertex, edges):
         if v2 == vertex:
             parents.append(v1)
     return parents
+
+
+def change_element_in_list(old_list, old_name, new_name):
+    new_list = []
+    for p in old_list:
+        if p == old_name:
+            new_list.append(new_name)
+        else:
+            new_list.append(p)
+    return new_list
+
+
+def list_to_str_list(list):
+    res = [str(a) for a in list]
+    return res

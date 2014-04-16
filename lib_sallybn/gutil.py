@@ -1,7 +1,8 @@
 import math
 from lib_sallybn import GraphDrawer
+from gi.repository import Gtk, Gdk
 
-__author__ = 'dav'
+
 
 
 # MOVE TO tuils
@@ -21,3 +22,10 @@ def vertex_in_circle(p, vertices):
             break
 
     return vertex
+
+def create_widget(glade_file, *widget_names):
+    # GTK builder
+    builder = Gtk.Builder()
+    builder.add_from_file(glade_file)
+
+    return [builder.get_object(wname) for wname in widget_names]

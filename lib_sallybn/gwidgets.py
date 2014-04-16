@@ -83,28 +83,21 @@ class StatesTable:
 
 
 class GraphicCptTable:
-    def __init__(self, vertices, edges, states, cpts, query_v, view):
+    def __init__(self, disc_bn, query_v, view):
         """
         Create a tree view for the CPT of the node query_v
-        :param vertices:
-        :param edges:
-        :param states:
         :param query_v:
         :return:
         """
-        self.view = view
-        self.cpts = cpts
-        self.cpt = None
-        self.query_v = query_v
-        self.states = states
-        self.vertices = vertices
-        self.edges = edges
+        self.disc_bn = disc_bn
 
-        self.parents = None
+        self.view = view
+        self.query_v = query_v
+
         ### DATA MODEL
         self.model = None
         self.editable_cells = {}
-        self.parents
+        # self.parents
 
         self.modify_treeview_for_cpt()
 
@@ -113,24 +106,25 @@ class GraphicCptTable:
         Modify a tree view for the CPT of the node query_v
         """
         ### Detect parents
-        self.parents = util.get_parents(self.query_v, self.edges)
+        parents = self.disc_bn.getparents(self.query_v)
 
+        node_states = self.disc_bn.get_states(self.query_v)
         # number of columns
-        n_state_cols = len(self.states[self.query_v])
+        n_state_cols = len(node_states)
         # Columns for titles
-        n_parent_cols = len(self.parents)
+        n_parent_cols = len(parents)
 
         # TODO Validate parents not zero states
 
         # number of rows
         n_rows = 1
-        for p in self.parents:
-            n_rows *= len(self.states[p])
+        for p in parents:
+            n_rows *= len(self.disc_bn.get_states(p))
 
         # data types for parents
-        parent_types = [str for i in self.parents]
+        parent_types = [str for i in parents]
         # the data in the model (three strings for each row, one for each column)
-        cpt_types = [str for i in self.states[self.query_v]]
+        cpt_types = [str for i in node_states]
         # all parent + cpt types
         all_types = parent_types + cpt_types
 
@@ -138,38 +132,28 @@ class GraphicCptTable:
         self.model = Gtk.ListStore(*all_types)
         self.view.set_model(self.model)
 
-
         # FILL CLEAN CPT
-        parents_matrix = util.parent_states(self.parents, self.states)
+        parents_matrix = self.disc_bn.get_parent_states(self.query_v)
+        str_parent_matrix = self.disc_bn.str_parent_states(parents_matrix)
+        cprob = self.disc_bn.get_cprob(self.query_v)
 
-        # Use the loaded CPT
-        if self.query_v in self.cpts:
-            print "rows", self.cpts and len(self.cpts[self.query_v]) == n_rows
-            print "cols", len(self.cpts[self.query_v][0])
-            print "cos2", n_state_cols
-        # if the table already exists, if nxm is right
-        if self.query_v in self.cpts and len(self.cpts[self.query_v]) == n_rows and \
-                        len(self.cpts[self.query_v][0]) == n_state_cols:
-            self.cpt = self.cpts[self.query_v]
-        ## Create a new CPT
-        else:
-            print "new cpt"
-            self.cpt = [["0.0"] * n_state_cols for i in range(n_rows)]
-
-        # PUT CPT
+        # PUT CPT in model
         for l in range(n_rows):
-            line = self.cpt[l]
-            line = [str(v) for v in line]
             # Fill for no parents
-            if len(self.parents) == 0:
-                self.model.append(line)
-            # With parents
+            if len(parents) == 0:
+                str_prob = util.list_to_str_list(cprob)
+                print cprob
+                self.model.append(str_prob)
+
             else:
-                self.model.append(parents_matrix[l] + line)
+                cprob_line = cprob[str_parent_matrix[l]]
+                str_cprob_line = util.list_to_str_list(cprob_line)
+                self.model.append(parents_matrix[l] + str_cprob_line)
+
         ### end fill data
 
         # Table titles
-        table_titles = self.parents + [s + "(%)" for s in self.states[self.query_v]]
+        table_titles = parents + [s + "(%)" for s in node_states]
 
         ### remove all columns
         cols = self.view.get_columns()
@@ -204,25 +188,20 @@ class GraphicCptTable:
 
     ## Event for Edited cells
     def text_edited(self, widget, path, text):
-        #1 remove the % symbol and spaces
-        # text = text.replace("%","")
-        # text = text.replace(" ","")
-        print text
         #2 validate the number between 0 and 100
         val = float(text)
         if val < 0 or val > 100:
             return
         #3 add the text
-        # text = str(val) + "%"
         col_number = self.editable_cells[widget]
         self.model[path][col_number] = text
 
     def fill_random(self):
         # number of  columns
-        n_state_cols = len(self.states[self.query_v])
+        n_state_cols = len(self.disc_bn.get_states(self.query_v))
 
         # FILL DATA
-        parents_matrix = util.parent_states(self.parents, self.states)
+        parents_matrix = self.disc_bn.get_parent_states(self.query_v)
 
         for i in range(len(parents_matrix)):
             state_values = [random.random() for j in range(n_state_cols)]
@@ -231,38 +210,47 @@ class GraphicCptTable:
             self.model[i] = parents_matrix[i] + state_values
 
         # Fill for no parents
-        if len(self.parents) == 0:
+        if len(self.disc_bn.getparents(self.query_v)) == 0:
             state_values = [random.random() for i in range(n_state_cols)]
             total_sum = sum(state_values)
             state_values = [str(100 * v / total_sum) for v in state_values]
             self.model[0] = state_values
 
-        pass
 
     def validate_cpt(self):
         for line in self.model:
-            svals = line[len(self.parents):]
+            parents = self.disc_bn.getparents(self.query_v)
+            svals = line[len(parents):]
             fvals = [float(s) for s in svals]
             # state values must sum 100 with precision of 0.001
             if not math.fabs(sum(fvals) - 100.0) < 0.001:
                 return False
         return True
 
-    def get_cpt(self):
-        cpt = []
+    # def get_cpt(self):
+    #     cpt = []
+    #     for line in self.model:
+    #         svals = line[len(self.parents):]
+    #         fvals = [float(s) for s in svals]
+    #         cpt.append(fvals)
+    #     return cpt
+
+    def get_cprob_from_table(self):
+        cprob = {}
+        parents = self.disc_bn.getparents(self.query_v)
+
         for line in self.model:
-            svals = line[len(self.parents):]
+            #key
+            parent_states = line[:len(parents)]
+            key = util.statelist_to_string(parent_states)
+            # values
+            svals = line[len(parents):]
             fvals = [float(s) for s in svals]
-            cpt.append(fvals)
-        return cpt
 
+            if len(parents) == 0:
+                return fvals
+            else:
+                cprob[key] = fvals
 
-        # class CellRendererClickablePixbuf(Gtk.CellRendererPixbuf):
-        #     g_signal('clicked', str)
-        #
-        #     def __init__(self):
-        #         Gtk.CellRendererPixbuf.__init__(self)
-        #         self.set_property('mode', gtk.CELL_RENDERER_MODE_ACTIVATABLE)
-        #
-        #     def do_activate(self, event, widget, path, background_area, cell_area, flags):
-        #         self.emit('clicked', path)
+        print "from table:", cprob
+        return cprob

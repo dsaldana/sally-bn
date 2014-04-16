@@ -1,14 +1,15 @@
 from gi.repository import Gtk, Gdk
 import math
-import json
 
 from enum import Enum
 
+from lib_sallybn.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
+from lib_sallybn.WinDiscBN import WinDiscBN
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
 import lib_sallybn.gwidgets
-from lib_sallybn.gwidgets import GraphicCptTable, StatesTable
+
 
 
 
@@ -28,7 +29,6 @@ class ModeEdit(Enum):
     delete = 3
 
 
-default_states = ["true", "false"]
 FILE_EXTENSION = ".sly"
 
 
@@ -37,7 +37,7 @@ class WinHandler:
 
         #FIXME statex from other place
         self.window = window
-        self.states = ["true", "false"]
+        # self.states = ["true", "false"]
 
         self.drawer = GraphDrawer(area)
         self.area = area
@@ -57,11 +57,16 @@ class WinHandler:
         # Temporal arrow for mouse motion
         self.tmp_arrow = None
 
+
         # Graph
-        self.vertices = {}
-        self.edges = []
-        self.states = {}
-        self.cpts = {}
+        self.disc_bn = DiscreteBayesianNetworkExt()
+        # Window manager for discrete bayesian networks
+        self.win_discbn = WinDiscBN(self.disc_bn)
+
+        self.vertex_locations = {}
+        # self.edges = []
+        # self.states = {}
+        # self.cpts = {}
 
         self.builder = None
 
@@ -101,22 +106,22 @@ class WinHandler:
         filter_py.add_pattern("*" + FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
-        response = dialog.run()
-
-        if response == Gtk.ResponseType.OK:
-            bn = {
-                "V": self.vertices,
-                "E": self.edges,
-                "S": self.states,
-                "CPT": self.cpts
-            }
-            file_name = dialog.get_filename()
-            if not file_name.endswith(FILE_EXTENSION):
-                file_name += FILE_EXTENSION
-            with open(file_name, 'w') as outfile:
-                json.dump(bn, outfile)
-
-        dialog.destroy()
+        # response = dialog.run()
+        #
+        # if response == Gtk.ResponseType.OK:
+        #     bn = {
+        #         "V": self.vertex_locations,
+        #         "E": self.edges,
+        #         "S": self.states,
+        #         "CPT": self.cpts
+        #     }
+        #     file_name = dialog.get_filename()
+        #     if not file_name.endswith(FILE_EXTENSION):
+        #         file_name += FILE_EXTENSION
+        #     with open(file_name, 'w') as outfile:
+        #         json.dump(bn, outfile)
+        #
+        # dialog.destroy()
 
 
     def on_open(self, widget):
@@ -128,7 +133,7 @@ class WinHandler:
         # Filter
         filter_py = Gtk.FileFilter()
         filter_py.set_name("Sally files")
-        filter_py.add_pattern("*"+ FILE_EXTENSION)
+        filter_py.add_pattern("*" + FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
         #RUN
@@ -160,12 +165,13 @@ class WinHandler:
 
         self.clicked_point = None
 
+
     def on_button_press(self, widget, event):
         # double
         p = [event.x, event.y]
         p = self.transform.transform_point(p[0], p[1])
 
-        self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+        self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertex_locations)
 
         self.dragged = None
 
@@ -176,100 +182,16 @@ class WinHandler:
 
         ## doble click, open the dialog
         elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
+
+            self.win_discbn.show_cpt_dialog(self.window, self.selected_vetex)
             self.clicked_point = None
-            print "doble click"
             self.selected_vetex = None
-            self.show_cpt_dialog(self.selected_vetex)
             return
 
         ## Click on edit area
         elif event.button == 1 and self.mode == Mode.edit:
             self.clicked_point = p
 
-    @staticmethod
-    def create_widget(*widget_names):
-        # GTK builder
-        builder = Gtk.Builder()
-        builder.add_from_file(lib_sallybn.SallyApp.glade_file)
-
-        return [builder.get_object(wname) for wname in widget_names]
-
-    def show_cpt_dialog(self, selected_vetex):
-        # Get widgets from dialog.
-        cpt_dialog, treeview_cpt, text_var_name, button_cancel, \
-        button_ok, button_rand, treeview_states, badd_state, bremove_state = \
-            self.create_widget("dialog_cpt",
-                               "treeview_cpt",
-                               "text_var_name",
-                               "button_cancel",
-                               "button_ok",
-                               "button_rand",
-                               "treeview_states",
-                               "badd_state",
-                               "bremove_state")
-
-        cpt_dialog.set_modal(True)
-        cpt_dialog.set_parent(self.window)
-        # cpt_dialog.set_default_size(250, 100)
-        text_var_name.set_text(selected_vetex)
-        # load info for CPT
-        gcpt_table = GraphicCptTable(self.vertices,
-                                     self.edges,
-                                     self.states,
-                                     self.cpts,
-                                     self.selected_vetex,
-                                     treeview_cpt)
-
-        def state_changed_func():
-            gcpt_table.modify_treeview_for_cpt()
-
-        gstates_table = StatesTable(self.states[selected_vetex],
-                                    state_changed_func, treeview_states,
-                                    badd_state, bremove_state)
-        # Quit
-        cpt_dialog.connect("delete-event", Gtk.main_quit)
-
-        # Cancel
-        def cancel_ev(widget):
-            cpt_dialog.destroy()
-
-        button_cancel.connect("clicked", cancel_ev)
-
-        # Fill rand
-        def fill_rand(widget):
-            gcpt_table.fill_random()
-
-        button_rand.connect("clicked", fill_rand)
-
-        # OK
-        def ok_ev(widget):
-            # validate CPT
-            if not gcpt_table.validate_cpt():
-                dialog = Gtk.MessageDialog(cpt_dialog, 0, Gtk.MessageType.WARNING,
-                                           Gtk.ButtonsType.OK, "Invalid CPT")
-                dialog.format_secondary_text(
-                    "Every row must sum 100 %")
-                dialog.set_modal(True)
-                dialog.run()
-                dialog.destroy()
-
-                return
-
-            # Save cpt in current name
-            cpt = gcpt_table.get_cpt()
-            self.cpts[self.selected_vetex] = cpt
-
-            # New vertex name
-            new_vertex_name = text_var_name.get_text()
-            # Change vertex name
-            self.change_vertex_name(new_vertex_name, self.selected_vetex)
-
-            cpt_dialog.destroy()
-
-        button_ok.connect("clicked", ok_ev)
-
-        cpt_dialog.run()
-        # cpt_dialog.destroy()
 
     def motion_event(self, widget, event):
         p = [event.x, event.y]
@@ -284,7 +206,7 @@ class WinHandler:
 
         # translate node
         elif self.clicked_point is not None and self.mode == Mode.edit and self.selected_vetex is not None:
-            self.vertices[self.selected_vetex] = p
+            self.vertex_locations[self.selected_vetex] = p
             self.area.queue_draw()
 
         # translate world
@@ -307,7 +229,7 @@ class WinHandler:
             cairo.translate(self.dragged[0], self.dragged[1])
             self.dragged = None
 
-        print cairo.get_matrix()
+        # print cairo.get_matrix()
         self.transform = cairo.get_matrix()
         self.transform.invert()
 
@@ -317,25 +239,26 @@ class WinHandler:
 
         if self.mode == Mode.edit:
             # Draw selected nodes
+            print "selected vertex:", self.selected_vetex
             if self.selected_vetex is not None:
-                self.drawer.draw_selected_vertices(cairo, self.selected_vetex, self.vertices)
+                self.drawer.draw_selected_vertices(cairo, self.selected_vetex, self.vertex_locations)
 
                 # Draw temporal arrow
                 if self.mode_edit == ModeEdit.edge and self.tmp_arrow is not None:
-                    tmp_v = {"I": self.vertices[self.selected_vetex], "F": self.tmp_arrow}
+                    tmp_v = {"I": self.vertex_locations[self.selected_vetex], "F": self.tmp_arrow}
                     tmp_e = [["I", "F"]]
                     self.drawer.draw_directed_arrows(cairo, tmp_e, tmp_v, headarrow_d=0)
 
             # Draw edges
-            self.drawer.draw_directed_arrows(cairo, self.edges, self.vertices)
+            self.drawer.draw_directed_arrows(cairo, self.disc_bn.get_edges(), self.vertex_locations)
             # Draw nodes
-            self.drawer.draw_vertices(cairo, self.vertices)
+            self.drawer.draw_vertices(cairo, self.vertex_locations)
 
         elif self.mode == Mode.run:
             # Draw edges
-            self.drawer.draw_arrow_box(cairo, self.vertices, self.edges)
+            self.drawer.draw_arrow_box(cairo, self.vertex_locations, self.disc_bn.E)
             # Draw nodes
-            self.drawer.draw_boxes(cairo, self.vertices, self.states)
+            self.drawer.draw_boxes(cairo, self.vertex_locations, self.disc_bn)
 
         return False
 
@@ -372,8 +295,6 @@ class WinHandler:
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)
 
-    def onButtonPressed(self, button):
-        print("Hello World!")
 
     def edition_action(self, p):
         # if self.transform is not None:
@@ -383,7 +304,7 @@ class WinHandler:
         if self.mode == Mode.edit:
 
             # search if a node exist in that point
-            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertices)
+            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertex_locations)
 
             ## Mode
             if self.mode_edit == ModeEdit.vertex:
@@ -391,8 +312,10 @@ class WinHandler:
                 if self.selected_vetex is None:
                     vname = 'Variable ' + str(self.vertex_count)
                     # new vertex
-                    self.vertices[vname] = p
-                    self.states[vname] = list(default_states)
+                    self.vertex_locations[vname] = p
+
+                    self.disc_bn.add_vertex(vname)
+
                     self.vertex_count += 1
 
             elif self.mode_edit == ModeEdit.edge:
@@ -406,17 +329,18 @@ class WinHandler:
                     self.vertex_1 = None
                 elif self.vertex_1 is not None and self.selected_vetex is not None:
                     if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
-                        self.edges.append([self.vertex_1, self.selected_vetex])
+                        self.disc_bn.add_edge([self.vertex_1, self.selected_vetex])
+
                         self.vertex_1 = None
                         self.selected_vetex = None
                 self.tmp_arrow = None
             elif self.mode_edit == ModeEdit.delete:
                 # Delete vertex
-                self.vertices.pop(self.selected_vetex)
+                self.vertex_locations.pop(self.selected_vetex)
                 # delete edges
-                for [v1, v2] in self.edges:
+                for [v1, v2] in self.disc_bn.E:
                     if v1 == self.selected_vetex or v2 == self.selected_vetex:
-                        self.edges.remove([v1, v2])
+                        self.disc_bn.remove_edge([v1, v2])
 
         ##### Mode run
         elif self.mode == Mode.run:
@@ -428,27 +352,16 @@ class WinHandler:
         for eb in self.edit_buttons:
             eb.set_visible(visible)
 
-    def change_vertex_name(self, new_vertex_name, current_name):
-        #vertex
-        self.vertices[new_vertex_name] = self.vertices.pop(current_name)
-
-        # CPT
-        if current_name in self.cpts:
-            self.cpts[new_vertex_name] = self.cpts.pop(current_name)
-
-        # Edges
-        for i in range(len(self.edges)):
-            if current_name == self.edges[i][0]:
-                self.edges[i][0] = new_vertex_name
-            if current_name == self.edges[i][1]:
-                self.edges[i][1] = new_vertex_name
-
-        #states
-        self.states[new_vertex_name] = self.states.pop(current_name)
+    def change_vertex_name_h(self, old_name, new_name):
+        #vertex locations
+        self.vertex_locations[new_name] = self.vertex_locations.pop(old_name)
+        # Change in BN
+        self.disc_bn.change_vertex_name(old_name, new_name)
 
         #selected vertex
-        if self.selected_vetex == current_name:
-            self.selected_vetex = new_vertex_name
+        if self.selected_vetex == old_name:
+            self.selected_vetex = new_name
+
 
     def show_edit_popup(self, event):
         #Draw selected node
@@ -463,9 +376,15 @@ class WinHandler:
         menuitem.set_submenu(menu)
         menu_it = Gtk.MenuItem("Edit Variable")
 
+        # Click on edit vertex data.
         def event_edit(widget, event):
             menu.destroy()
-            self.show_cpt_dialog(self.selected_vetex)
+            self.win_discbn.show_cpt_dialog(self.window, self.selected_vetex)
+
+            new_var_name =self.win_discbn.get_var_name()
+
+            if not new_var_name == self.selected_vetex:
+                self.change_vertex_name_h(self.selected_vetex, new_var_name)
 
 
         menu_it.connect("button-release-event", event_edit)
