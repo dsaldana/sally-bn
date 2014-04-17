@@ -79,8 +79,14 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         # TODO 2 validate unique name
 
-    def remove_vertex(self, name):
-        pass  #todo
+    def remove_vertex(self, vertex_name):
+        # delete edges
+        for [v1, v2] in self.E:
+            if v1 == vertex_name or v2 == vertex_name:
+                self.remove_edge([v1, v2])
+
+        # Vertex
+        self.V.remove(vertex_name)
 
     def add_state(self, vertex_name, new_state):
         ## Outcomes
@@ -141,25 +147,6 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
             self.Vdata[child]["cprob"] = new_cprob
 
-            # parents = self.getparents(child)
-
-            # index
-            # idx = parents.index(vertex_name)
-            # old parents matrix
-            # parents_mtx = self.get_parent_states(child)
-            # old_str_parent_mtx = self.str_parent_states(parents_mtx)
-            #
-            # for i in range(len(parents_mtx)):
-            #     if parents_mtx[i][idx] == old_name:
-            #         parents_mtx[i][idx] = new_name
-            #
-            # new_str_parent_mtx = self.str_parent_states(parents_mtx)
-            #
-            # for j in range(len(old_str_parent_mtx)):
-            #     new_cprob[new_str_parent_mtx[i]] = new_cprob.pop(old_str_parent_mtx[i])
-            #
-            # self.Vdata[child]["cprob"] = new_cprob
-
 
     def change_vertex_name(self, old_name, new_name):
         # change in edges
@@ -202,58 +189,23 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         self.Vdata[parent]["children"].append(child)
 
         #  Modify CPT in v
-        parents_matrix = self.get_parent_states(child)
-        str_parent_matrix = self.str_parent_states(parents_matrix)
-
-        new_cprob = {}
-        n_outcomes = len(self.get_states(child))
-        for s in str_parent_matrix:
-            new_cprob[s] = [0.0] * n_outcomes
-
-        self.Vdata[child]["cprob"] = new_cprob
-
-
-
-
-        # TODO If the cpt already exists
-        # TODO Validate if the cpt is well formed
-
-    #  # Use the loaded CPT
-    # if self.query_v in self.cpts:
-    #     print "rows", self.cpts and len(self.cpts[self.query_v]) == n_rows
-    #     print "cols", len(self.cpts[self.query_v][0])
-    #     print "cos2", n_state_cols
-    # # if the table already exists, if nxm is right
-    # if self.query_v in self.cpts and len(self.cpts[self.query_v]) == n_rows and \
-    #                 len(self.cpts[self.query_v][0]) == n_state_cols:
-    #     self.cpt = self.cpts[self.query_v]
-    # ## Create a new CPT
-    # else:
-    #     print "new cpt"
-    #     self.cpt = [["0.0"] * n_state_cols for i in range(n_rows)]
+        self.create_new_cprob(child)
 
     def remove_edge(self, edge):
-
-        self.E.remove(edge)
         parent, child = edge
-        self.E.append(edge)
 
-        # add parent
+        # remove parent's Vdata for child
         self.Vdata[child]["parents"].remove(parent)
+        # new cprob for child
+        self.create_new_cprob(child)
 
-        # add child
+        # remove children's Vdata for parent
         self.Vdata[parent]["children"].remove(child)
+        # new cprob for parent
+        self.create_new_cprob(parent)
 
-        # TODO Modify CPT in v
-        parents_matrix = self.get_parent_states(child)
-        str_parent_matrix = self.str_parent_states(parents_matrix)
-
-        new_cprob = {}
-        n_outcomes = len(self.get_states(child))
-        for s in str_parent_matrix:
-            new_cprob[s] = [0.0] * n_outcomes
-
-        self.Vdata[child]["cprob"] = new_cprob
+        # Remove edge
+        self.E.remove(edge)
 
     def get_vertices(self):
         return self.V
@@ -261,6 +213,16 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
     def get_vdata(self):
         return self.Vdata
 
+    def create_new_cprob(self, vertex):
+        parents_matrix = self.get_parent_states(vertex)
+        str_parent_matrix = self.str_parent_states(parents_matrix)
+
+        new_cprob = {}
+        n_outcomes = len(self.get_states(vertex))
+        for s in str_parent_matrix:
+            new_cprob[s] = [0.0] * n_outcomes
+
+        self.Vdata[vertex]["cprob"]
 
 
 

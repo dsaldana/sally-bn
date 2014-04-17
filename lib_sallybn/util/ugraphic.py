@@ -1,4 +1,6 @@
 import math
+from random import shuffle
+
 from gi.repository import Gtk
 
 from lib_sallybn import GraphDrawer
@@ -57,6 +59,9 @@ def create_vertex_locations(graph_skeleton, dx=200, dy=150):
     # push the roots into the queue
     queue = roots
 
+    # random order for roots
+    shuffle(queue)
+
     while queue:
         # get the first path from the queue
         parent = queue.pop(0)
@@ -86,6 +91,7 @@ def create_vertex_locations(graph_skeleton, dx=200, dy=150):
     # for each level
     for lk in level.keys():
         lvertices = level[lk]
+        shuffle(lvertices)
         len_level = len(lvertices)
         for i in range(len_level):
             #vertex pos

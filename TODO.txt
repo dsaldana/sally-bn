@@ -2,7 +2,7 @@
 --- Priority TODO ---
 * Solve the BN
 * Remove node
-
+* Delete Edge
 
 ----TO FIX----
 - gui bugs

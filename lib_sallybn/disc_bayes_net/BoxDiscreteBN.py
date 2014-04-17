@@ -18,8 +18,10 @@ import lib_sallybn.util.resources as res
 
 
 
+
 ## Constants
 FILE_EXTENSION = ".sly"
+DEFAULT_NODE_NAME = 'Variable'
 
 ## Enumerations
 # Mode for
@@ -117,7 +119,7 @@ class BoxDiscreteBN(Gtk.Box):
         # normal click
         if click_distance < 10.0:
             self.dragged = None
-            self.edition_action(p)
+            self.editing_action(p)
 
         self.clicked_point = None
 
@@ -193,6 +195,7 @@ class BoxDiscreteBN(Gtk.Box):
 
         self.drawer.draw_background(cairo)
 
+        #### ON EDITION MODE ###
         if self.mode == Mode.edit:
             # Draw selected nodes
             # print "selected vertex:", self.selected_vetex
@@ -210,6 +213,7 @@ class BoxDiscreteBN(Gtk.Box):
             # Draw nodes
             self.drawer.draw_vertices(cairo, self.vertex_locations)
 
+        #### ON RUN MODE ###
         elif self.mode == Mode.run:
             # Draw edges
             self.drawer.draw_arrow_box(cairo, self.vertex_locations, self.disc_bn.E)
@@ -253,11 +257,16 @@ class BoxDiscreteBN(Gtk.Box):
             print "not supported"
         self.selected_vetex = None
 
-    def onDeleteWindow(self, *args):
-        Gtk.main_quit(*args)
+    def get_new_vertex_name(self):
+        counter = 1
+        new_name = DEFAULT_NODE_NAME + ' ' + str(counter)
 
+        while new_name in self.disc_bn.get_vertices():
+            counter += 1
+            new_name = DEFAULT_NODE_NAME + ' ' + str(counter)
+        return new_name
 
-    def edition_action(self, p):
+    def editing_action(self, p):
         # if self.transform is not None:
         # p = self.transform.transform_point(p[0], p[1])
 
@@ -267,11 +276,11 @@ class BoxDiscreteBN(Gtk.Box):
             # search if a node exist in that point
             self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(p, self.vertex_locations)
 
-            ## Mode
+            ## Mode VERTEX
             if self.mode_edit == ModeEdit.vertex:
                 # Create new Vertex
                 if self.selected_vetex is None:
-                    vname = 'Variable ' + str(self.vertex_count)
+                    vname = self.get_new_vertex_name()
                     # new vertex
                     self.vertex_locations[vname] = p
 
@@ -279,6 +288,7 @@ class BoxDiscreteBN(Gtk.Box):
 
                     self.vertex_count += 1
 
+            ## Mode EDGE
             elif self.mode_edit == ModeEdit.edge:
 
                 # If there is not a initial vertex selected
@@ -295,13 +305,18 @@ class BoxDiscreteBN(Gtk.Box):
                         self.vertex_1 = None
                         self.selected_vetex = None
                 self.tmp_arrow = None
+
+            # Mode DELETE
             elif self.mode_edit == ModeEdit.delete:
                 # Delete vertex
                 self.vertex_locations.pop(self.selected_vetex)
-                # delete edges
-                for [v1, v2] in self.disc_bn.E:
-                    if v1 == self.selected_vetex or v2 == self.selected_vetex:
-                        self.disc_bn.remove_edge([v1, v2])
+
+                # Delete from model
+                self.disc_bn.remove_vertex(self.selected_vetex)
+
+                # Non selected vertex
+                self.selected_vetex = None
+
 
         ##### Mode run
         elif self.mode == Mode.run:
