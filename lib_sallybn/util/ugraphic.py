@@ -21,7 +21,7 @@ def edge_in_point(p, vertex_locations, edges):
         d1_2 = math.hypot(x2 - x1, y2 - y1)
 
         # validate
-        if d1_p + d2_p - d1_2 < 0.2:
+        if d1_p + d2_p - d1_2 < 0.5:
             return e
 
     return None

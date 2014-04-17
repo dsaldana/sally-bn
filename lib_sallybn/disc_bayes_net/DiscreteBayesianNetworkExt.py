@@ -194,6 +194,9 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
     def remove_edge(self, edge):
         parent, child = edge
 
+        # Remove edge
+        self.E.remove(edge)
+
         # remove parent's Vdata for child
         self.Vdata[child]["parents"].remove(parent)
         # new cprob for child
@@ -204,8 +207,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         # new cprob for parent
         self.create_new_cprob(parent)
 
-        # Remove edge
-        self.E.remove(edge)
+
 
     def get_vertices(self):
         return self.V
@@ -219,10 +221,14 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         new_cprob = {}
         n_outcomes = len(self.get_states(vertex))
-        for s in str_parent_matrix:
-            new_cprob[s] = [0.0] * n_outcomes
 
-        self.Vdata[vertex]["cprob"]
+        if str_parent_matrix:
+            for s in str_parent_matrix:
+                new_cprob[s] = [0.0] * n_outcomes
+        else:
+            new_cprob = [0.0] * n_outcomes
+
+        self.Vdata[vertex]["cprob"] = new_cprob
 
 
 

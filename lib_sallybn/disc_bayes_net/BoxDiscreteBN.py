@@ -36,7 +36,6 @@ class ModeEdit(Enum):
     manual = 0
     vertex = 1
     edge = 2
-    delete = 3
 
 
 class BoxDiscreteBN(Gtk.Box):
@@ -80,14 +79,15 @@ class BoxDiscreteBN(Gtk.Box):
         self.builder = None
 
         #FIXME change all events for only motion
-        self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
-                             Gdk.EventMask.SMOOTH_SCROLL_MASK | Gdk.EventMask.ALL_EVENTS_MASK)
-        self.area.connect('draw', self.on_drawing_area_draw)
+        # self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
+        #                      Gdk.EventMask.SMOOTH_SCROLL_MASK | Gdk.EventMask.ALL_EVENTS_MASK)
+        # self.area.connect('draw', self.on_drawing_area_draw)
 
-        self.area.connect("motion_notify_event", self.motion_event)
-        self.area.connect('button-press-event', self.on_button_press)
-        self.area.connect('scroll-event', self.on_scroll)
-        self.area.connect('button-release-event', self.on_button_release)
+        # self.area.connect("motion_notify_event", self.motion_event)
+        # self.area.connect('button-press-event', self.on_button_press)
+        # self.area.connect('scroll-event', self.on_scroll)
+        # self.area.connect('button-release-event', self.on_button_release)
+
 
         self.clicks = []
         self.transform = None
@@ -249,6 +249,28 @@ class BoxDiscreteBN(Gtk.Box):
         self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
         self.area.queue_draw()
 
+
+    def on_key_area(self, widget, event):
+        print "key", event
+
+    def on_delete(self, widget):
+        # Delete vertex
+        if self.selected_vetex is not None:
+            self.vertex_locations.pop(self.selected_vetex)
+
+            # Delete from model
+            self.disc_bn.remove_vertex(self.selected_vetex)
+
+            # Non selected vertex
+            self.selected_vetex = None
+        # Delete edge
+        elif self.selected_edge is not None:
+            # Delete from model
+            self.disc_bn.remove_edge(self.selected_edge)
+            # Non selected
+            self.selected_edge = None
+        self.area.queue_draw()
+
     def on_edit_mode(self, radiotool):
         if not radiotool.get_active():
             return True
@@ -260,8 +282,6 @@ class BoxDiscreteBN(Gtk.Box):
             self.mode_edit = ModeEdit.edge
         elif radiotool.get_label() == "bmanual":
             self.mode_edit = ModeEdit.manual
-        elif radiotool.get_label() == "bdelete":
-            self.mode_edit = ModeEdit.delete
         else:
             print "not supported"
         self.selected_vetex = None
@@ -315,16 +335,7 @@ class BoxDiscreteBN(Gtk.Box):
                         self.selected_vetex = None
                 self.tmp_arrow = None
 
-            # Mode DELETE
-            elif self.mode_edit == ModeEdit.delete:
-                # Delete vertex
-                self.vertex_locations.pop(self.selected_vetex)
 
-                # Delete from model
-                self.disc_bn.remove_vertex(self.selected_vetex)
-
-                # Non selected vertex
-                self.selected_vetex = None
 
 
         ##### Mode run

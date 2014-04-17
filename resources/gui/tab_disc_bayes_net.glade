@@ -22,8 +22,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Create variable</property>
-                <property name="tooltip_text" translatable="yes">Create variable</property>
+                <property name="tooltip_markup" translatable="yes">Create variables</property>
+                <property name="tooltip_text" translatable="yes">Create variables</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">bvertex</property>
                 <property name="use_underline">True</property>
@@ -42,8 +42,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Create edge</property>
-                <property name="tooltip_text" translatable="yes">Create edge</property>
+                <property name="tooltip_markup" translatable="yes">Create edges</property>
+                <property name="tooltip_text" translatable="yes">Create edges</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">bedge</property>
                 <property name="use_underline">True</property>
@@ -57,17 +57,16 @@
               </packing>
             </child>
             <child>
-              <object class="GtkRadioToolButton" id="bdelete">
+              <object class="GtkToolButton" id="bdelete">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Delete</property>
+                <property name="tooltip_text" translatable="yes">Delete selected node or edge</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">bdelete</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-cancel</property>
-                <property name="group">bvertex</property>
-                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
+                <signal name="clicked" handler="on_delete" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -115,6 +114,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Edit mode</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">bedit</property>
                 <property name="use_underline">True</property>
@@ -133,6 +133,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Run mode</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">brun</property>
                 <property name="use_underline">True</property>
@@ -194,12 +195,15 @@
     <child>
       <object class="GtkDrawingArea" id="drawingarea_bn">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can_focus">True</property>
+        <property name="events">GDK_EXPOSURE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_PROXIMITY_IN_MASK | GDK_PROXIMITY_OUT_MASK | GDK_SUBSTRUCTURE_MASK | GDK_SCROLL_MASK | GDK_TOUCH_MASK | GDK_SMOOTH_SCROLL_MASK</property>
         <property name="hexpand">True</property>
         <property name="vexpand">True</property>
-        <signal name="motion-notify-event" handler="motion_event" swapped="no"/>
-        <signal name="drag-begin" handler="motion_event" swapped="no"/>
         <signal name="scroll-event" handler="on_scroll" swapped="no"/>
+        <signal name="button-press-event" handler="on_button_press" swapped="no"/>
+        <signal name="motion-notify-event" handler="motion_event" swapped="no"/>
+        <signal name="button-release-event" handler="on_button_release" swapped="no"/>
+        <signal name="draw" handler="on_drawing_area_draw" swapped="no"/>
       </object>
       <packing>
         <property name="expand">False</property>
