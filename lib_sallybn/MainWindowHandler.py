@@ -58,17 +58,15 @@ class MainWindowHandler:
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
             file_name = ntpath.basename(file_path)
+            file_name= file_name.replace(FILE_EXTENSION, "")
 
-            self.tab_bn = BoxDiscreteBN(self.window)
-            self.tab_bn.load_bn_from_file(file_path)
+            # Create and add the tab
+            tab_bn = self.add_bn_tab(file_name)
+            # Load from file
+            tab_bn.load_bn_from_file(file_path)
 
-            #TODO validate the bn is good
-            #  create new tab
-            self.tabber.append_page(self.tab_bn.get_box(),
-                                Gtk.Label(file_name))
+            #TODO validate if the bn is good
             self.goto_last_tab()
-
-
 
         dialog.destroy()
 
@@ -79,11 +77,12 @@ class MainWindowHandler:
 
     def add_bn_tab(self, title):
         tab_bn = BoxDiscreteBN(self.window)
-        self.tabber.append_page(tab_bn.get_box(),
+        self.tabber.append_page(tab_bn,
                                 Gtk.Label(title))
         self.goto_last_tab()
+        return tab_bn
 
     def goto_last_tab(self):
         # select loaded tab
         n_new_tab = self.tabber.get_n_pages()
-        self.tabber.set_current_page(n_new_tab-1)
+        self.tabber.set_current_page(n_new_tab - 1)

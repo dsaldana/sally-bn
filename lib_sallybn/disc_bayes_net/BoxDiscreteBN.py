@@ -19,6 +19,7 @@ import lib_sallybn.util.resources as res
 
 
 
+
 ## Constants
 FILE_EXTENSION = ".sly"
 
@@ -37,7 +38,7 @@ class ModeEdit(Enum):
     delete = 3
 
 
-class BoxDiscreteBN:
+class BoxDiscreteBN(Gtk.Box):
     def __init__(self, window):
         self.window = window
 
@@ -48,8 +49,9 @@ class BoxDiscreteBN:
                 res.TAB_DISC_BAYES_NET_GLADE,
                 ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn"], self)
 
-        # super(BoxDiscreteBN, self).__init__(spacing=1)
-        # self.pack_start(self.box_disc_bn, True, True, 0)
+        super(BoxDiscreteBN, self).__init__(spacing=1)
+        self.pack_start(self.box_disc_bn, True, True, 0)
+        self.set_visible(True)
 
         self.drawer = GraphDrawer(self.area)
 
