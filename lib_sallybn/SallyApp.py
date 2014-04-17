@@ -3,7 +3,7 @@ from gi.repository import Gtk
 from lib_sallybn import WinHandler
 
 
-glade_file = 'visual_editor.glade'
+glade_file = 'resources/visual_editor.glade'
 
 # FIXME Not here
 
