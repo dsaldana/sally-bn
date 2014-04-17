@@ -15,6 +15,7 @@ import lib_sallybn.util.ugraphic
 import lib_sallybn.disc_bayes_net.gwidgets
 
 
+## Enumerations
 # Mode for
 class Mode(Enum):
     edit = 0
@@ -29,15 +30,13 @@ class ModeEdit(Enum):
     delete = 3
 
 
-FILE_EXTENSION = ".sly"
+class TabDiscBN:
+    def __init__(self, window):
 
+        #TODO must be loaded
+        #area, edit_buttons
 
-class WinHandler:
-    def __init__(self, window, area, edit_buttons):
-
-        #FIXME statex from other place
         self.window = window
-        # self.states = ["true", "false"]
 
         self.drawer = GraphDrawer(area)
         self.area = area
@@ -95,57 +94,7 @@ class WinHandler:
         self.area.queue_draw()
         return True
 
-    def on_save(self, widget):
-        dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
-                                       Gtk.FileChooserAction.SAVE,
-                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-        dialog.set_parent(self.window)
-        dialog.set_modal(True)
 
-        filter_py = Gtk.FileFilter()
-        filter_py.set_name("Sally files")
-        filter_py.add_pattern("*" + FILE_EXTENSION)
-        dialog.add_filter(filter_py)
-
-        dialog.show_all()
-        response = dialog.run()
-
-        if response == Gtk.ResponseType.OK:
-            self.save_bn_to_file(self.disc_bn, self.vertex_locations, dialog.get_filename())
-
-        dialog.destroy()
-
-
-    def on_open(self, widget):
-        dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
-                                       Gtk.FileChooserAction.OPEN,
-                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK),
-                                       flags=Gtk.DialogFlags.MODAL)
-
-        # dialog.set_transient_for(self.window)
-        # self.window.set_transient_for(dialog)
-        dialog.set_parent(self.window)
-        dialog.set_modal(True)
-        # Filter
-        filter_py = Gtk.FileFilter()
-        filter_py.set_name("Sally files")
-        filter_py.add_pattern("*" + FILE_EXTENSION)
-        dialog.add_filter(filter_py)
-
-        #RUN
-        response = dialog.run()
-
-        if response == Gtk.ResponseType.OK:
-            print("File selected: " + dialog.get_filename())
-            self.disc_bn, self.vertex_locations = self.load_bn_from_file(dialog.get_filename())
-            self.win_discbn.disc_bn = self.disc_bn
-            # TODO create an alg to show the nodes if vertex locations does not exist
-        dialog.destroy()
-
-    def on_new(self, widget):
-        print "new"
 
     def on_button_release(self, widget, event):
         # Right click
@@ -430,4 +379,3 @@ class WinHandler:
             json_file.close()
 
         return disc_bn, vertex_locations
-
