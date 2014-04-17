@@ -1,10 +1,11 @@
 
 ### Graphic widgets
-from lib_sallybn import gwidgets
 
 from gi.repository import Gtk
-
 import sys
+
+from lib_sallybn.disc_bayes_net import gwidgets
+
 
 class MyApplication(Gtk.Application):
     def __init__(self):

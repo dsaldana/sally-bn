@@ -4,20 +4,15 @@ import math
 
 from enum import Enum
 
+from lib_sallybn.disc_bayes_net.WinDiscBN import WinDiscBN
+from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
+
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
-from lib_sallybn.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
-from lib_sallybn.WinDiscBN import WinDiscBN
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
-import lib_sallybn.gutil
-import lib_sallybn.gwidgets
-
-
-
-
-
-
+import lib_sallybn.util.ugraphic
+import lib_sallybn.disc_bayes_net.gwidgets
 
 
 # Mode for
@@ -175,7 +170,7 @@ class WinHandler:
         p = [event.x, event.y]
         p = self.transform.transform_point(p[0], p[1])
 
-        self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertex_locations)
+        self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(p, self.vertex_locations)
 
         self.dragged = None
 
@@ -308,7 +303,7 @@ class WinHandler:
         if self.mode == Mode.edit:
 
             # search if a node exist in that point
-            self.selected_vetex = lib_sallybn.gutil.vertex_in_circle(p, self.vertex_locations)
+            self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(p, self.vertex_locations)
 
             ## Mode
             if self.mode_edit == ModeEdit.vertex:
