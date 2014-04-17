@@ -4,7 +4,6 @@ import math
 
 from enum import Enum
 
-from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 from lib_sallybn.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
@@ -13,6 +12,7 @@ import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.gutil
 import lib_sallybn.gwidgets
+
 
 
 
@@ -105,12 +105,15 @@ class WinHandler:
                                        Gtk.FileChooserAction.SAVE,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        dialog.set_parent(self.window)
+        dialog.set_modal(True)
 
         filter_py = Gtk.FileFilter()
         filter_py.set_name("Sally files")
         filter_py.add_pattern("*" + FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
+        dialog.show_all()
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
@@ -123,8 +126,13 @@ class WinHandler:
         dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
                                        Gtk.FileChooserAction.OPEN,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK),
+                                       flags=Gtk.DialogFlags.MODAL)
 
+        # dialog.set_transient_for(self.window)
+        # self.window.set_transient_for(dialog)
+        dialog.set_parent(self.window)
+        dialog.set_modal(True)
         # Filter
         filter_py = Gtk.FileFilter()
         filter_py.set_name("Sally files")
