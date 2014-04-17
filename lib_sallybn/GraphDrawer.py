@@ -22,11 +22,15 @@ class GraphDrawer:
         cairo.rectangle(0, 0, 10000, 100000)
         cairo.fill()
 
-    def draw_directed_arrows(self, cairo, edges, vertices, headarrow_d =vertex_radious):
+    def draw_directed_arrows(self, cairo, edges, vertices, headarrow_d=vertex_radious):
         for edge in edges:
             x1, y1 = vertices[edge[0]]
             x2, y2 = vertices[edge[1]]
             dx, dy = float(x2 - x1), float(y2 - y1)
+
+            # Avoid problem with atan
+            if dx == 0:
+                dx = 1
 
             cairo.set_source_rgb(0, 0, 0.0)
             cairo.move_to(x1, y1)
@@ -110,7 +114,7 @@ class GraphDrawer:
 
             #draw arrow
             # FIXME put the headarrow in the right place
-            d = math.hypot(dx, dy)/2
+            d = math.hypot(dx, dy) / 2
             theta = math.atan(dy / dx)
             # adjust for atan
             s = 1.0

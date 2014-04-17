@@ -19,6 +19,7 @@
 
 
 --- FIXED -----
+* Read libpgm files
 * Example API to show only a BN from file
 * Save BN in tab
 * Tab support

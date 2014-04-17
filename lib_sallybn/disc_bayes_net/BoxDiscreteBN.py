@@ -1,5 +1,4 @@
 from gi.repository import Gtk, Gdk
-import json
 import math
 
 from enum import Enum
@@ -7,6 +6,7 @@ from enum import Enum
 from lib_sallybn.disc_bayes_net.WinDiscBN import WinDiscBN
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 from lib_sallybn.util import ugraphic
+from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 import lib_sallybn
@@ -14,6 +14,7 @@ from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.util.ugraphic
 import lib_sallybn.disc_bayes_net.gwidgets
 import lib_sallybn.util.resources as res
+
 
 
 
@@ -355,18 +356,23 @@ class BoxDiscreteBN(Gtk.Box):
 
 
     def save_bn_to_file(self, file_name):
+        # if does not have extension
+        if not file_name.endswith(FILE_EXTENSION):
+            file_name += FILE_EXTENSION
+
+
         bn = {
             "vertex_loc": self.vertex_locations,
             "E": self.disc_bn.get_edges(),
             "V": self.disc_bn.get_vertices(),
             "Vdata": self.disc_bn.get_vdata()}
 
-        if not file_name.endswith(FILE_EXTENSION):
-            file_name += FILE_EXTENSION
-        with open(file_name, 'w') as outfile:
-            json.dump(bn, outfile)
+        dic_to_file(bn, file_name)
+
+
 
     def load_bn_from_file(self, file_name):
+        #### Load BN
         nd = NodeData()
         skel = GraphSkeleton()
         nd.load(file_name)  # any input file
@@ -377,19 +383,20 @@ class BoxDiscreteBN(Gtk.Box):
 
         # load bayesian network
         self.disc_bn = DiscreteBayesianNetworkExt(skel, nd)
-        # vertex_locations = None
-        ## load vertex locations (if exist)
-        with open(file_name) as json_file:
-            json_data = json.load(json_file)
 
-            if "vertex_loc" in json_data.keys():
-                self.vertex_locations = json_data["vertex_loc"]
-            # disc_bn.V = json_data["V"]
-            # disc_bn.E = json_data["E"]
-            # disc_bn.Vdata = json_data["Vdata"]
-            else:
-                # TODO create an alg to show the nodes if vertex locations does not exist
-                pass
-            json_file.close()
+        ### Load Vertex locations
+        json_data = dic_from_json_file(file_name)
+        # Vertex locations
+        if "vertex_loc" in json_data.keys():
+            self.vertex_locations = json_data["vertex_loc"]
+        else:
+            self.create_vertex_locations()
 
-            # return disc_bn, vertex_locations
+
+
+    def create_vertex_locations(self):
+        self.vertex_locations = {"Letter": [100, 100], "Grade": [200, 100],
+                                         "Intelligence": [200, 200],
+                                         "SAT": [100, 200],
+                                         "Difficulty": [300, 100]}
+

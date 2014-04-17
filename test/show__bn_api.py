@@ -7,7 +7,7 @@ os.chdir("../")
 
 # Load file
 file = "examples/simplebn.sly"
-
+file = "examples/disc_bn_recommendation_letter.txt"
 # Create window
 window = Gtk.Window()
 window.set_size_request(800, 600)
