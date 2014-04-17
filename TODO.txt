@@ -1,6 +1,5 @@
 
 --- Priority TODO ---
-* show graph without previous locations
 * Solve the BN
 * Remove node
 
@@ -16,9 +15,11 @@
 * Complete empty spaces in CPT
 * Cancel in CPT dialog should not modify anything.
 * Plugins or another way to extend to other bns.
-
+* Marginal probabilities after delete node for children.
+* Improve the graph drawing algorithm for multiple bns
 
 --- FIXED -----
+* show graph without previous locations
 * Read libpgm files
 * Example API to show only a BN from file
 * Save BN in tab

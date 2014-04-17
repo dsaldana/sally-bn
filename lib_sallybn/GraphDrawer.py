@@ -107,6 +107,10 @@ class GraphDrawer:
             x2, y2 = vertices[edge[1]]
             dx, dy = float(x2 - x1), float(y2 - y1)
 
+            # Avoid problem with atan
+            if dx == 0:
+                dx = 1
+
             cairo.set_source_rgb(0, 0, 0.0)
             cairo.move_to(x1, y1)
             cairo.line_to(x2, y2)

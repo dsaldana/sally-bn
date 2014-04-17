@@ -18,9 +18,6 @@ import lib_sallybn.util.resources as res
 
 
 
-
-
-
 ## Constants
 FILE_EXTENSION = ".sly"
 
@@ -70,17 +67,12 @@ class BoxDiscreteBN(Gtk.Box):
         # Temporal arrow for mouse motion
         self.tmp_arrow = None
 
-
         # Graph
         self.disc_bn = DiscreteBayesianNetworkExt()
         # Window manager for discrete bayesian networks
         self.win_discbn = WinDiscBN(self.disc_bn)
 
         self.vertex_locations = {}
-        # self.edges = []
-        # self.states = {}
-        # self.cpts = {}
-
         self.builder = None
 
         #FIXME change all events for only motion
@@ -239,6 +231,11 @@ class BoxDiscreteBN(Gtk.Box):
 
         self.area.queue_draw()
 
+    def on_organize(self, widget):
+        print "organize"
+        self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
+        self.area.queue_draw()
+
     def on_edit_mode(self, radiotool):
         if not radiotool.get_active():
             return True
@@ -360,7 +357,6 @@ class BoxDiscreteBN(Gtk.Box):
         if not file_name.endswith(FILE_EXTENSION):
             file_name += FILE_EXTENSION
 
-
         bn = {
             "vertex_loc": self.vertex_locations,
             "E": self.disc_bn.get_edges(),
@@ -368,7 +364,6 @@ class BoxDiscreteBN(Gtk.Box):
             "Vdata": self.disc_bn.get_vdata()}
 
         dic_to_file(bn, file_name)
-
 
 
     def load_bn_from_file(self, file_name):
@@ -379,7 +374,11 @@ class BoxDiscreteBN(Gtk.Box):
         skel.load(file_name)
 
         # topologically order graphskeleton
-        skel.toporder()
+        try:
+            skel.toporder()
+        except ValueError:
+            print ValueError
+            return
 
         # load bayesian network
         self.disc_bn = DiscreteBayesianNetworkExt(skel, nd)
@@ -390,13 +389,9 @@ class BoxDiscreteBN(Gtk.Box):
         if "vertex_loc" in json_data.keys():
             self.vertex_locations = json_data["vertex_loc"]
         else:
-            self.create_vertex_locations()
+            self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
 
 
 
-    def create_vertex_locations(self):
-        self.vertex_locations = {"Letter": [100, 100], "Grade": [200, 100],
-                                         "Intelligence": [200, 200],
-                                         "SAT": [100, 200],
-                                         "Difficulty": [300, 100]}
+
 

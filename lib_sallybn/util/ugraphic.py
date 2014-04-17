@@ -1,6 +1,7 @@
 import math
+from gi.repository import Gtk
+
 from lib_sallybn import GraphDrawer
-from gi.repository import Gtk, Gdk
 
 
 
@@ -23,7 +24,12 @@ def vertex_in_circle(p, vertices):
 
     return vertex
 
-def create_widget(glade_file, widget_names, handler = None):
+
+def create_widget(glade_file, widget_names, handler=None):
+    """
+    Create a widget from a glade file
+    :glade_file
+    """
     # GTK builder
     builder = Gtk.Builder()
     builder.add_from_file(glade_file)
@@ -32,3 +38,60 @@ def create_widget(glade_file, widget_names, handler = None):
         builder.connect_signals(handler)
 
     return [builder.get_object(wname) for wname in widget_names]
+
+
+def create_vertex_locations(graph_skeleton, dx=200, dy=150):
+    vertex = list(graph_skeleton.get_vertices())
+
+    ## Extract root nodes
+    roots = []
+    for v in vertex:
+        if len(graph_skeleton.getparents(v)) == 0:
+            roots.append(v)
+
+    ## Bread first search for each node
+    # Initinal distances
+    dist = {r: 0 for r in roots}
+    level = {0: list(roots)}
+    # maintain a queue of paths
+    # push the roots into the queue
+    queue = roots
+
+    while queue:
+        # get the first path from the queue
+        parent = queue.pop(0)
+        children = graph_skeleton.getchildren(parent)
+
+        for child in children:
+            if child in vertex:
+                lev = dist[parent] + 1
+                dist[child] = lev
+
+                # add level
+                if not lev in level:
+                    level[lev] = []
+                # add child to level
+                if not child in level[lev]:
+                    level[lev].append(child)
+
+                queue.append(child)
+                vertex.remove(child)
+
+    max_level = max([len(level[k]) for k in level.keys()])
+
+    max_width = (max_level + 2) * dx
+
+    vertex_locations = {}
+
+    # for each level
+    for lk in level.keys():
+        lvertices = level[lk]
+        len_level = len(lvertices)
+        for i in range(len_level):
+            #vertex pos
+            x = (i + 1) * max_width / (len_level + 1)
+            y = (lk + 1) * dy
+
+            vertex_locations[lvertices[i]] = [x, y]
+
+    return vertex_locations

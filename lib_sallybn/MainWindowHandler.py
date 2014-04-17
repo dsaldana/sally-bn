@@ -1,7 +1,7 @@
 from gi.repository import Gtk
+import ntpath
 
 from lib_sallybn.disc_bayes_net.BoxDiscreteBN import BoxDiscreteBN, FILE_EXTENSION
-import ntpath
 
 
 ## Class
@@ -60,7 +60,7 @@ class MainWindowHandler:
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
             file_name = ntpath.basename(file_path)
-            file_name= file_name.replace(FILE_EXTENSION, "")
+            file_name = file_name.replace(FILE_EXTENSION, "")
 
             # Create and add the tab
             tab_bn = self.add_bn_tab(file_name)
