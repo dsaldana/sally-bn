@@ -10,9 +10,7 @@ class MainWindowHandler:
         self.window = window
         self.tabber = tabber
 
-        self.tab_bn = BoxDiscreteBN(window)
-        self.tabber.append_page(self.tab_bn.get_box(),
-                                Gtk.Label("New Bayesian Network"))
+        self.add_bn_tab("New Bayesian Network")
 
     def on_save(self, widget):
         dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
@@ -76,13 +74,16 @@ class MainWindowHandler:
 
     def on_new(self, widget):
         print "new"
-        self.tab_bn = BoxDiscreteBN(self.window)
-        self.tabber.append_page(self.tab_bn.get_box(),
-                                Gtk.Label("New BN"))
+        self.add_bn_tab("New BN")
 
-        # select loaded tab
+
+    def add_bn_tab(self, title):
+        tab_bn = BoxDiscreteBN(self.window)
+        self.tabber.append_page(tab_bn.get_box(),
+                                Gtk.Label(title))
         self.goto_last_tab()
 
     def goto_last_tab(self):
+        # select loaded tab
         n_new_tab = self.tabber.get_n_pages()
         self.tabber.set_current_page(n_new_tab-1)

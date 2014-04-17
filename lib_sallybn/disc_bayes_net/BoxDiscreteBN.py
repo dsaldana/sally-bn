@@ -48,6 +48,9 @@ class BoxDiscreteBN:
                 res.TAB_DISC_BAYES_NET_GLADE,
                 ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn"], self)
 
+        # super(BoxDiscreteBN, self).__init__(spacing=1)
+        # self.pack_start(self.box_disc_bn, True, True, 0)
+
         self.drawer = GraphDrawer(self.area)
 
         # Scale
