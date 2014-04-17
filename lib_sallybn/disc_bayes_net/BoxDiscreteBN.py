@@ -24,6 +24,8 @@ import lib_sallybn.util.resources as res
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
 
+KEY_SUPR_CODE = 65535
+
 ## Enumerations
 # Mode for
 class Mode(Enum):
@@ -125,6 +127,11 @@ class BoxDiscreteBN(Gtk.Box):
 
         self.clicked_point = None
 
+    def on_key_press(self, widget, event):
+
+        # Supr key is pressed
+        if event.keyval == KEY_SUPR_CODE:
+            self.on_delete(None)
 
     def on_button_press(self, widget, event):
         # double
