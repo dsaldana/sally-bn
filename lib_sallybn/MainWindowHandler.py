@@ -1,29 +1,18 @@
 from gi.repository import Gtk
-import json
-import math
 
-from enum import Enum
-
-from lib_sallybn.disc_bayes_net.WinDiscBN import WinDiscBN
-from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
-
-from libpgm.graphskeleton import GraphSkeleton
-from libpgm.nodedata import NodeData
-import lib_sallybn
-from lib_sallybn.GraphDrawer import GraphDrawer
-import lib_sallybn.util.ugraphic
-import lib_sallybn.disc_bayes_net.gwidgets
-
-## Constants
-FILE_EXTENSION = ".sly"
-
+from lib_sallybn.disc_bayes_net.BoxDiscreteBN import BoxDiscreteBN
 
 
 
 ## Class
 class MainWindowHandler:
-    def __init__(self, window):
+    def __init__(self, window, tabber):
         self.window = window
+        self.tabber = tabber
+
+        self.tab_bn = BoxDiscreteBN(window)
+        self.tabber.append_page(self.tab_bn.get_box(),
+                                Gtk.Label("New"))
 
     def on_save(self, widget):
         dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
@@ -35,7 +24,7 @@ class MainWindowHandler:
 
         filter_py = Gtk.FileFilter()
         filter_py.set_name("Sally files")
-        filter_py.add_pattern("*" + FILE_EXTENSION)
+        filter_py.add_pattern("*" + BoxDiscreteBN.FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
         dialog.show_all()
@@ -63,7 +52,7 @@ class MainWindowHandler:
         # Filter
         filter_py = Gtk.FileFilter()
         filter_py.set_name("Sally files")
-        filter_py.add_pattern("*" + FILE_EXTENSION)
+        filter_py.add_pattern("*" + BoxDiscreteBN.FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
         #RUN
@@ -79,5 +68,7 @@ class MainWindowHandler:
         dialog.destroy()
 
     def on_new(self, widget):
-        # TODO create new BN
         print "new"
+        self.tab_bn = BoxDiscreteBN(self.window)
+        self.tabber.append_page(self.tab_bn.get_box(),
+                                Gtk.Label("New"))

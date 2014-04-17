@@ -6,14 +6,19 @@ from enum import Enum
 
 from lib_sallybn.disc_bayes_net.WinDiscBN import WinDiscBN
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
-
+from lib_sallybn.util import ugraphic
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.util.ugraphic
 import lib_sallybn.disc_bayes_net.gwidgets
+import lib_sallybn.util.resources as res
 
+
+
+## Constants
+FILE_EXTENSION = ".sly"
 
 ## Enumerations
 # Mode for
@@ -30,17 +35,18 @@ class ModeEdit(Enum):
     delete = 3
 
 
-class TabDiscBN:
+class BoxDiscreteBN:
     def __init__(self, window):
-
-        #TODO must be loaded
-        #area, edit_buttons
-
         self.window = window
 
-        self.drawer = GraphDrawer(area)
-        self.area = area
-        self.edit_buttons = edit_buttons
+        # Create graphic widgets
+        # other "bvertex", "bdelete", "bedge"
+        self.box_disc_bn, self.area, self.edit_toolbar = \
+            ugraphic.create_widget(
+                res.TAB_DISC_BAYES_NET_GLADE,
+                "box_disc_bn", "drawingarea_bn", "toolbar_edit_bn")
+
+        self.drawer = GraphDrawer(self.area)
 
         # Scale
         self.scale = 1
@@ -86,6 +92,9 @@ class TabDiscBN:
         self.clicked_point = None
         self.dragged = None
 
+    def get_box(self):
+        return self.box_disc_bn
+
     def on_scroll(self, widget, event):
         #print event.direction, event.delta_x, event.delta_y
         self.trans_point = [event.x, event.y]
@@ -93,7 +102,6 @@ class TabDiscBN:
 
         self.area.queue_draw()
         return True
-
 
 
     def on_button_release(self, widget, event):
@@ -216,10 +224,10 @@ class TabDiscBN:
 
         if radio_tool.get_label() == "bedit":
             self.mode = Mode.edit
-            self.set_edit_buttons_visible(True)
+            self.edit_toolbar.set_visible(True)
         if radio_tool.get_label() == "brun":
             self.mode = Mode.run
-            self.set_edit_buttons_visible(False)
+            self.edit_toolbar.set_visible(False)
 
         self.area.queue_draw()
 
@@ -296,9 +304,7 @@ class TabDiscBN:
 
         self.area.queue_draw()
 
-    def set_edit_buttons_visible(self, visible):
-        for eb in self.edit_buttons:
-            eb.set_visible(visible)
+
 
     def change_vertex_name_h(self, old_name, new_name):
         #vertex locations

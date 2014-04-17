@@ -1,175 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-    <object class="GtkBox" id="box7">
+  <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkBox" id="box_disc_bn">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="GtkBox" id="box8">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
         <child>
-            <object class="GtkBox" id="box8">
+          <object class="GtkToolbar" id="toolbar_edit_bn">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="show_arrow">False</property>
+            <child>
+              <object class="GtkRadioToolButton" id="bvertex">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <child>
-                    <object class="GtkToolbar" id="toolbar3">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="show_arrow">False</property>
-                        <child>
-                            <object class="GtkRadioToolButton" id="bvertex">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="has_tooltip">True</property>
-                                <property name="tooltip_markup" translatable="yes">Create node</property>
-                                <property name="tooltip_text" translatable="yes">Create node</property>
-                                <property name="use_action_appearance">False</property>
-                                <property name="label" translatable="yes">bvertex</property>
-                                <property name="use_underline">True</property>
-                                <property name="icon_name">emblem-default</property>
-                                <property name="group">bedge</property>
-                                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <object class="GtkRadioToolButton" id="bedge">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="has_tooltip">True</property>
-                                <property name="tooltip_markup" translatable="yes">Create edge</property>
-                                <property name="tooltip_text" translatable="yes">Create edge</property>
-                                <property name="use_action_appearance">False</property>
-                                <property name="label" translatable="yes">bedge</property>
-                                <property name="use_underline">True</property>
-                                <property name="stock_id">gtk-sort-ascending</property>
-                                <property name="group">bvertex</property>
-                                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <object class="GtkRadioToolButton" id="bdelete">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
-                                <property name="label" translatable="yes">bdelete</property>
-                                <property name="use_underline">True</property>
-                                <property name="stock_id">gtk-cancel</property>
-                                <property name="group">bvertex</property>
-                                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <object class="GtkSeparatorToolItem" id="se">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                    </object>
-                    <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                    </packing>
-                </child>
-                <child>
-                    <object class="GtkToolbar" id="toolbar4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="show_arrow">False</property>
-                        <child>
-                            <object class="GtkSeparatorToolItem" id="se1">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <object class="GtkRadioToolButton" id="Edition">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
-                                <property name="label" translatable="yes">bedit</property>
-                                <property name="use_underline">True</property>
-                                <property name="stock_id">gtk-edit</property>
-                                <property name="active">True</property>
-                                <property name="group">Run</property>
-                                <signal name="toggled" handler="on_mode" swapped="no"/>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                        <child>
-                            <object class="GtkRadioToolButton" id="Run">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
-                                <property name="label" translatable="yes">brun</property>
-                                <property name="use_underline">True</property>
-                                <property name="icon_name">applications-office</property>
-                                <signal name="toggled" handler="on_mode" swapped="no"/>
-                            </object>
-                            <packing>
-                                <property name="expand">False</property>
-                                <property name="homogeneous">True</property>
-                            </packing>
-                        </child>
-                    </object>
-                    <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">1</property>
-                    </packing>
-                </child>
-            </object>
-            <packing>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip_markup" translatable="yes">Create node</property>
+                <property name="tooltip_text" translatable="yes">Create node</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">bvertex</property>
+                <property name="use_underline">True</property>
+                <property name="icon_name">emblem-default</property>
+                <property name="group">bedge</property>
+                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
+              </object>
+              <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-            </packing>
-        </child>
-        <child>
-            <object class="GtkDrawingArea" id="drawingarea1">
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioToolButton" id="bedge">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-                <signal name="motion-notify-event" handler="motion_event" swapped="no"/>
-                <signal name="drag-begin" handler="motion_event" swapped="no"/>
-                <signal name="scroll-event" handler="on_scroll" swapped="no"/>
-            </object>
-            <packing>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip_markup" translatable="yes">Create edge</property>
+                <property name="tooltip_text" translatable="yes">Create edge</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">bedge</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-sort-ascending</property>
+                <property name="group">bvertex</property>
+                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
+              </object>
+              <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-            </packing>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioToolButton" id="bdelete">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">bdelete</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-cancel</property>
+                <property name="group">bvertex</property>
+                <signal name="toggled" handler="on_edit_mode" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem" id="se">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
         </child>
-    </object>
+        <child>
+          <object class="GtkToolbar" id="toolbar4">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="show_arrow">False</property>
+            <child>
+              <object class="GtkSeparatorToolItem" id="se1">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioToolButton" id="Edition">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">bedit</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-edit</property>
+                <property name="active">True</property>
+                <property name="group">Run</property>
+                <signal name="toggled" handler="on_mode" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioToolButton" id="Run">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">brun</property>
+                <property name="use_underline">True</property>
+                <property name="icon_name">applications-office</property>
+                <signal name="toggled" handler="on_mode" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkDrawingArea" id="drawingarea_bn">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <signal name="motion-notify-event" handler="motion_event" swapped="no"/>
+        <signal name="drag-begin" handler="motion_event" swapped="no"/>
+        <signal name="scroll-event" handler="on_scroll" swapped="no"/>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+  </object>
 </interface>
