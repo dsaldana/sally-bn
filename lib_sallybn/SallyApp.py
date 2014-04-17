@@ -1,11 +1,9 @@
 from gi.repository import Gtk
 
 from lib_sallybn import WinHandler
-
-
-glade_file = 'resources/visual_editor.glade'
-
 # FIXME Not here
+import lib_sallybn.util.resources as res
+
 
 class SallyApp(Gtk.Application):
     def __init__(self):
@@ -19,7 +17,7 @@ class SallyApp(Gtk.Application):
         # Set the Glade file
 
         builder = Gtk.Builder()
-        builder.add_from_file(glade_file)
+        builder.add_from_file(res.MAIN_WINDOW_GLADE)
 
         #Get the Main Window, and connect the "destroy" event
         window = builder.get_object("MainWindow")

@@ -1,4 +1,4 @@
-from lib_sallybn import util
+from lib_sallybn.util import ulist
 from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 
 DEFAULT_STATES = ["true", "false"]
@@ -55,7 +55,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
     def str_parent_states(self, parents_matrix):
         str_pstates = []
         for states in parents_matrix:
-            tmp = util.statelist_to_string(states)
+            tmp = ulist.statelist_to_string(states)
             str_pstates.append(tmp)
 
         return str_pstates
@@ -123,7 +123,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         # state name
         l_vals = self.Vdata[vertex_name]["vals"]
         self.Vdata[vertex_name]["vals"] = \
-            util.change_element_in_list(l_vals, old_name, new_name)
+            ulist.change_element_in_list(l_vals, old_name, new_name)
 
         # CPT in children
         children = self.getchildren(vertex_name)
@@ -171,7 +171,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
                 # in vdata
                 pars = self.Vdata[self.E[i][1]]["parents"]
                 self.Vdata[self.E[i][1]]["parents"] = \
-                    util.change_element_in_list(pars, old_name, new_name)
+                    ulist.change_element_in_list(pars, old_name, new_name)
 
             # change in children
             elif old_name == self.E[i][1]:
@@ -179,10 +179,10 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
                 # in vdata
                 children = self.Vdata[self.E[i][0]]["children"]
                 self.Vdata[self.E[i][0]]["children"] = \
-                    util.change_element_in_list(children, old_name, new_name)
+                    ulist.change_element_in_list(children, old_name, new_name)
 
         self.Vdata[new_name] = self.Vdata.pop(old_name)
-        self.V = util.change_element_in_list(self.V, old_name, new_name)
+        self.V = ulist.change_element_in_list(self.V, old_name, new_name)
 
     def add_edge(self, edge):
         parent, child = edge

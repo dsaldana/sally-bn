@@ -11,8 +11,8 @@ from gi.repository import Gtk
 from gi.repository import Pango
 import random
 import math
+from lib_sallybn.util import ulist
 
-import util
 
 
 NEW_STATE_NAME = "-Click here for new state-"
@@ -151,7 +151,7 @@ class GraphicCptTable:
         for l in range(n_rows):
             # Fill for no parents
             if len(parents) == 0:
-                str_prob = util.list_to_str_list(cprob)
+                str_prob = ulist.list_to_str_list(cprob)
                 print cprob
                 self.model.append(str_prob)
 
@@ -159,7 +159,7 @@ class GraphicCptTable:
                 print l
                 print str_parent_matrix[l]
                 cprob_line = cprob[str_parent_matrix[l]]
-                str_cprob_line = util.list_to_str_list(cprob_line)
+                str_cprob_line = ulist.list_to_str_list(cprob_line)
                 self.model.append(parents_matrix[l] + str_cprob_line)
 
         ### end fill data
@@ -254,7 +254,7 @@ class GraphicCptTable:
         for line in self.model:
             #key
             parent_states = line[:len(parents)]
-            key = util.statelist_to_string(parent_states)
+            key = ulist.statelist_to_string(parent_states)
             # values
             svals = line[len(parents):]
             fvals = [float(s) for s in svals]

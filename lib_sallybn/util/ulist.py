@@ -10,20 +10,6 @@ def statelist_to_string(states):
     return tmp
 
 
-##TODO remove, it is implemented in DBN
-def get_parents(vertex, edges):
-    """
-    get the parents for a vertex in a list of edges
-    :param vertex:
-    :param edges:
-    :return:
-    """
-    parents = []
-    for v1, v2 in edges:
-        if v2 == vertex:
-            parents.append(v1)
-    return parents
-
 
 def change_element_in_list(old_list, old_name, new_name):
     new_list = []

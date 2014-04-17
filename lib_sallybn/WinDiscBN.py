@@ -3,7 +3,7 @@ from gi.repository import Gtk
 from lib_sallybn import gutil
 import lib_sallybn
 from lib_sallybn.gwidgets import GraphicCptTable, StatesTable
-
+import lib_sallybn.util.resources as res
 
 class WinDiscBN:
     def __init__(self, disc_bn):
@@ -15,7 +15,7 @@ class WinDiscBN:
         # Get widgets from dialog.
         cpt_dialog, treeview_cpt, text_var_name, button_cancel, \
         button_ok, button_rand, treeview_states, badd_state, bremove_state = \
-            gutil.create_widget(lib_sallybn.SallyApp.glade_file,
+            gutil.create_widget(res.DISC_VAR_DIALOG_GLADE,
                                 "dialog_cpt",
                                 "treeview_cpt",
                                 "text_var_name",
