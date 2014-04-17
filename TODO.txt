@@ -2,6 +2,7 @@
 --- Priority TODO ---
 * Solve the BN
 * Tab support
+* Remove node
 
 
 ----TO FIX----
