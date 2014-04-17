@@ -23,9 +23,12 @@ def vertex_in_circle(p, vertices):
 
     return vertex
 
-def create_widget(glade_file, *widget_names):
+def create_widget(glade_file, widget_names, handler = None):
     # GTK builder
     builder = Gtk.Builder()
     builder.add_from_file(glade_file)
+
+    if handler is not None:
+        builder.connect_signals(handler)
 
     return [builder.get_object(wname) for wname in widget_names]

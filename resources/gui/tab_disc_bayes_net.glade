@@ -134,6 +134,7 @@
                 <property name="label" translatable="yes">brun</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">applications-office</property>
+                <property name="group">Edition</property>
                 <signal name="toggled" handler="on_mode" swapped="no"/>
               </object>
               <packing>

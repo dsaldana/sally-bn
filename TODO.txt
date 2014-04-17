@@ -1,5 +1,7 @@
 
 --- Priority TODO ---
+* show graph without previous locations
+* Save tab
 * Solve the BN
 * Remove node
 
@@ -7,6 +9,7 @@
 ----TO FIX----
 - gui bugs
 * Zoom and translate
+* Error loading from file
 
 --- Next release ---
 * New BN, multiple BNs with tabs

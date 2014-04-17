@@ -15,7 +15,7 @@ class WinDiscBN:
         cpt_dialog, treeview_cpt, text_var_name, button_cancel, \
         button_ok, button_rand, treeview_states, badd_state, bremove_state = \
             ugraphic.create_widget(res.DISC_VAR_DIALOG_GLADE,
-                                "dialog_cpt",
+                                ["dialog_cpt",
                                 "treeview_cpt",
                                 "text_var_name",
                                 "button_cancel",
@@ -23,7 +23,7 @@ class WinDiscBN:
                                 "button_rand",
                                 "treeview_states",
                                 "badd_state",
-                                "bremove_state")
+                                "bremove_state"])
 
 
         cpt_dialog.set_parent(window)

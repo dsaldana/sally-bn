@@ -17,6 +17,8 @@ import lib_sallybn.util.resources as res
 
 
 
+
+
 ## Constants
 FILE_EXTENSION = ".sly"
 
@@ -44,7 +46,7 @@ class BoxDiscreteBN:
         self.box_disc_bn, self.area, self.edit_toolbar = \
             ugraphic.create_widget(
                 res.TAB_DISC_BAYES_NET_GLADE,
-                "box_disc_bn", "drawingarea_bn", "toolbar_edit_bn")
+                ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn"], self)
 
         self.drawer = GraphDrawer(self.area)
 
@@ -305,7 +307,6 @@ class BoxDiscreteBN:
         self.area.queue_draw()
 
 
-
     def change_vertex_name_h(self, old_name, new_name):
         #vertex locations
         self.vertex_locations[new_name] = self.vertex_locations.pop(old_name)
@@ -371,17 +372,20 @@ class BoxDiscreteBN:
         skel.toporder()
 
         # load bayesian network
-        disc_bn = DiscreteBayesianNetworkExt(skel, nd)
-        vertex_locations = None
+        self.disc_bn = DiscreteBayesianNetworkExt(skel, nd)
+        # vertex_locations = None
         ## load vertex locations (if exist)
         with open(file_name) as json_file:
             json_data = json.load(json_file)
 
             if "vertex_loc" in json_data.keys():
-                vertex_locations = json_data["vertex_loc"]
+                self.vertex_locations = json_data["vertex_loc"]
             # disc_bn.V = json_data["V"]
             # disc_bn.E = json_data["E"]
             # disc_bn.Vdata = json_data["Vdata"]
+            else:
+                # TODO create an alg to show the nodes if vertex locations does not exist
+                pass
             json_file.close()
 
-        return disc_bn, vertex_locations
+            # return disc_bn, vertex_locations
