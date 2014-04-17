@@ -1,14 +1,32 @@
 import math
 from random import shuffle
-
 from gi.repository import Gtk
 
 from lib_sallybn import GraphDrawer
 
 
+def edge_in_point(p, vertex_locations, edges):
+    px, py = p
+
+    for e in edges:
+        x1, y1 = vertex_locations[e[0]]
+        x2, y2 = vertex_locations[e[1]]
+
+        # distance from p1 to p
+        d1_p = math.hypot(x1 - px, y1 - py)
+        # distance from p to p2
+        d2_p = math.hypot(x2 - px, y2 - py)
+
+        # distance prom p1 to p2
+        d1_2 = math.hypot(x2 - x1, y2 - y1)
+
+        # validate
+        if d1_p + d2_p - d1_2 < 0.2:
+            return e
+
+    return None
 
 
-# MOVE TO tuils
 def vertex_in_circle(p, vertices):
     """
     Serach if there is a node in the clicked point
@@ -101,3 +119,4 @@ def create_vertex_locations(graph_skeleton, dx=200, dy=150):
             vertex_locations[lvertices[i]] = [x, y]
 
     return vertex_locations
+

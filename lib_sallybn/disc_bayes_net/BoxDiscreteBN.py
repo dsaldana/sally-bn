@@ -19,6 +19,7 @@ import lib_sallybn.util.resources as res
 
 
 
+
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
@@ -64,6 +65,7 @@ class BoxDiscreteBN(Gtk.Box):
         # Temporal vertex for edge
         self.vertex_1 = None
         self.selected_vetex = None
+        self.selected_edge = None
         self.vertex_count = 1
 
         # Temporal arrow for mouse motion
@@ -130,6 +132,11 @@ class BoxDiscreteBN(Gtk.Box):
         p = self.transform.transform_point(p[0], p[1])
 
         self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(p, self.vertex_locations)
+
+        if self.selected_vetex is None:
+            self.selected_edge = lib_sallybn.util.ugraphic.edge_in_point(p,
+                                                                         self.vertex_locations,
+                                                                         self.disc_bn.get_edges())
 
         self.dragged = None
 
@@ -200,13 +207,16 @@ class BoxDiscreteBN(Gtk.Box):
             # Draw selected nodes
             # print "selected vertex:", self.selected_vetex
             if self.selected_vetex is not None:
-                self.drawer.draw_selected_vertices(cairo, self.selected_vetex, self.vertex_locations)
+                self.drawer.draw_selected_vertex(cairo, self.selected_vetex, self.vertex_locations)
 
                 # Draw temporal arrow
                 if self.mode_edit == ModeEdit.edge and self.tmp_arrow is not None:
                     tmp_v = {"I": self.vertex_locations[self.selected_vetex], "F": self.tmp_arrow}
                     tmp_e = [["I", "F"]]
                     self.drawer.draw_directed_arrows(cairo, tmp_e, tmp_v, headarrow_d=0)
+            elif self.selected_edge is not None:
+                print "selected edge", self.selected_edge
+                self.drawer.draw_selected_edge(cairo, self.selected_edge, self.vertex_locations)
 
             # Draw edges
             self.drawer.draw_directed_arrows(cairo, self.disc_bn.get_edges(), self.vertex_locations)
@@ -236,7 +246,6 @@ class BoxDiscreteBN(Gtk.Box):
         self.area.queue_draw()
 
     def on_organize(self, widget):
-        print "organize"
         self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
         self.area.queue_draw()
 
@@ -279,7 +288,7 @@ class BoxDiscreteBN(Gtk.Box):
             ## Mode VERTEX
             if self.mode_edit == ModeEdit.vertex:
                 # Create new Vertex
-                if self.selected_vetex is None:
+                if self.selected_vetex is None and self.selected_edge is None:
                     vname = self.get_new_vertex_name()
                     # new vertex
                     self.vertex_locations[vname] = p

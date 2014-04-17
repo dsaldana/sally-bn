@@ -66,16 +66,32 @@ class GraphDrawer:
 
             cairo.fill()
 
-    def draw_selected_vertices(self, cairo, selected_vertex, vertices):
+    def draw_selected_edge(self, cairo, selected_edge, vertex_locations):
+        x1, y1 = vertex_locations[selected_edge[0]]
+        x2, y2 = vertex_locations[selected_edge[1]]
+
+        dx, dy = float(x2 - x1), float(y2 - y1)
+        # Avoid problem with atan
+        # if dx == 0:
+        #     dx = 1
+
+        cairo.set_source_rgb(244 / 255.0, 192 / 255.0, 125 / 255.0)
+        cairo.set_line_width(9.1)
+        cairo.move_to(x1, y1)
+        cairo.line_to(x2, y2)
+        cairo.stroke()
+        cairo.set_line_width(2.0)
+
+    def draw_selected_vertex(self, cairo, selected_vertex, vertex_locations):
         ## selected node
-        point = vertices[selected_vertex]
+        point = vertex_locations[selected_vertex]
         cairo.set_source_rgb(1, 0.8, 0.0)  # yellow
         cairo.arc(point[0], point[1], vertex_radious + 5, 0, 2 * 3.1416)
         cairo.fill()
 
 
-    def draw_vertices(self, cairo, vertices):
-        for vname, point in vertices.items():
+    def draw_vertices(self, cairo, vertex_locations):
+        for vname, point in vertex_locations.items():
             ## Fill circle
             cairo.set_source_rgb(0.61, 0.75, 1.0)  # light blue
             cairo.arc(point[0], point[1], vertex_radious, 0, 2 * 3.1416)
@@ -83,7 +99,7 @@ class GraphDrawer:
 
             ## Draw border
             cairo.set_source_rgb(0.22, 0.30, 0.66)  # blue
-            cairo.arc(point[0], point[1], vertex_radious, 0, 2 * 3.1416)
+            cairo.arc(point[0], point[1], vertex_radious, 0, 2 * math.pi)
             cairo.stroke()
 
             ## Draw text
@@ -194,4 +210,6 @@ class GraphDrawer:
     @staticmethod
     def _get_box_height(states):
         return title_height + delta_state * len(states)
+
+
 

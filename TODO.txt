@@ -1,7 +1,6 @@
 
 --- Priority TODO ---
 * Solve the BN
-* Remove node
 * Delete Edge
 
 ----TO FIX----
@@ -20,6 +19,7 @@
 
 
 --- FIXED -----
+* Remove node
 - Error loading from file
 * show graph without previous locations
 * Read libpgm files
