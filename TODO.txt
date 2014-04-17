@@ -1,7 +1,6 @@
 
 --- Priority TODO ---
 * Solve the BN
-* Tab support
 * Remove node
 
 
@@ -18,6 +17,7 @@
 
 
 --- FIXED -----
+* Tab support
 * Save and Open json.
 - CPT is not modal
 - add state for children
