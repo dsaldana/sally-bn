@@ -7,7 +7,7 @@
 ----TO FIX----
 - gui bugs
 * Zoom and translate
-* Error loading from file
+
 
 --- Next release ---
 * New BN, multiple BNs with tabs
@@ -18,7 +18,9 @@
 * Marginal probabilities after delete node for children.
 * Improve the graph drawing algorithm for multiple bns
 
+
 --- FIXED -----
+- Error loading from file
 * show graph without previous locations
 * Read libpgm files
 * Example API to show only a BN from file

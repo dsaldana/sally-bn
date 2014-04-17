@@ -3,7 +3,7 @@ import math
 
 from enum import Enum
 
-from lib_sallybn.disc_bayes_net.WinDiscBN import WinDiscBN
+from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 from lib_sallybn.util import ugraphic
 from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
@@ -70,7 +70,7 @@ class BoxDiscreteBN(Gtk.Box):
         # Graph
         self.disc_bn = DiscreteBayesianNetworkExt()
         # Window manager for discrete bayesian networks
-        self.win_discbn = WinDiscBN(self.disc_bn)
+        self.cpt_dialog = CptDialog()
 
         self.vertex_locations = {}
         self.builder = None
@@ -139,10 +139,10 @@ class BoxDiscreteBN(Gtk.Box):
         ## doble click, open the dialog
         elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
 
-            self.win_discbn.show_cpt_dialog(self.window, self.selected_vetex)
+            self.cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
             self.clicked_point = None
             self.selected_vetex = None
-            return
+            # return True
 
         ## Click on edit area
         elif event.button == 1 and self.mode == Mode.edit:
@@ -337,9 +337,9 @@ class BoxDiscreteBN(Gtk.Box):
         # Click on edit vertex data.
         def event_edit(widget, event):
             menu.destroy()
-            self.win_discbn.show_cpt_dialog(self.window, self.selected_vetex)
+            self.cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
 
-            new_var_name = self.win_discbn.get_var_name()
+            new_var_name = self.cpt_dialog.get_var_name()
 
             if not new_var_name == self.selected_vetex:
                 self.change_vertex_name_h(self.selected_vetex, new_var_name)
@@ -390,7 +390,7 @@ class BoxDiscreteBN(Gtk.Box):
             self.vertex_locations = json_data["vertex_loc"]
         else:
             self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
-
+        print self.vertex_locations
 
 
 

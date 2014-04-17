@@ -4,13 +4,12 @@ from lib_sallybn.disc_bayes_net.gwidgets import GraphicCptTable, StatesTable
 from lib_sallybn.util import ugraphic
 import lib_sallybn.util.resources as res
 
-class WinDiscBN:
-    def __init__(self, disc_bn):
+class CptDialog:
+    def __init__(self):
         # Represents a Bayesian network with discrete CPD tables.
-        self.disc_bn = disc_bn
         self.var_name = None
 
-    def show_cpt_dialog(self, window, selected_vetex):
+    def show_cpt_dialog(self, window, disc_bn, selected_vetex):
         # Get widgets from dialog.
         cpt_dialog, treeview_cpt, text_var_name, button_cancel, \
         button_ok, button_rand, treeview_states, badd_state, bremove_state = \
@@ -33,7 +32,7 @@ class WinDiscBN:
         #TODO clone disc_bn and assign only if accept
 
         # load info for CPT
-        gcpt_table = GraphicCptTable(self.disc_bn,
+        gcpt_table = GraphicCptTable(disc_bn,
                                      selected_vetex,
                                      treeview_cpt)
 
@@ -41,11 +40,13 @@ class WinDiscBN:
             gcpt_table.modify_treeview_for_cpt()
 
 
-        gstates_table = StatesTable(self.disc_bn, selected_vetex,
+        gstates_table = StatesTable(disc_bn, selected_vetex,
                                     state_changed_func, treeview_states,
                                     badd_state, bremove_state)
         # Quit
-        cpt_dialog.connect("delete-event", Gtk.main_quit)
+        def quit(*args):
+            cpt_dialog.destroy()
+        cpt_dialog.connect("delete-event", quit)
 
         # Cancel
         def cancel_ev(widget):
@@ -76,7 +77,7 @@ class WinDiscBN:
             else:
                 # Save cpt in current name
                 cprob = gcpt_table.get_cprob_from_table()
-                self.disc_bn.set_cprob(selected_vetex, cprob)
+                disc_bn.set_cprob(selected_vetex, cprob)
 
                 cpt_dialog.destroy()
 

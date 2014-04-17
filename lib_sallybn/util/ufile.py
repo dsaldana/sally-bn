@@ -22,9 +22,10 @@ def dic_from_json_file(file_name):
             json_file = json_file.replace('.', '0.')
             json_data = json.loads(json_file)
 
-            return json_data
+            json_data
         except ValueError:
             raise ValueError, "Convert to JSON from input file failed. Check formatting."
+    return json_data
     f.close()
 
 def dic_to_file(dic, file_name):
