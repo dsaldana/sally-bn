@@ -9,7 +9,7 @@ class MainWindowHandler:
     def __init__(self, window, tabber):
         self.window = window
         self.tabber = tabber
-
+        # Add a clean bn
         self.add_bn_tab("New Bayesian Network")
 
     def on_save(self, widget):
@@ -22,16 +22,18 @@ class MainWindowHandler:
 
         filter_py = Gtk.FileFilter()
         filter_py.set_name("Sally files")
-        filter_py.add_pattern("*" + BoxDiscreteBN.FILE_EXTENSION)
+        filter_py.add_pattern("*" + FILE_EXTENSION)
         dialog.add_filter(filter_py)
 
         dialog.show_all()
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            #self.save_bn_to_file(self.disc_bn, self.vertex_locations, dialog.get_filename())
-            #TODO send tab to save
-            pass
+            # get selected tab
+            n_tab = self.tabber.get_current_page()
+            disc_bn = self.tabber.get_nth_page(n_tab)
+            # save
+            disc_bn.save_bn_to_file(dialog.get_filename())
 
         dialog.destroy()
 

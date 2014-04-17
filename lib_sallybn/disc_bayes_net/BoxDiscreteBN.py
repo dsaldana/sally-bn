@@ -354,13 +354,12 @@ class BoxDiscreteBN(Gtk.Box):
         menu.popup(None, None, None, None, event.button, event.time)
 
 
-    @staticmethod
-    def save_bn_to_file(disc_bn, vertex_locations, file_name):
+    def save_bn_to_file(self, file_name):
         bn = {
-            "vertex_loc": vertex_locations,
-            "E": disc_bn.get_edges(),
-            "V": disc_bn.get_vertices(),
-            "Vdata": disc_bn.get_vdata()}
+            "vertex_loc": self.vertex_locations,
+            "E": self.disc_bn.get_edges(),
+            "V": self.disc_bn.get_vertices(),
+            "Vdata": self.disc_bn.get_vdata()}
 
         if not file_name.endswith(FILE_EXTENSION):
             file_name += FILE_EXTENSION
