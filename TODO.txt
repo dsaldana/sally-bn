@@ -1,7 +1,7 @@
 
 --- Priority TODO ---
 * Solve the BN
-* Delete Edge
+
 
 ----TO FIX----
 - gui bugs
@@ -16,9 +16,11 @@
 * Plugins or another way to extend to other bns.
 * Marginal probabilities after delete node for children.
 * Improve the graph drawing algorithm for multiple bns
+* Close tabs
 
 
 --- FIXED -----
+* Delete Edge
 * Remove node
 - Error loading from file
 * show graph without previous locations

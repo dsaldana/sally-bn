@@ -35,7 +35,7 @@ class SallyApp(Gtk.Application):
         window.connect("delete-event", Gtk.main_quit)
         window.connect("destroy", Gtk.main_quit)
 
-        # window.show_all()
+        window.show_all()
 
 
 

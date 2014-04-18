@@ -18,4 +18,5 @@ box.load_bn_from_file(file)
 window.add(box)
 
 window.show_all()
+window.connect("delete-event", Gtk.main_quit)
 Gtk.main()
