@@ -9,20 +9,11 @@ from lib_sallybn.util import ugraphic
 from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
-import lib_sallybn
 from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.util.ugraphic
+import lib_sallybn
 import lib_sallybn.disc_bayes_net.gwidgets
 import lib_sallybn.util.resources as res
-
-
-
-
-
-
-
-
-
 
 
 
@@ -138,21 +129,21 @@ class BoxDiscreteBN(Gtk.Box):
         #transformed point
         trf_p = self.transform.transform_point(p[0], p[1])
 
+        # If there is a vertex in the clicked point
         self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(trf_p, self.vertex_locations)
-
+        # If there is a edge in the clicked point
         if self.selected_vetex is None:
             self.selected_edge = lib_sallybn.util.ugraphic.edge_in_point(trf_p,
                                                                          self.vertex_locations,
                                                                          self.disc_bn.get_edges())
 
-        # self.dragged = None
-
-        ## Right click for edit node
-        if event.button == 3 and self.selected_vetex is not None:
+        ## Right click for edit and delete
+        if event.button == 3 and (self.selected_vetex
+                                  is not None or self.selected_edge is not None):
             self.show_edit_popup(event)
-            return True
+            self.clicked_point = None
 
-        ## doble click, open the dialog
+        ## double click, open the dialog
         elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
             # Show cpt dialog
             cpt_dialog = CptDialog()
@@ -231,7 +222,6 @@ class BoxDiscreteBN(Gtk.Box):
                     tmp_e = [["I", "F"]]
                     self.drawer.draw_directed_arrows(cairo, tmp_e, tmp_v, headarrow_d=0)
             elif self.selected_edge is not None:
-                print "selected edge", self.selected_edge
                 self.drawer.draw_selected_edge(cairo, self.selected_edge, self.vertex_locations)
 
             # Draw edges
@@ -288,7 +278,7 @@ class BoxDiscreteBN(Gtk.Box):
     def on_key_area(self, widget, event):
         print "key", event
 
-    def on_delete(self, widget):
+    def on_delete(self, *widget):
         # Delete vertex
         if self.selected_vetex is not None:
             self.vertex_locations.pop(self.selected_vetex)
@@ -402,22 +392,29 @@ class BoxDiscreteBN(Gtk.Box):
         menu = Gtk.Menu()
         menuitem = Gtk.MenuItem(label="RadioMenuItem")
         menuitem.set_submenu(menu)
-        menu_it = Gtk.MenuItem("Edit Variable")
 
-        # Click on edit vertex data.
-        def event_edit(widget, event):
-            menu.destroy()
-            cpt_dialog = CptDialog()
-            cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
+        if self.selected_vetex is not None:
+            menu_it = Gtk.MenuItem("Edit Variable")
 
-            new_var_name = cpt_dialog.get_var_name()
+            # Click on edit vertex data.
+            def event_edit(widget, event):
+                menu.destroy()
+                cpt_dialog = CptDialog()
+                cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
 
-            if not new_var_name == self.selected_vetex:
-                self.change_vertex_name_h(self.selected_vetex, new_var_name)
+                new_var_name = cpt_dialog.get_var_name()
+
+                if not new_var_name == self.selected_vetex:
+                    self.change_vertex_name_h(self.selected_vetex, new_var_name)
 
 
-        menu_it.connect("button-release-event", event_edit)
-        menu.append(menu_it)
+            menu_it.connect("button-release-event", event_edit)
+            menu.append(menu_it)
+
+        # Delete variable or edge
+        menu_it_del = Gtk.MenuItem("Delete")
+        menu_it_del.connect("button-release-event", self.on_delete)
+        menu.append(menu_it_del)
 
         menu.show_all()
         menu.popup(None, None, None, None, event.button, event.time)
