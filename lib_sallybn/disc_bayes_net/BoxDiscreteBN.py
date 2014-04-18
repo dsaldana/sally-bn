@@ -89,16 +89,6 @@ class BoxDiscreteBN(Gtk.Box):
         self.vertex_locations = {}
         self.builder = None
 
-        #FIXME change all events for only motion
-        # self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
-        #                      Gdk.EventMask.SMOOTH_SCROLL_MASK | Gdk.EventMask.ALL_EVENTS_MASK)
-        # self.area.connect('draw', self.on_drawing_area_draw)
-
-        # self.area.connect("motion_notify_event", self.motion_event)
-        # self.area.connect('button-press-event', self.on_button_press)
-        # self.area.connect('scroll-event', self.on_scroll)
-        # self.area.connect('button-release-event', self.on_button_release)
-
         self.transform = None
         self.trans_point = None
 
@@ -212,23 +202,14 @@ class BoxDiscreteBN(Gtk.Box):
             self.area.queue_draw()
 
     def on_drawing_area_draw(self, drawing_area, cairo):
+        # Sacale
         cairo.scale(self.scale, self.scale)
-
-        # TODO translate for zoom
-        # if self.trans_point is not None:
-        #     tx, ty = self.transform.transform_point(self.trans_point[0], self.trans_point[1])
-        #     cairo.translate(tx, ty)
-        # if self.dragged is not None:
+        # Translate
         tx = self.translation[0] + self.last_translation[0]
         ty = self.translation[1] + self.last_translation[1]
-        # if tx < -100: tx = -100
-        # if ty < -100: ty = -100
         cairo.translate(tx, ty)
 
-        print [ty, ty], self.last_translation
-        # self.dragged = None
 
-        # print cairo.get_matrix()
         self.transform = cairo.get_matrix()
         self.transform.invert()
 
