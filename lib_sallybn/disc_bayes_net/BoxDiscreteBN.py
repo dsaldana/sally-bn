@@ -83,18 +83,18 @@ class BoxDiscreteBN(Gtk.Box):
 
         # Graph
         self.disc_bn = DiscreteBayesianNetworkExt()
-        # Window manager for discrete bayesian networks
-        self.cpt_dialog = CptDialog()
 
+
+        # Vertex locations to draw
         self.vertex_locations = {}
-        self.builder = None
 
+        # Transform for scale
         self.transform = None
-        self.trans_point = None
-
-        self.clicked_point = None
+        # Translations
         self.translation = [0, 0]
         self.last_translation = [0, 0]
+        self.clicked_point = None
+
 
     def get_box(self):
         return self.box_disc_bn
@@ -154,8 +154,10 @@ class BoxDiscreteBN(Gtk.Box):
 
         ## doble click, open the dialog
         elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
+            # Show cpt dialog
+            cpt_dialog = CptDialog()
+            cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
 
-            self.cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
             self.clicked_point = None
             self.selected_vetex = None
             # return True
@@ -208,13 +210,12 @@ class BoxDiscreteBN(Gtk.Box):
         tx = self.translation[0] + self.last_translation[0]
         ty = self.translation[1] + self.last_translation[1]
         cairo.translate(tx, ty)
-
-
+        # Get transformation
         self.transform = cairo.get_matrix()
         self.transform.invert()
 
-        # print self.transform
-
+        #### Drawing ####
+        # Background
         self.drawer.draw_background(cairo)
 
         #### ON EDITION MODE ###
@@ -406,9 +407,10 @@ class BoxDiscreteBN(Gtk.Box):
         # Click on edit vertex data.
         def event_edit(widget, event):
             menu.destroy()
-            self.cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
+            cpt_dialog = CptDialog()
+            cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
 
-            new_var_name = self.cpt_dialog.get_var_name()
+            new_var_name = cpt_dialog.get_var_name()
 
             if not new_var_name == self.selected_vetex:
                 self.change_vertex_name_h(self.selected_vetex, new_var_name)
