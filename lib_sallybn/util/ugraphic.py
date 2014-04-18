@@ -60,7 +60,7 @@ def create_widget(glade_file, widget_names, handler=None):
     return [builder.get_object(wname) for wname in widget_names]
 
 
-def create_vertex_locations(graph_skeleton, dx=200, dy=150):
+def create_vertex_locations(graph_skeleton, dx=220, dy=180):
     vertex = list(graph_skeleton.get_vertices())
 
     ## Extract root nodes

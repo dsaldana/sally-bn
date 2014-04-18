@@ -1,9 +1,9 @@
 import math
-
+from random import random
 # Node radious
 vertex_radious = 30.0
 
-box_width = 100
+box_width = 160
 delta_state = 30
 title_height = delta_state + 5
 
@@ -174,38 +174,84 @@ class GraphDrawer:
             x_corner = px - box_width / 2.0
             y_corner = py - box_heigh / 2.0
 
+            color_dark_green = [5.0 / 255, 138.0 / 255, 0.0 / 255]
+            color_light_green = [230.0 / 255, 242.0 / 255, 230.0 / 255]
+            color_gray = 152.0 / 255, 152.0 / 255, 152.0 / 255
+
             # Background
-            cairo.set_source_rgb(230.0 / 255, 242.0 / 255, 230.0 / 255)  # light green
+            cairo.set_source_rgb(*color_light_green)  # light green
             cairo.rectangle(x_corner, y_corner, box_width, box_heigh)
             cairo.fill()
 
-            # Border
+
+            # Title background
             cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
             cairo.rectangle(x_corner, y_corner, box_width, title_height)
             cairo.fill()
 
-            ## Title
+            ## Title text
             cairo.select_font_face("Georgia")
-            cairo.set_source_rgb(59.0 / 255, 143.0 / 255, 0.0 / 255)  # dark green
+            cairo.set_source_rgb(*color_dark_green)  # dark green
             # cairo.set_source_rgb(0.0 / 255, 0.0 / 255, 0.0 / 255)  # green
             cairo.move_to(x_corner + 5, y_corner + 25)
             cairo.set_font_size(17)
             cairo.show_text(vname)
 
+            # Background rectangle for prob value box
+            rwidth = (box_width / 2 - 10)
+            rheight = delta_state / 2.0 + 5.0
+
             for i in range(len(var_states)):
-                ## States
                 ny = y_corner + title_height + (i + 1) * delta_state
+
+                # Text for states
+                cairo.select_font_face("Georgia")
+                cairo.set_source_rgb(15.0 / 255, 158.0 / 255, 0.0 / 255)
+                cairo.set_font_size(14)
+                cairo.move_to(x_corner + 5, ny - 10)
+                cairo.show_text(var_states[i][:11])
+
+                ### Values
+                rx = x_corner + box_width / 2.0
+                ry = ny - 25.0
+
+                # Prob rectangle
+                cairo.set_source_rgb(*color_gray)  # gray
+                cairo.rectangle(rx, ry, rwidth, rheight)
+                cairo.fill()
+
+                val = random()
+                # Prob rectangle
+                val_width = rwidth * val
+                cairo.set_source_rgb(*color_dark_green)  # dark green
+                cairo.rectangle(rx, ry, val_width, rheight)
+                cairo.fill()
+
+                # Text for value
+                cairo.select_font_face("Georgia")
+                cairo.set_source_rgb(255.0 / 255, 255.0 / 255, 255.0 / 255)
+                cairo.set_font_size(14)
+                cairo.move_to(rx + 5, ny - 10)
+                cairo.show_text(str(val)[:5])
+
+                ## State line
+                cairo.set_line_width(0.5)
                 cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
                 cairo.move_to(x_corner, ny)
                 cairo.line_to(x_corner + box_width, ny)
                 cairo.stroke()
 
-                # Text for states
-                cairo.select_font_face("Georgia")
-                cairo.set_source_rgb(69.0 / 255, 163.0 / 255, 0.0 / 255)  # dark green
-                cairo.set_font_size(14)
-                cairo.move_to(x_corner + 5, ny - 10)
-                cairo.show_text(var_states[i])
+            #Border
+            cairo.set_line_width(0.5)
+            cairo.set_source_rgb(*color_dark_green)
+            cairo.rectangle(x_corner, y_corner, box_width, box_heigh)
+            cairo.stroke()
+
+            # Line title
+            cairo.move_to(x_corner, y_corner + title_height)
+            cairo.line_to(x_corner + box_width, y_corner + title_height)
+            cairo.stroke()
+
 
     @staticmethod
     def _get_box_height(states):

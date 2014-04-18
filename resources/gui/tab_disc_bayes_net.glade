@@ -111,7 +111,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkRadioToolButton" id="Edition">
+              <object class="GtkRadioToolButton" id="bedit">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -121,7 +121,7 @@
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-edit</property>
                 <property name="active">True</property>
-                <property name="group">Run</property>
+                <property name="group">brun</property>
                 <signal name="toggled" handler="on_mode" swapped="no"/>
               </object>
               <packing>
@@ -130,7 +130,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkRadioToolButton" id="Run">
+              <object class="GtkRadioToolButton" id="brun">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -139,7 +139,7 @@
                 <property name="label" translatable="yes">brun</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">applications-office</property>
-                <property name="group">Edition</property>
+                <property name="group">bedit</property>
                 <signal name="toggled" handler="on_mode" swapped="no"/>
               </object>
               <packing>

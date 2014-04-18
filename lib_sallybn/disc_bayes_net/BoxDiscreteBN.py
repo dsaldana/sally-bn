@@ -17,14 +17,13 @@ import lib_sallybn.util.resources as res
 
 
 
-
-
-
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
 
 KEY_SUPR_CODE = 65535
+KEY_E_CODE = 101
+KEY_R_CODE = 114
 
 ## Enumerations
 # Mode for
@@ -46,10 +45,10 @@ class BoxDiscreteBN(Gtk.Box):
 
         # Create graphic widgets
         # other "bvertex", "bdelete", "bedge"
-        self.box_disc_bn, self.area, self.edit_toolbar = \
+        self.box_disc_bn, self.area, self.edit_toolbar, self.bedit, self.brun = \
             ugraphic.create_widget(
                 res.TAB_DISC_BAYES_NET_GLADE,
-                ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn"], self)
+                ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn", "bedit", "brun"], self)
 
         super(BoxDiscreteBN, self).__init__(spacing=1)
         self.pack_start(self.box_disc_bn, True, True, 0)
@@ -128,10 +127,14 @@ class BoxDiscreteBN(Gtk.Box):
         self.clicked_point = None
 
     def on_key_press(self, widget, event):
-
+        print event.keyval
         # Supr key is pressed
         if event.keyval == KEY_SUPR_CODE:
             self.on_delete(None)
+        elif event.keyval == KEY_E_CODE:
+            self.bedit.set_active(True)
+        elif event.keyval == KEY_R_CODE:
+            self.brun.set_active(True)
 
     def on_button_press(self, widget, event):
         # double
@@ -244,12 +247,17 @@ class BoxDiscreteBN(Gtk.Box):
             return True
 
         if radio_tool.get_label() == "bedit":
-            self.mode = Mode.edit
-            self.edit_toolbar.set_visible(True)
+            self.set_mode(Mode.edit)
         if radio_tool.get_label() == "brun":
-            self.mode = Mode.run
-            self.edit_toolbar.set_visible(False)
+            self.set_mode(Mode.run)
 
+
+    def set_mode(self, mode):
+        self.mode = mode
+        if self.mode == Mode.edit:
+            self.edit_toolbar.set_visible(True)
+        else:
+            self.edit_toolbar.set_visible(False)
         self.area.queue_draw()
 
     def on_organize(self, widget):
