@@ -18,6 +18,7 @@
 * Marginal probabilities after delete node for children.
 * Improve the graph drawing algorithm for multiple bns
 * Close tabs
+* Separate lib from app.
 
 
 --- FIXED -----

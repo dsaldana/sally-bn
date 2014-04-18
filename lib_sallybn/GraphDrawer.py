@@ -19,7 +19,7 @@ class GraphDrawer:
         # FIXME only white for the workspace.
         #self.area.size_request().width
         #self.area.size_request().height
-        cairo.rectangle(0, 0, 10000, 100000)
+        cairo.rectangle(-10000, -10000, 100000, 1000000)
         cairo.fill()
 
     def draw_directed_arrows(self, cairo, edges, vertices, headarrow_d=vertex_radious):

@@ -18,6 +18,15 @@ import lib_sallybn.util.resources as res
 
 
 
+
+
+
+
+
+
+
+
+
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
@@ -90,25 +99,21 @@ class BoxDiscreteBN(Gtk.Box):
         # self.area.connect('scroll-event', self.on_scroll)
         # self.area.connect('button-release-event', self.on_button_release)
 
-
-        self.clicks = []
         self.transform = None
         self.trans_point = None
 
         self.clicked_point = None
-        self.dragged = None
+        self.translation = [0, 0]
+        self.last_translation = [0, 0]
 
     def get_box(self):
         return self.box_disc_bn
 
-    def on_scroll(self, widget, event):
-        #print event.direction, event.delta_x, event.delta_y
-        self.trans_point = [event.x, event.y]
-        self.scale -= self.delta_zoom * event.delta_y
-
+    def on_zoom(self, button):
+        self.translation = [0, 0]
+        self.last_translation = [0, 0]
+        self.scale = 1
         self.area.queue_draw()
-        return True
-
 
     def on_button_release(self, widget, event):
         # Right click
@@ -122,7 +127,7 @@ class BoxDiscreteBN(Gtk.Box):
         click_distance = math.hypot(dx, dy)
         # normal click
         if click_distance < 10.0:
-            self.dragged = None
+            # self.dragged = None
             self.editing_action(p)
 
         self.clicked_point = None
@@ -140,16 +145,17 @@ class BoxDiscreteBN(Gtk.Box):
     def on_button_press(self, widget, event):
         # double
         p = [event.x, event.y]
-        p = self.transform.transform_point(p[0], p[1])
+        #transformed point
+        trf_p = self.transform.transform_point(p[0], p[1])
 
-        self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(p, self.vertex_locations)
+        self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(trf_p, self.vertex_locations)
 
         if self.selected_vetex is None:
-            self.selected_edge = lib_sallybn.util.ugraphic.edge_in_point(p,
+            self.selected_edge = lib_sallybn.util.ugraphic.edge_in_point(trf_p,
                                                                          self.vertex_locations,
                                                                          self.disc_bn.get_edges())
 
-        self.dragged = None
+        # self.dragged = None
 
         ## Right click for edit node
         if event.button == 3 and self.selected_vetex is not None:
@@ -167,7 +173,16 @@ class BoxDiscreteBN(Gtk.Box):
         ## Click on edit area
         elif event.button == 1 and self.mode == Mode.edit:
             self.clicked_point = p
+            self.last_translation[0] += self.translation[0]
+            self.last_translation[1] += self.translation[1]
 
+    def on_scroll(self, widget, event):
+        #print event.direction, event.delta_x, event.delta_y
+        # self.trans_point = [event.x, event.y]
+        self.scale -= self.delta_zoom * event.delta_y
+
+        self.area.queue_draw()
+        return True
 
     def motion_event(self, widget, event):
         p = [event.x, event.y]
@@ -188,10 +203,12 @@ class BoxDiscreteBN(Gtk.Box):
         # translate world
         elif self.clicked_point is not None:
             p = [event.x, event.y]
-            p = self.transform.transform_point(p[0], p[1])
 
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
-            self.dragged = [-dx, -dy]
+
+            self.translation[0] = -dx
+            self.translation[1] = -dy
+
             self.area.queue_draw()
 
     def on_drawing_area_draw(self, drawing_area, cairo):
@@ -201,9 +218,15 @@ class BoxDiscreteBN(Gtk.Box):
         # if self.trans_point is not None:
         #     tx, ty = self.transform.transform_point(self.trans_point[0], self.trans_point[1])
         #     cairo.translate(tx, ty)
-        if self.dragged is not None:
-            cairo.translate(self.dragged[0], self.dragged[1])
-            self.dragged = None
+        # if self.dragged is not None:
+        tx = self.translation[0] + self.last_translation[0]
+        ty = self.translation[1] + self.last_translation[1]
+        # if tx < -100: tx = -100
+        # if ty < -100: ty = -100
+        cairo.translate(tx, ty)
+
+        print [ty, ty], self.last_translation
+        # self.dragged = None
 
         # print cairo.get_matrix()
         self.transform = cairo.get_matrix()
