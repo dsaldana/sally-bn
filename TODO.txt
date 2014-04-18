@@ -1,12 +1,12 @@
 
 --- Priority TODO ---
-* Solve the BN with lib_pgm
 * Save current file
 
 
 ----TO FIX----
 - gui bugs
 * Zoom and translate
+* Change node name
 
 
 --- Next release ---
@@ -21,6 +21,7 @@
 
 
 --- FIXED -----
+* Solve the BN with lib_pgm
 * Delete Edge
 * Remove node
 - Error loading from file

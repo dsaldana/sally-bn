@@ -245,6 +245,13 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
                 return False
         return True
 
+    def clone(self):
+        clone = DiscreteBayesianNetworkExt()
+        clone.E = list(self.E)
+        clone.V = list(self.V)
+        clone.Vdata = dict(self.Vdata)
+        return clone
+
     def compute_marginals(self, evidence={}):
         """ Compute the marginal probabilities for each node
         ""  and return a dictionary with:
@@ -254,7 +261,8 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         for v in self.V:
 
             query = {v: ''}
-            fn = TableCPDFactorization(self)
+
+            fn = TableCPDFactorization(self.clone())
             #marginal values
             mar_vals = fn.condprobve(query, evidence)
             vertex_marginals = {}

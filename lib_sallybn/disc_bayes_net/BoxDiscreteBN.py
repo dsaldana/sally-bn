@@ -239,7 +239,7 @@ class BoxDiscreteBN(Gtk.Box):
             # Draw edges
             self.drawer.draw_arrow_box(cairo, self.vertex_locations, self.disc_bn.E)
             # Draw nodes
-            # self.drawer.draw_boxes(cairo, self.vertex_locations, self.marginals)
+            self.drawer.draw_boxes(cairo, self.vertex_locations, self.marginals)
 
         return False
 
@@ -258,7 +258,7 @@ class BoxDiscreteBN(Gtk.Box):
                 if not ok:
                     ugraphic.show_warning(self.window,
                                           v + " is not valid.",
-                                          "Please, check the probability table.")
+                                          "please, check the probability table.")
                     self.bedit.set_active(True)
                     return
             # compute marginals
