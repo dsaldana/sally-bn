@@ -1,6 +1,7 @@
 
 --- Priority TODO ---
-* Solve the BN
+* Solve the BN with lib_pgm
+* Save current file
 
 
 ----TO FIX----

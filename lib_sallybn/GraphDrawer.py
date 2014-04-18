@@ -162,9 +162,10 @@ class GraphDrawer:
 
             cairo.fill()
 
-    def draw_boxes(self, cairo, vertices, disc_bn):
+    def draw_boxes(self, cairo, vertices, marginals):
         for vname, point in vertices.items():
-            var_states = disc_bn.get_states(vname)
+            # var_states = disc_bn.get_states(vname)
+            var_states = marginals[vname].keys()
 
             # Rectangles
             px, py = point
@@ -220,7 +221,8 @@ class GraphDrawer:
                 cairo.rectangle(rx, ry, rwidth, rheight)
                 cairo.fill()
 
-                val = random()
+                # val = random()
+                val = marginals[vname][var_states[i]]
                 # Prob rectangle
                 val_width = rwidth * val
                 cairo.set_source_rgb(*color_dark_green)  # dark green

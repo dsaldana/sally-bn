@@ -17,6 +17,7 @@ import lib_sallybn.util.resources as res
 
 
 
+
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
@@ -67,7 +68,7 @@ class BoxDiscreteBN(Gtk.Box):
         self.selected_vetex = None
         self.selected_edge = None
         self.vertex_count = 1
-
+        self.marginals = None
         # Temporal arrow for mouse motion
         self.tmp_arrow = None
 
@@ -238,7 +239,7 @@ class BoxDiscreteBN(Gtk.Box):
             # Draw edges
             self.drawer.draw_arrow_box(cairo, self.vertex_locations, self.disc_bn.E)
             # Draw nodes
-            self.drawer.draw_boxes(cairo, self.vertex_locations, self.disc_bn)
+            # self.drawer.draw_boxes(cairo, self.vertex_locations, self.marginals)
 
         return False
 
@@ -246,9 +247,23 @@ class BoxDiscreteBN(Gtk.Box):
         if not radio_tool.get_active():
             return True
 
+        print self.disc_bn.get_vertices()
         if radio_tool.get_label() == "bedit":
             self.set_mode(Mode.edit)
+
         if radio_tool.get_label() == "brun":
+            # Validate BN
+            for v in self.disc_bn.get_vertices():
+                ok = self.disc_bn.validate_cprob(v)
+                if not ok:
+                    ugraphic.show_warning(self.window,
+                                          v + " is not valid.",
+                                          "Please, check the probability table.")
+                    self.bedit.set_active(True)
+                    return
+            # compute marginals
+            self.marginals = self.disc_bn.compute_marginals()
+            print self.marginals
             self.set_mode(Mode.run)
 
 

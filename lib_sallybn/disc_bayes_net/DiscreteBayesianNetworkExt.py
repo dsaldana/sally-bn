@@ -1,11 +1,11 @@
 from lib_sallybn.util import ulist
 from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
+from libpgm.tablecpdfactorization import TableCPDFactorization
 
 DEFAULT_STATES = ["true", "false"]
 
 
 class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
-
     def __init__(self, skel=None, nd=None):
         if skel is None and nd is None:
             # Create a clean graph
@@ -207,8 +207,6 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         # new cprob for parent
         self.create_new_cprob(parent)
 
-
-
     def get_vertices(self):
         return self.V
 
@@ -231,4 +229,42 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         self.Vdata[vertex]["cprob"] = new_cprob
 
 
+    def validate_cprob(self, vertex_name):
+        cprob = self.Vdata[vertex_name]["cprob"]
+
+        # no parents
+        if not self.getparents(vertex_name):
+            if 1 - sum(cprob) > 0.001:
+                return False
+            else:
+                return True
+        # Has parents
+        for k, v in cprob.iteritems():
+            # must sum 1
+            if 1 - sum(v) > 0.001:
+                return False
+        return True
+
+    def compute_marginals(self, evidence={}):
+        """ Compute the marginal probabilities for each node
+        ""  and return a dictionary with:
+        ""  vertexname -> state name -> marginal values
+        """
+        marginals = {}
+        for v in self.V:
+
+            query = {v: ''}
+            fn = TableCPDFactorization(self)
+            #marginal values
+            mar_vals = fn.condprobve(query, evidence)
+            vertex_marginals = {}
+
+            states = self.get_states(v)
+            # Associate marginals with values
+            for i in range(len(states)):
+                vertex_marginals[states[i]] = mar_vals.vals[i]
+
+            marginals[v] = vertex_marginals
+
+        return marginals
 
