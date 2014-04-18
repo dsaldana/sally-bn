@@ -100,8 +100,9 @@ class BoxDiscreteBN(Gtk.Box):
         Button release on the drawing area.
         """
         self.button_pressed = False
-        # Right click
-        if event.button == 3:
+
+        # Right click or middle click does not matter
+        if event.button > 1:
             return
 
         p = [event.x, event.y]
@@ -152,7 +153,7 @@ class BoxDiscreteBN(Gtk.Box):
             # return True
 
         ## Click on edit area
-        elif event.button == 1 and self.mode == Mode.edit:
+        elif event.button == 1 :
             self.clicked_point = p
             # # For translation in drawing area.
             self.last_translation[0] += self.translation[0]

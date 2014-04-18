@@ -4,8 +4,6 @@
 
 
 ----TO FIX----
-- gui bugs
-* Zoom and translate
 * Change node name
 
 
@@ -22,6 +20,7 @@
 
 
 --- FIXED -----
+* Zoom and translate
 * Solve the BN with lib_pgm
 * Delete Edge
 * Remove node
