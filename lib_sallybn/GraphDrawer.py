@@ -11,6 +11,7 @@ color_green = [204.0 / 255, 229.0 / 255, 204.0 / 255]
 color_dark_green = [5.0 / 255, 138.0 / 255, 0.0 / 255]
 color_light_green = [230.0 / 255, 242.0 / 255, 230.0 / 255]
 color_gray = 152.0 / 255, 152.0 / 255, 152.0 / 255
+color_light_gray = 235 / 255.0, 235 / 255.0, 235 / 255.0
 color_white = [255.0 / 255, 255.0 / 255, 255.0 / 255]
 
 
@@ -200,18 +201,30 @@ class GraphDrawer:
         :param vertex_locations dic with name and point, ex. {"v1":[x,y]}
         :param marginals dic with marginal probabilities to all variables
             ex. {"v1":{"state1": 0.5, "state2": 0.5}}
+        :param evidence is a dictionary with vertex name and state {"vertex_name":"state"}
         """
         for vname, point in vertex_locations.items():
             v_states = marginals[vname].keys()
-
+            is_evidence = vname in evidence
             # Rectangles
             px, py = point
             box_heigh = self._get_box_height(v_states)
             x_corner = px - box_width / 2.0
             y_corner = py - box_heigh / 2.0
 
+            #Background for evidence
+            if is_evidence:
+                cairo.set_source_rgb(*color_gray)
+                cairo.rectangle(x_corner - 3, y_corner - 3, box_width + 6, box_heigh + 6)
+                cairo.fill()
+
             # Background
             cairo.set_source_rgb(*color_light_green)  # light green
+
+            ## if is evidence
+            if is_evidence:
+                cairo.set_source_rgb(*color_light_gray)  # light gray
+
             cairo.rectangle(x_corner, y_corner, box_width, box_heigh)
             cairo.fill()
 
@@ -231,6 +244,7 @@ class GraphDrawer:
             rwidth = (box_width / 2 - 10)
             rheight = delta_state / 2.0 + 5.0
 
+            # For each state
             for i in range(len(v_states)):
                 ny = y_corner + title_height + (i + 1) * delta_state
 
