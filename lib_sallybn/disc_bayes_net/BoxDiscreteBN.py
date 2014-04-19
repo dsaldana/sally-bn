@@ -22,6 +22,9 @@ import lib_sallybn.util.resources as res
 
 
 
+
+
+
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
@@ -71,6 +74,8 @@ class BoxDiscreteBN(Gtk.Box):
         self.selected_vetex = None
         self.selected_edge = None
         self.marginals = None
+        self.evidences = {}
+
         # Temporal arrow for mouse motion
         self.tmp_arrow = None
 
@@ -130,31 +135,42 @@ class BoxDiscreteBN(Gtk.Box):
         #trf_p = self.transform.transform_point(p[0],p[1])
         trf_p = self.transform_point(p)
 
-        # If there is a vertex in the clicked point
-        self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(trf_p, self.vertex_locations)
-        # If there is a edge in the clicked point
-        if self.selected_vetex is None:
-            self.selected_edge = lib_sallybn.util.ugraphic.edge_in_point(trf_p,
-                                                                         self.vertex_locations,
-                                                                         self.disc_bn.get_edges())
+        if self.mode == Mode.edit:
+            # If there is a vertex in the clicked point
+            self.selected_vetex = ugraphic.point_in_circle(trf_p, self.vertex_locations)
+            # If there is a edge in the clicked point
+            if self.selected_vetex is None:
+                self.selected_edge = ugraphic.point_in_line(trf_p, self.vertex_locations,
+                                                            self.disc_bn.get_edges())
 
-        ## Right click for edit and delete
-        if event.button == 3 and (self.selected_vetex
-                                  is not None or self.selected_edge is not None):
-            self.show_edit_popup(event)
-            self.clicked_point = None
+            ## Right click for edit and delete
+            if event.button == 3 and (self.selected_vetex
+                                      is not None or self.selected_edge is not None):
+                self.show_edit_popup(event)
+                self.clicked_point = None
 
-        ## double click, open the dialog
-        elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
-            # Show cpt dialog
-            self.show_edit_var_dialog()
+            ## double click, open the dialog
+            elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
+                # Show cpt dialog
+                self.show_edit_var_dialog()
 
-            self.clicked_point = None
-            self.selected_vetex = None
-            # return True
+                self.clicked_point = None
+                self.selected_vetex = None
+                return
+        elif self.mode == Mode.run:
+            # get selected state for evidence
+            new_evidence = self.drawer.point_in_state(trf_p, self.vertex_locations, self.marginals)
 
-        ## Click on edit area
-        elif event.button == 1:
+            if new_evidence is not None:
+                v_evid, s_evid = new_evidence
+                self.evidences[v_evid] = s_evid
+                # compute marginals again
+                self.marginals = self.disc_bn.compute_marginals(self.evidences)
+
+
+
+        ## Click on edit area to TRANSLATE
+        if event.button == 1:
             self.clicked_point = p
             # # For translation in drawing area.
             self.last_translation[0] += self.translation[0]
@@ -253,7 +269,7 @@ class BoxDiscreteBN(Gtk.Box):
             # Draw edges
             self.drawer.draw_arrow_box(cairo, self.vertex_locations, self.disc_bn.E)
             # Draw nodes
-            self.drawer.draw_boxes(cairo, self.vertex_locations, self.marginals)
+            self.drawer.draw_boxes(cairo, self.vertex_locations, self.marginals, self.evidences)
 
     def on_mode(self, radio_tool):
         """
@@ -276,7 +292,7 @@ class BoxDiscreteBN(Gtk.Box):
                     self.bedit.set_active(True)
                     return
             # compute marginals
-            self.marginals = self.disc_bn.compute_marginals()
+            self.marginals = self.disc_bn.compute_marginals(self.evidences)
             self.set_mode(Mode.run)
 
 
@@ -361,7 +377,7 @@ class BoxDiscreteBN(Gtk.Box):
         if self.mode == Mode.edit:
 
             # search if a node exist in that point
-            self.selected_vetex = lib_sallybn.util.ugraphic.vertex_in_circle(p, self.vertex_locations)
+            self.selected_vetex = lib_sallybn.util.ugraphic.point_in_circle(p, self.vertex_locations)
 
             ## Mode VERTEX
             if self.mode_edit == ModeEdit.vertex:

@@ -5,7 +5,13 @@ from gi.repository import Gtk
 from lib_sallybn import GraphDrawer
 
 
-def edge_in_point(p, vertex_locations, edges):
+def point_in_line(p, vertex_locations, edges):
+    """
+    Identify if a point is in one of the set of edges
+    :param p point = [x,y]
+    :param terminal points of the edges, is a dictionary {"v1":[x,y]}
+    :param edges set of lines represented by two points each. ex [["v1","v2"],["v3","v2"]]
+    """
     px, py = p
 
     for e in edges:
@@ -27,7 +33,7 @@ def edge_in_point(p, vertex_locations, edges):
     return None
 
 
-def vertex_in_circle(p, vertices):
+def point_in_circle(p, vertices):
     """
     Serach if there is a node in the clicked point
 
@@ -61,6 +67,9 @@ def create_widget(glade_file, widget_names, handler=None):
 
 
 def create_vertex_locations(graph_skeleton, dx=220, dy=180):
+    """
+    Organize the graph in order to show it.
+    """
     vertex = list(graph_skeleton.get_vertices())
 
     ## Extract root nodes

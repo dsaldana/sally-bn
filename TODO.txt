@@ -7,8 +7,8 @@
 
 ----TO FIX----
 - Change node name
-- Translating is unstable
-- Show cpt with temporal values, because a cancel option.
+- Translating is unstable when a node is selected
+
 
 --- Next release ---
 * New BN, multiple BNs with tabs
@@ -24,6 +24,7 @@
 
 
 --- FIXED -----
+- Show cpt with temporal values until accept.
 * Zoom and translate
 * Solve the BN with lib_pgm
 * Delete Edge

@@ -255,8 +255,9 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
     def compute_marginals(self, evidence={}):
         """ Compute the marginal probabilities for each node
-        ""  and return a dictionary with:
-        ""  vertexname -> state name -> marginal values
+
+        :return: a dictionary with: vertexname -> state name -> marginal values
+            ex. {"v1":{"state1": 0.5, "state2": 0.5}}
         """
         marginals = {}
         for v in self.V:

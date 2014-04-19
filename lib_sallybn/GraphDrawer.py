@@ -6,6 +6,13 @@ box_width = 160
 delta_state = 30
 title_height = delta_state + 5
 
+# Colors
+color_green = [204.0 / 255, 229.0 / 255, 204.0 / 255]
+color_dark_green = [5.0 / 255, 138.0 / 255, 0.0 / 255]
+color_light_green = [230.0 / 255, 242.0 / 255, 230.0 / 255]
+color_gray = 152.0 / 255, 152.0 / 255, 152.0 / 255
+color_white = [255.0 / 255, 255.0 / 255, 255.0 / 255]
+
 
 class GraphDrawer:
     def __init__(self, area):
@@ -15,9 +22,6 @@ class GraphDrawer:
 
     def draw_background(self, cairo):
         cairo.set_source_rgb(1, 1, 1.0)
-        # FIXME only white for the workspace.
-        #self.area.size_request().width
-        #self.area.size_request().height
         cairo.rectangle(-10000, -10000, 100000, 1000000)
         cairo.fill()
 
@@ -69,11 +73,6 @@ class GraphDrawer:
         x1, y1 = vertex_locations[selected_edge[0]]
         x2, y2 = vertex_locations[selected_edge[1]]
 
-        dx, dy = float(x2 - x1), float(y2 - y1)
-        # Avoid problem with atan
-        # if dx == 0:
-        #     dx = 1
-
         cairo.set_source_rgb(244 / 255.0, 192 / 255.0, 125 / 255.0)
         cairo.set_line_width(9.1)
         cairo.move_to(x1, y1)
@@ -116,10 +115,10 @@ class GraphDrawer:
             cairo.show_text(vname)
 
 
-    def draw_arrow_box(self, cairo, vertices, edges):
+    def draw_arrow_box(self, cairo, vertex_locations, edges):
         for edge in edges:
-            x1, y1 = vertices[edge[0]]
-            x2, y2 = vertices[edge[1]]
+            x1, y1 = vertex_locations[edge[0]]
+            x2, y2 = vertex_locations[edge[1]]
             dx, dy = float(x2 - x1), float(y2 - y1)
 
             # Avoid problem with atan
@@ -161,38 +160,69 @@ class GraphDrawer:
 
             cairo.fill()
 
-    def draw_boxes(self, cairo, vertices, marginals):
-        for vname, point in vertices.items():
-            # var_states = disc_bn.get_states(vname)
-            var_states = marginals[vname].keys()
+    def point_in_state(self, p, vertex_locations, marginals):
+        """
+        :p point to evaluate [x,y]
+        :param vertex_locations dic with name and point, ex. {"v1":[x,y]}
+        :param marginals dic with marginal probabilities to all variables
+            ex. {"v1":{"state1": 0.5, "state2": 0.5}}
+        :return: ("vertex", "state")
+        """
+        x, y = p
+
+        for v, v_position in vertex_locations.iteritems():
+            # states of vertex
+            v_states = marginals[v].keys()
+            box_heigh = self._get_box_height(v_states)
+
+            # go to left-upper corner
+            x_corner = v_position[0] - box_width / 2.0
+            y_corner = v_position[1] - box_heigh / 2.0
+
+            #if point.x is not in range
+            if x >= x_corner and x >= x_corner + box_width:
+                continue
+
+            # evaluate each state for p.y
+            for i in range(len(v_states)):
+                ny = y_corner + title_height + i * delta_state
+                ny_next = y_corner + title_height + (i + 1) * delta_state
+
+                if y > ny and y <= ny_next:
+                    return v, v_states[i]
+
+        return None
+
+    def draw_boxes(self, cairo, vertex_locations, marginals, evidence):
+        """
+        Draw boxes for each variable with its marginal probabilities.
+        :param cairo to draw
+        :param vertex_locations dic with name and point, ex. {"v1":[x,y]}
+        :param marginals dic with marginal probabilities to all variables
+            ex. {"v1":{"state1": 0.5, "state2": 0.5}}
+        """
+        for vname, point in vertex_locations.items():
+            v_states = marginals[vname].keys()
 
             # Rectangles
             px, py = point
-
-            box_heigh = self._get_box_height(var_states)
-
+            box_heigh = self._get_box_height(v_states)
             x_corner = px - box_width / 2.0
             y_corner = py - box_heigh / 2.0
-
-            color_dark_green = [5.0 / 255, 138.0 / 255, 0.0 / 255]
-            color_light_green = [230.0 / 255, 242.0 / 255, 230.0 / 255]
-            color_gray = 152.0 / 255, 152.0 / 255, 152.0 / 255
 
             # Background
             cairo.set_source_rgb(*color_light_green)  # light green
             cairo.rectangle(x_corner, y_corner, box_width, box_heigh)
             cairo.fill()
 
-
             # Title background
-            cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
+            cairo.set_source_rgb(*color_green)  # green
             cairo.rectangle(x_corner, y_corner, box_width, title_height)
             cairo.fill()
 
             ## Title text
             cairo.select_font_face("Georgia")
             cairo.set_source_rgb(*color_dark_green)  # dark green
-            # cairo.set_source_rgb(0.0 / 255, 0.0 / 255, 0.0 / 255)  # green
             cairo.move_to(x_corner + 5, y_corner + 25)
             cairo.set_font_size(17)
             cairo.show_text(vname)
@@ -201,7 +231,7 @@ class GraphDrawer:
             rwidth = (box_width / 2 - 10)
             rheight = delta_state / 2.0 + 5.0
 
-            for i in range(len(var_states)):
+            for i in range(len(v_states)):
                 ny = y_corner + title_height + (i + 1) * delta_state
 
                 # Text for states
@@ -209,7 +239,7 @@ class GraphDrawer:
                 cairo.set_source_rgb(15.0 / 255, 158.0 / 255, 0.0 / 255)
                 cairo.set_font_size(14)
                 cairo.move_to(x_corner + 5, ny - 10)
-                cairo.show_text(var_states[i][:11])
+                cairo.show_text(v_states[i][:11])
 
                 ### Values
                 rx = x_corner + box_width / 2.0
@@ -221,7 +251,7 @@ class GraphDrawer:
                 cairo.fill()
 
                 # val = random()
-                val = marginals[vname][var_states[i]]
+                val = marginals[vname][v_states[i]]
                 # Prob rectangle
                 val_width = rwidth * val
                 cairo.set_source_rgb(*color_dark_green)  # dark green
@@ -230,14 +260,14 @@ class GraphDrawer:
 
                 # Text for value
                 cairo.select_font_face("Georgia")
-                cairo.set_source_rgb(255.0 / 255, 255.0 / 255, 255.0 / 255)
+                cairo.set_source_rgb(*color_white)
                 cairo.set_font_size(14)
                 cairo.move_to(rx + 5, ny - 10)
                 cairo.show_text(str(val * 100)[:5] + "")
 
                 ## State line
                 cairo.set_line_width(0.5)
-                cairo.set_source_rgb(204.0 / 255, 229.0 / 255, 204.0 / 255)  # green
+                cairo.set_source_rgb(*color_green)  # green
                 cairo.move_to(x_corner, ny)
                 cairo.line_to(x_corner + box_width, ny)
                 cairo.stroke()
@@ -255,8 +285,8 @@ class GraphDrawer:
 
 
     @staticmethod
-    def _get_box_height(states):
-        return title_height + delta_state * len(states)
+    def _get_box_height(num_states):
+        return title_height + delta_state * len(num_states)
 
 
 
