@@ -1,5 +1,4 @@
 import math
-from random import random
 # Node radious
 vertex_radious = 30.0
 
@@ -234,7 +233,7 @@ class GraphDrawer:
                 cairo.set_source_rgb(255.0 / 255, 255.0 / 255, 255.0 / 255)
                 cairo.set_font_size(14)
                 cairo.move_to(rx + 5, ny - 10)
-                cairo.show_text(str(val)[:5])
+                cairo.show_text(str(val * 100)[:5] + "")
 
                 ## State line
                 cairo.set_line_width(0.5)
