@@ -187,19 +187,21 @@ class BoxDiscreteBN(Gtk.Box):
         """
         p = self.transform_point([event.x, event.y])
 
+        print "aa"
         ## Dynamic head arrow
         if self.mode == Mode.edit and self.mode_edit == ModeEdit.edge and \
                         self.selected_vetex is not None:
             self.tmp_arrow = p
             self.area.queue_draw()
+            print "arrow"
 
         # translate node
         elif self.clicked_point is not None and self.mode == Mode.edit and self.selected_vetex is not None:
             self.vertex_locations[self.selected_vetex] = p
             self.area.queue_draw()
 
-        # translate world self.clicked_point is not None  and
-        elif self.button_pressed:
+        # translate world  is not None  and
+        elif self.clicked_point and self.button_pressed:
             p = [event.x, event.y]
 
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
