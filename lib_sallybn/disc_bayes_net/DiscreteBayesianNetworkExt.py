@@ -1,3 +1,4 @@
+import copy
 from lib_sallybn.util import ulist
 from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.tablecpdfactorization import TableCPDFactorization
@@ -249,7 +250,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         clone = DiscreteBayesianNetworkExt()
         clone.E = list(self.E)
         clone.V = list(self.V)
-        clone.Vdata = dict(self.Vdata)
+        clone.Vdata = copy.deepcopy(self.Vdata)
         return clone
 
     def compute_marginals(self, evidence={}):

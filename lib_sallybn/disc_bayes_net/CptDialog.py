@@ -62,8 +62,6 @@ class CptDialog:
 
         # OK
         def ok_ev(widget):
-            self.var_name = text_var_name.get_text()
-
             # validate CPT
             if not gcpt_table.validate_cpt():
                 dialog = Gtk.MessageDialog(cpt_dialog, 0, Gtk.MessageType.WARNING,
@@ -75,6 +73,7 @@ class CptDialog:
 
                 return
             else:
+                self.var_name = text_var_name.get_text()
                 # Save cpt in current name
                 cprob = gcpt_table.get_cprob_from_table()
                 disc_bn.set_cprob(selected_vetex, cprob)

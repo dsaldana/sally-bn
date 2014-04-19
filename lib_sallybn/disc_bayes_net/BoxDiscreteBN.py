@@ -21,6 +21,7 @@ import lib_sallybn.util.resources as res
 
 
 
+
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
@@ -146,8 +147,7 @@ class BoxDiscreteBN(Gtk.Box):
         ## double click, open the dialog
         elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
             # Show cpt dialog
-            cpt_dialog = CptDialog()
-            cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
+            self.show_edit_var_dialog()
 
             self.clicked_point = None
             self.selected_vetex = None
@@ -426,13 +426,7 @@ class BoxDiscreteBN(Gtk.Box):
             # Click on edit vertex data.
             def event_edit(widget, event):
                 menu.destroy()
-                cpt_dialog = CptDialog()
-                cpt_dialog.show_cpt_dialog(self.window, self.disc_bn, self.selected_vetex)
-
-                new_var_name = cpt_dialog.get_var_name()
-
-                if not new_var_name == self.selected_vetex:
-                    self.change_vertex_name_h(self.selected_vetex, new_var_name)
+                self.show_edit_var_dialog()
 
             menu_it.connect("button-release-event", event_edit)
             menu.append(menu_it)
@@ -444,6 +438,23 @@ class BoxDiscreteBN(Gtk.Box):
 
         menu.show_all()
         menu.popup(None, None, None, None, event.button, event.time)
+
+    def show_edit_var_dialog(self):
+        cpt_dialog = CptDialog()
+        # Create clone of disc_bn
+        new_disc_bn = self.disc_bn.clone()
+        cpt_dialog.show_cpt_dialog(self.window, new_disc_bn, self.selected_vetex)
+
+        new_var_name = cpt_dialog.get_var_name()
+
+        ## Cancel button, new_var_name is assigned
+        if new_var_name is None:
+            return
+
+        self.disc_bn = new_disc_bn
+
+        if not new_var_name == self.selected_vetex:
+            self.change_vertex_name_h(self.selected_vetex, new_var_name)
 
     def save_bn_to_file(self, file_name):
         # if does not have extension
