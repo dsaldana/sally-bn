@@ -264,15 +264,27 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
             query = {v: ''}
 
-            fn = TableCPDFactorization(self.clone())
-            #marginal values
-            mar_vals = fn.condprobve(query, evidence)
             vertex_marginals = {}
-
             states = self.get_states(v)
-            # Associate marginals with values
-            for i in range(len(states)):
-                vertex_marginals[states[i]] = mar_vals.vals[i]
+
+            ## if evidence node
+            if v in evidence:
+                vals = []
+                s_evidence = evidence[v]
+                for s in states:
+                    if s == s_evidence:
+                        vertex_marginals[s] = 1.0
+                    else:
+                        vertex_marginals[s] = 0.0
+            # if query node.
+            else:
+                #marginal values
+                fn = TableCPDFactorization(self.clone())
+                mar_vals = fn.condprobve(query, evidence)
+
+                # Associate marginals with values
+                for i in range(len(states)):
+                    vertex_marginals[states[i]] = mar_vals.vals[i]
 
             marginals[v] = vertex_marginals
 
