@@ -259,7 +259,7 @@
       <object class="GtkDrawingArea" id="drawingarea_bn">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="events">GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SMOOTH_SCROLL_MASK</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SMOOTH_SCROLL_MASK</property>
         <property name="hexpand">True</property>
         <property name="vexpand">True</property>
         <signal name="button-press-event" handler="on_button_press" swapped="no"/>
