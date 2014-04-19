@@ -52,10 +52,10 @@ class BoxDiscreteBN(Gtk.Box):
         self.window = window
 
         # Create graphic widgets
-        self.box_disc_bn, self.area, self.edit_toolbar, self.bedit, self.brun = \
+        self.box_disc_bn, self.area, self.toolbar_edit, self.bedit, self.brun, self.bclear_evidence = \
             ugraphic.create_widget(
                 res.TAB_DISC_BAYES_NET_GLADE,
-                ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn", "bedit", "brun"], self)
+                ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn", "bedit", "brun", "bclear_evidence"], self)
 
         super(BoxDiscreteBN, self).__init__(spacing=1)
         self.pack_start(self.box_disc_bn, True, True, 0)
@@ -92,6 +92,17 @@ class BoxDiscreteBN(Gtk.Box):
         self.last_translation = [0, 0]
         self.clicked_point = None
         self.button_pressed = False
+
+
+
+    def on_clear_evidence(self, button):
+        """
+        Event to clear all evidence
+        """
+        print "clear evidence"
+        self.evidences = {}
+        self.marginals = self.disc_bn.compute_marginals(self.evidences)
+        self.area.queue_draw()
 
     def on_zoom(self, button):
         """
@@ -196,6 +207,9 @@ class BoxDiscreteBN(Gtk.Box):
         """
         self.scale -= self.delta_zoom * event.delta_y
         self.area.queue_draw()
+
+    def on_show(self,widget, event):
+        print "show"
 
     def motion_event(self, widget, event):
         """
@@ -302,9 +316,11 @@ class BoxDiscreteBN(Gtk.Box):
         """
         self.mode = mode
         if self.mode == Mode.edit:
-            self.edit_toolbar.set_visible(True)
+            self.toolbar_edit.set_visible(True)
+            self.bclear_evidence.set_visible_horizontal(False)
         else:
-            self.edit_toolbar.set_visible(False)
+            self.toolbar_edit.set_visible(False)
+            self.bclear_evidence.set_visible_horizontal(True)
         self.area.queue_draw()
 
     def on_organize(self, widget):

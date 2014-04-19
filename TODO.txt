@@ -1,12 +1,10 @@
 
 --- Priority TODO ---
 * Save current file
-* Evidence for running mode
 * documentation
 
 
 ----TO FIX----
-- Change node name
 - Translating is unstable when a node is selected
 
 
@@ -24,6 +22,9 @@
 
 
 --- FIXED -----
+- Change node name
+* Clean evidence
+* Evidence for running mode
 - Show cpt with temporal values until accept.
 * Zoom and translate
 * Solve the BN with lib_pgm

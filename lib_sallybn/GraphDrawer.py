@@ -1,5 +1,6 @@
 import math
-# Node radious
+
+
 vertex_radious = 30.0
 
 box_width = 160

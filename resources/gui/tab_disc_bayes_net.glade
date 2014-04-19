@@ -74,18 +74,6 @@
                 <property name="homogeneous">True</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkSeparatorToolItem" id="se">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -94,23 +82,20 @@
           </packing>
         </child>
         <child>
-          <object class="GtkToolbar" id="toolbar1">
-            <property name="visible">True</property>
+          <object class="GtkToolbar" id="toolbar_evidence">
             <property name="can_focus">False</property>
             <property name="show_arrow">False</property>
             <child>
-              <object class="GtkToolButton" id="border">
+              <object class="GtkToolButton" id="bclear_evidence">
                 <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Hierarchical organization</property>
-                <property name="tooltip_text" translatable="yes">Hierarchical organization</property>
+                <property name="tooltip_text" translatable="yes">Remove all evidence</property>
                 <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">toolbutton1</property>
+                <property name="visible_horizontal">False</property>
+                <property name="label" translatable="yes">bclearevidence</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-page-setup</property>
-                <signal name="clicked" handler="on_organize" swapped="no"/>
+                <property name="icon_name">emblem-unreadable</property>
+                <signal name="clicked" handler="on_clear_evidence" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -125,21 +110,16 @@
           </packing>
         </child>
         <child>
-          <object class="GtkToolbar" id="toolbar2">
+          <object class="GtkToolbar" id="toolbar1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="show_arrow">False</property>
             <child>
-              <object class="GtkToolButton" id="bzoomin">
+              <object class="GtkSeparatorToolItem" id="toolbutton1">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
-                <property name="visible_horizontal">False</property>
-                <property name="label" translatable="yes">bzoomin</property>
-                <property name="use_underline">True</property>
-                <property name="stock_id">gtk-zoom-in</property>
-                <signal name="clicked" handler="on_zoom" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -147,32 +127,18 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="bzoomout">
+              <object class="GtkToolButton" id="border">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip_markup" translatable="yes">Hierarchical organization</property>
+                <property name="tooltip_text" translatable="yes">Hierarchical organization</property>
                 <property name="use_action_appearance">False</property>
-                <property name="visible_horizontal">False</property>
-                <property name="label" translatable="yes">bzoomout</property>
+                <property name="label" translatable="yes">toolbutton1</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-zoom-out</property>
-                <signal name="clicked" handler="on_zoom" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bnozoom">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">bnozoom</property>
-                <property name="use_underline">True</property>
-                <property name="stock_id">gtk-zoom-100</property>
-                <signal name="clicked" handler="on_zoom" swapped="no"/>
+                <property name="stock_id">gtk-page-setup</property>
+                <signal name="clicked" handler="on_organize" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -246,6 +212,69 @@
             <property name="fill">True</property>
             <property name="pack_type">end</property>
             <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolbar" id="toolbar_zoom">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="show_arrow">False</property>
+            <child>
+              <object class="GtkToolButton" id="bzoomin">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible_horizontal">False</property>
+                <property name="label" translatable="yes">bzoomin</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-zoom-in</property>
+                <signal name="clicked" handler="on_zoom" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="bzoomout">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible_horizontal">False</property>
+                <property name="label" translatable="yes">bzoomout</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-zoom-out</property>
+                <signal name="clicked" handler="on_zoom" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="bnozoom">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Restore zoom</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">bnozoom</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-zoom-fit</property>
+                <signal name="clicked" handler="on_zoom" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
           </packing>
         </child>
       </object>
