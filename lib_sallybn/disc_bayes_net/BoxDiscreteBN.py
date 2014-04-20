@@ -279,7 +279,7 @@ class BoxDiscreteBN(Gtk.Box):
 
     def on_mode(self, radio_tool):
         """
-        Event to choose the edit mode or the run mode.
+        Event to choose the 'edit mode' or the 'run mode'.
         """
         if not radio_tool.get_active():
             return True
@@ -290,6 +290,15 @@ class BoxDiscreteBN(Gtk.Box):
         if radio_tool.get_label() == "brun":
             # Validate BN
             for v in self.disc_bn.get_vertices():
+                # Validate cycles
+                try:
+                    self.disc_bn.toporder()
+                except Exception:
+                    ugraphic.show_warning(self.window,
+                                          "The Bayesian Network contains cycles.")
+                    return
+
+                # Validate that the BN has all the cpts
                 ok = self.disc_bn.validate_cprob(v)
                 if not ok:
                     ugraphic.show_warning(self.window,
@@ -310,7 +319,7 @@ class BoxDiscreteBN(Gtk.Box):
         if self.mode == Mode.edit:
             self.toolbar_edit.set_visible(True)
             self.bclear_evidence.set_visible_horizontal(False)
-        else:
+        elif self.mode == Mode.run:
             self.toolbar_edit.set_visible(False)
             self.bclear_evidence.set_visible_horizontal(True)
         self.area.queue_draw()
@@ -494,26 +503,28 @@ class BoxDiscreteBN(Gtk.Box):
         dic_to_file(bn, file_name)
 
     def load_bn_from_file(self, file_name):
-        #### Load BN
-        nd = NodeData()
-        skel = GraphSkeleton()
-        nd.load(file_name)  # any input file
-        skel.load(file_name)
-
-        # topologically order graphskeleton
         try:
+            #### Load BN
+            nd = NodeData()
+            skel = GraphSkeleton()
+            nd.load(file_name)  # any input file
+            skel.load(file_name)
+
+            # topologically order graphskeleton
             skel.toporder()
-        except ValueError:
-            print ValueError
+
+            # load bayesian network
+            self.disc_bn = DiscreteBayesianNetworkExt(skel, nd)
+
+            ### Load Vertex locations
+            json_data = dic_from_json_file(file_name)
+            # Vertex locations
+            if "vertex_loc" in json_data.keys():
+                self.vertex_locations = json_data["vertex_loc"]
+            else:
+                self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
+
+        except Exception:
+            ugraphic.show_warning(self.window, "Error loading the Bayesian Network")
             return
 
-        # load bayesian network
-        self.disc_bn = DiscreteBayesianNetworkExt(skel, nd)
-
-        ### Load Vertex locations
-        json_data = dic_from_json_file(file_name)
-        # Vertex locations
-        if "vertex_loc" in json_data.keys():
-            self.vertex_locations = json_data["vertex_loc"]
-        else:
-            self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)

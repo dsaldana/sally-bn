@@ -133,6 +133,7 @@ def create_vertex_locations(graph_skeleton, dx=220, dy=180):
 def show_warning(window, message, sec_text=""):
     dialog = Gtk.MessageDialog(window, 0, Gtk.MessageType.WARNING,
                                Gtk.ButtonsType.OK, message)
+    dialog.set_title("Warning")
     dialog.format_secondary_text(sec_text)
     dialog.run()
     dialog.destroy()

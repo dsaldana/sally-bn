@@ -81,11 +81,16 @@ class MainWindowHandler:
         # self.window.set_transient_for(dialog)
         dialog.set_parent(self.window)
         dialog.set_modal(True)
-        # Filter
-        filter_py = Gtk.FileFilter()
-        filter_py.set_name("Sally files")
-        filter_py.add_pattern("*" + FILE_EXTENSION)
-        dialog.add_filter(filter_py)
+        # Filter sally
+        filter_sally = Gtk.FileFilter()
+        filter_sally.set_name("Sally files")
+        filter_sally.add_pattern("*" + FILE_EXTENSION)
+        dialog.add_filter(filter_sally)
+        # Filter all
+        filter_all = Gtk.FileFilter()
+        filter_all.set_name("All files")
+        filter_all.add_pattern("*")
+        dialog.add_filter(filter_all)
 
         #RUN
         response = dialog.run()
