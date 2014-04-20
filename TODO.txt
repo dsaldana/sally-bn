@@ -19,6 +19,7 @@
 * Close tabs
 * Separate lib from app.
 * auto-organize horizontally.
+* Copy-paste vertices
 
 
 --- FIXED -----

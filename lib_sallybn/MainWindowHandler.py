@@ -2,7 +2,8 @@ from gi.repository import Gtk
 import ntpath
 
 from lib_sallybn.disc_bayes_net.BoxDiscreteBN import BoxDiscreteBN, FILE_EXTENSION
-
+import lib_sallybn.util.resources as res
+from lib_sallybn.util import ugraphic
 
 ## Class
 class MainWindowHandler:
@@ -11,6 +12,7 @@ class MainWindowHandler:
         self.tabber = tabber
         # Add a clean bn
         self.add_bn_tab("New Bayesian Network")
+
 
     def on_save(self, widget):
         dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
@@ -36,6 +38,22 @@ class MainWindowHandler:
             disc_bn.save_bn_to_file(dialog.get_filename())
 
         dialog.destroy()
+
+    def on_save_as(self, widget):
+        #TODO
+        pass
+
+    def on_about(self, widget):
+        [aboutdialog] = ugraphic.create_widget(res.DIALOG_ABOUT,["aboutdialog"])
+
+        aboutdialog.set_parent(self.window)
+        aboutdialog.set_modal(True)
+
+        aboutdialog.run()
+        pass
+
+    def on_quit(self, widget):
+        self.window.destroy()
 
     def on_open(self, widget):
         dialog = Gtk.FileChooserDialog("Please choose a file", self.window,

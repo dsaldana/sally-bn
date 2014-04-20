@@ -7,6 +7,8 @@
     <property name="title" translatable="yes">Variable Info</property>
     <property name="modal">True</property>
     <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
     <property name="urgency_hint">True</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox1">

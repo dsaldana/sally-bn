@@ -17,14 +17,6 @@ import lib_sallybn.util.resources as res
 
 
 
-
-
-
-
-
-
-
-
 ## Constants
 FILE_EXTENSION = ".sly"
 DEFAULT_NODE_NAME = 'Variable'
