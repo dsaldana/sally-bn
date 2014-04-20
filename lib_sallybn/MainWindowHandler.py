@@ -46,11 +46,11 @@ class MainWindowHandler:
     def on_about(self, widget):
         [aboutdialog] = ugraphic.create_widget(res.DIALOG_ABOUT,["aboutdialog"])
 
-        aboutdialog.set_parent(self.window)
+        # aboutdialog.set_parent(self.window)
         aboutdialog.set_modal(True)
 
         aboutdialog.run()
-        pass
+        aboutdialog.destroy()
 
     def on_quit(self, widget):
         self.window.destroy()
