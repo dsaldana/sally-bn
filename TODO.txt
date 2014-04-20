@@ -1,7 +1,6 @@
 
 --- Priority TODO ---
-* documentation
-
+* Documentation
 
 ----TO FIX----
 - Translating is unstable when a node is selected
@@ -18,9 +17,11 @@
 * Separate lib from app.
 * auto-organize horizontally.
 * Copy-paste vertices
+* Export graph to png.
 
 
 --- FIXED -----
+- gpl in src
 - validate cycles
 * Save current file
 * About dialog
