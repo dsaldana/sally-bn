@@ -5,7 +5,6 @@
 
 ----TO FIX----
 - Translating is unstable when a node is selected
-- validate cycles
 
 --- Next release ---
 * New BN, multiple BNs with tabs
@@ -22,6 +21,7 @@
 
 
 --- FIXED -----
+- validate cycles
 * Save current file
 * About dialog
 - Change node name
