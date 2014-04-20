@@ -27,10 +27,17 @@
 
 
 import sys
+import os
 from lib_sallybn import SallyApp
+
 
 # MAIN
 if __name__ == "__main__":
+    # Change workspace
+    app_ws = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(app_ws)
+
+    # Run Sally!
     app = SallyApp.SallyApp()
     exit_status = app.run(sys.argv)
     sys.exit(exit_status)
