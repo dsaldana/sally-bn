@@ -4,6 +4,7 @@
   <object class="GtkWindow" id="MainWindow">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Sally BN</property>
+    <property name="icon">images/logo.png</property>
     <child>
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>

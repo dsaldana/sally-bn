@@ -1,12 +1,11 @@
 
 --- Priority TODO ---
-* Save current file
 * documentation
 
 
 ----TO FIX----
 - Translating is unstable when a node is selected
-
+- validate cycles
 
 --- Next release ---
 * New BN, multiple BNs with tabs
@@ -23,6 +22,8 @@
 
 
 --- FIXED -----
+* Save current file
+* About dialog
 - Change node name
 * Clean evidence
 * Evidence for running mode
