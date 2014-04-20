@@ -20,9 +20,24 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # ----------------------------------------------------------------------------
+import os
+
+# current path
+current = os.getcwd()
+
+# resources path
+path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+os.chdir('../../')
+root_path = os.getcwd()
+
+# Go back
+os.chdir(current)
+current = os.getcwd()
+
 
 # Glade Files
-MAIN_WINDOW_GLADE = 'resources/gui/main_window.glade'
-DISC_VAR_DIALOG_GLADE = 'resources/gui/discrete_var_dialog.glade'
-TAB_DISC_BAYES_NET_GLADE = 'resources/gui/tab_disc_bayes_net.glade'
-DIALOG_ABOUT= 'resources/gui/about.glade'
+MAIN_WINDOW_GLADE = root_path + '/resources/gui/main_window.glade'
+DISC_VAR_DIALOG_GLADE = root_path + '/resources/gui/discrete_var_dialog.glade'
+TAB_DISC_BAYES_NET_GLADE = root_path + '/resources/gui/tab_disc_bayes_net.glade'
+DIALOG_ABOUT = root_path + '/resources/gui/about.glade'
