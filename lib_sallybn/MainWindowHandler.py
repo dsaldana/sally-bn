@@ -136,7 +136,6 @@ class MainWindowHandler:
         dialog.destroy()
 
     def on_new(self, widget):
-        print "new"
         self.add_bn_tab("New BN")
 
     def add_bn_tab(self, title):

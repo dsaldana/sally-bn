@@ -3,6 +3,7 @@
 * Documentation
 
 ----TO FIX----
+- evidence is wrong box
 - Translating is unstable when a node is selected
 
 --- Next release ---

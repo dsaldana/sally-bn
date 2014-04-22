@@ -252,7 +252,6 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         self.Vdata[vertex]["cprob"] = new_cprob
 
-
     def validate_cprob(self, vertex_name):
         cprob = self.Vdata[vertex_name]["cprob"]
 
