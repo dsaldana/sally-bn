@@ -357,6 +357,7 @@ class BoxDiscreteBN(Gtk.Box):
 
             # Non selected vertex
             self.selected_vetex = None
+
         # Delete edge
         elif self.selected_edge is not None:
             # Delete from model

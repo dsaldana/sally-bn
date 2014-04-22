@@ -64,7 +64,7 @@ def point_in_circle(p, vertices):
     :param vertices: nodes
     :return: the vertex
     """
-    radious = GraphDrawer.vertex_radious
+    radious = GraphDrawer.vertex_radio
     vertex = None
     for k, point in vertices.items():
         if math.hypot(p[0] - point[0], p[1] - point[1]) < radious:
