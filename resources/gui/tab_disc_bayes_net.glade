@@ -29,7 +29,6 @@
                 <property name="label" translatable="yes">bvertex</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">emblem-default</property>
-                <property name="group">bedge</property>
                 <signal name="toggled" handler="on_edit_mode" swapped="no"/>
               </object>
               <packing>
@@ -180,7 +179,6 @@
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-edit</property>
                 <property name="active">True</property>
-                <property name="group">brun</property>
                 <signal name="toggled" handler="on_mode" swapped="no"/>
               </object>
               <packing>
