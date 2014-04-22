@@ -24,8 +24,6 @@
 from gi.repository import Gtk, Gdk
 import math
 
-from enum import Enum
-
 from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 from lib_sallybn.util import ugraphic
@@ -50,13 +48,13 @@ KEY_R_CODE = 114
 
 ## Enumerations
 # Mode for
-class Mode(Enum):
+class Mode:
     edit = 0
     run = 1
 
 
 # Mode for edition
-class ModeEdit(Enum):
+class ModeEdit:
     manual = 0
     vertex = 1
     edge = 2
