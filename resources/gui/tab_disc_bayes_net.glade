@@ -290,10 +290,7 @@
         <property name="hexpand">True</property>
         <property name="vexpand">True</property>
         <signal name="button-press-event" handler="on_button_press" swapped="no"/>
-        <signal name="draw" handler="on_drawing_area_draw" swapped="no"/>
         <signal name="button-release-event" handler="on_button_release" swapped="no"/>
-        <signal name="motion-notify-event" handler="motion_event" swapped="no"/>
-        <signal name="scroll-event" handler="on_scroll" swapped="no"/>
       </object>
       <packing>
         <property name="expand">False</property>
