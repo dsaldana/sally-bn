@@ -3,8 +3,7 @@
 * Documentation
 
 ----TO FIX----
-- Translating is unstable when a node is selected
-- Translate node is not working after drawer separation
+- draw boxes
 
 
 --- Next release ---
@@ -23,6 +22,8 @@
 
 
 --- FIXED -----
+- Translating is unstable when a node is selected
+- Translate node is not working after drawer separation
 - radiobox fatal error
 - evidence is wrong box
 - gpl in src

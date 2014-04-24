@@ -77,6 +77,9 @@ class BoxDiscreteBN(Gtk.Box):
         self.drawer = GraphDrawer()
         self.drawing_box.pack_start(self.drawer.get_drawing_area(), True, True, 0)
 
+        self.drawer.get_drawing_area().connect("button-press-event", self.on_button_press)
+        self.drawer.get_drawing_area().connect("button-release-event", self.on_button_release)
+
         self.mode_edit = ModeEdit.vertex
         self.mode = Mode.edit
 
@@ -253,6 +256,7 @@ class BoxDiscreteBN(Gtk.Box):
             self.bclear_evidence.set_visible_horizontal(True)
 
 
+
     def on_organize(self, widget):
         """
         Estimate good places to draw each vertex of the graph.
@@ -302,7 +306,13 @@ class BoxDiscreteBN(Gtk.Box):
             self.mode_edit = ModeEdit.manual
         else:
             print "not supported"
+
+        # No selections
+        self.selected_edge = None
         self.selected_vetex = None
+        self.drawer.set_selected_vertices([])
+        self.drawer.set_selected_edges([])
+        self.drawer.repaint()
 
     def get_new_vertex_name(self):
         """ Vertex name generator to create incremental variables and does not generate

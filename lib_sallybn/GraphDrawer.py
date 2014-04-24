@@ -22,7 +22,7 @@
 # ----------------------------------------------------------------------------
 
 import math
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 vertex_radio = 30.0
 box_width = 160
@@ -67,11 +67,12 @@ class GraphDrawer:
         self.viewer_mode = True
 
         self.area = Gtk.DrawingArea()
+        self.area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK |
+                             Gdk.EventMask.SMOOTH_SCROLL_MASK | Gdk.EventMask.ALL_EVENTS_MASK)
+
         self.area.connect("motion-notify-event", self.on_motion_event)
         self.area.connect("draw", self.on_drawing_area_draw)
         self.area.connect("scroll-event", self.on_scroll)
-
-
         self.area.connect("button-press-event", self.on_button_press)
         self.area.connect("button-release-event", self.on_button_release)
 
@@ -79,9 +80,6 @@ class GraphDrawer:
         self.button_pressed = False
         self.clicked_point = None
         self.area.set_visible(True)
-
-    def do_realize(self):
-        print "realize"
 
     def get_drawing_area(self):
         return self.area
@@ -105,12 +103,13 @@ class GraphDrawer:
             self.last_translation[0] += self.translation[0]
             self.last_translation[1] += self.translation[1]
 
+            self.translation = [0,0]
+        # print self.last_translation, self.translation
+
     def on_button_release(self, widget, event):
         """
         Button release on the drawing area.
         """
-        self.button_pressed = False
-
         # Right click or middle click does not matter
         if event.button > 1:
             return
@@ -124,6 +123,7 @@ class GraphDrawer:
             self.translation = [0, 0]
 
         self.clicked_point = None
+        self.button_pressed = False
 
     def on_motion_event(self, widget, event):
         """
@@ -144,7 +144,6 @@ class GraphDrawer:
             p = [event.x, event.y]
 
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
-
             self.translation[0] = -dx / self.scale
             self.translation[1] = -dy / self.scale
 
@@ -168,6 +167,9 @@ class GraphDrawer:
         tx = self.translation[0] + self.last_translation[0]
         ty = self.translation[1] + self.last_translation[1]
         cairo.translate(tx, ty)
+
+        # print (tx, ty), self.last_translation
+
         # Get transformation
         self.transform = cairo.get_matrix()
         self.transform.invert()
