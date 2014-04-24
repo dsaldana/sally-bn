@@ -145,7 +145,6 @@ class GraphDrawer:
             self.area.queue_draw()
 
 
-
     def on_scroll(self, widget, event):
         """
         Scroll event by the mouse. It modifies the scale for drawing.

@@ -276,7 +276,11 @@ class BoxDiscreteBN(Gtk.Box):
             self.disc_bn.remove_edge(self.selected_edge)
             # Non selected
             self.selected_edge = None
-        self.area.queue_draw()
+
+        # Draw
+        self.drawer.set_selected_edges([])
+        self.drawer.set_edges_type_vertex(self.disc_bn.get_edges())
+        self.drawer.repaint()
 
     def on_edit_mode(self, radiotool):
         if not radiotool.get_active():
