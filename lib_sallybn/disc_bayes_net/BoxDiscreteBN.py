@@ -31,10 +31,8 @@ from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 from lib_sallybn.GraphDrawer import GraphDrawer
-import lib_sallybn.util.ugraphic
-import lib_sallybn
-import lib_sallybn.disc_bayes_net.gwidgets
 import lib_sallybn.util.resources as res
+
 
 
 
@@ -67,16 +65,17 @@ class BoxDiscreteBN(Gtk.Box):
         self.window = window
 
         # Create graphic widgets
-        self.box_disc_bn, self.area, self.toolbar_edit, self.bedit, self.brun, self.bclear_evidence = \
+        self.box_disc_bn, self.drawing_box, self.toolbar_edit, self.bedit, self.brun, self.bclear_evidence = \
             ugraphic.create_widget(
                 res.TAB_DISC_BAYES_NET_GLADE,
-                ["box_disc_bn", "drawingarea_bn", "toolbar_edit_bn", "bedit", "brun", "bclear_evidence"], self)
+                ["box_disc_bn", "drawing_box", "toolbar_edit_bn", "bedit", "brun", "bclear_evidence"], self)
 
         super(BoxDiscreteBN, self).__init__(spacing=1)
         self.pack_start(self.box_disc_bn, True, True, 0)
         self.set_visible(True)
 
-        self.drawer = GraphDrawer(self.area)
+        self.drawer = GraphDrawer()
+        self.drawing_box.pack_start(self.drawer.get_drawing_area(), True, True, 0)
 
         self.mode_edit = ModeEdit.vertex
         self.mode = Mode.edit
@@ -107,7 +106,7 @@ class BoxDiscreteBN(Gtk.Box):
         """
         self.evidences = {}
         self.marginals = self.disc_bn.compute_marginals(self.evidences)
-        self.area.queue_draw()
+        self.drawer.repaint()
 
     def on_zoom(self, button):
         """
@@ -148,10 +147,17 @@ class BoxDiscreteBN(Gtk.Box):
         if self.mode == Mode.edit:
             # If there is a vertex in the clicked point
             self.selected_vetex = ugraphic.point_in_circle(trf_p, self.vertex_locations)
+            self.selected_edge = None
+
             # If there is a edge in the clicked point
             if self.selected_vetex is None:
                 self.selected_edge = ugraphic.point_in_line(trf_p, self.vertex_locations,
                                                             self.disc_bn.get_edges())
+
+            # Draw selected edge or vertex
+            self.drawer.set_selected_vertices([self.selected_vetex])
+            self.drawer.set_selected_edges([self.selected_edge])
+            self.drawer.repaint()
 
             ## Right click for edit and delete
             if event.button == 3 and (self.selected_vetex
@@ -160,7 +166,8 @@ class BoxDiscreteBN(Gtk.Box):
                 self.clicked_point = None
 
             ## double click, open the dialog
-            elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS:
+            elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS and \
+                            self.selected_vetex is not None:
                 # Show cpt dialog
                 self.show_edit_var_dialog()
 
@@ -244,7 +251,7 @@ class BoxDiscreteBN(Gtk.Box):
         elif self.mode == Mode.run:
             self.toolbar_edit.set_visible(False)
             self.bclear_evidence.set_visible_horizontal(True)
-        self.area.queue_draw()
+
 
     def on_organize(self, widget):
         """
@@ -269,6 +276,8 @@ class BoxDiscreteBN(Gtk.Box):
 
             # Non selected vertex
             self.selected_vetex = None
+            #Draw
+            self.drawer.set_selected_vertices([])
 
         # Delete edge
         elif self.selected_edge is not None:
@@ -276,10 +285,9 @@ class BoxDiscreteBN(Gtk.Box):
             self.disc_bn.remove_edge(self.selected_edge)
             # Non selected
             self.selected_edge = None
+            self.drawer.set_selected_edges([])
 
         # Draw
-        self.drawer.set_selected_edges([])
-        self.drawer.set_edges_type_vertex(self.disc_bn.get_edges())
         self.drawer.repaint()
 
     def on_edit_mode(self, radiotool):
@@ -346,10 +354,6 @@ class BoxDiscreteBN(Gtk.Box):
         #### Mode Edit #####
         if self.mode == Mode.edit:
 
-
-            # search if a node exist in that point
-            self.selected_vetex = lib_sallybn.util.ugraphic.point_in_circle(p, self.vertex_locations)
-
             self.draw_mode_edit()
 
             ## Mode edit VERTEX
@@ -386,7 +390,7 @@ class BoxDiscreteBN(Gtk.Box):
         elif self.mode == Mode.run:
             self.draw_mode_run()
 
-        self.area.queue_draw()
+        self.drawer.repaint()
 
     def change_vertex_name_h(self, old_name, new_name):
         #vertex locations
@@ -400,7 +404,7 @@ class BoxDiscreteBN(Gtk.Box):
 
     def show_edit_popup(self, event):
         #Draw selected node
-        self.area.queue_draw()
+        self.drawer.repaint()
 
         menu = Gtk.Menu()
         menu_it = Gtk.MenuItem()

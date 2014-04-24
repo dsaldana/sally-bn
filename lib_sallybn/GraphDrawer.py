@@ -22,7 +22,7 @@
 # ----------------------------------------------------------------------------
 
 import math
-
+from gi.repository import Gtk
 
 vertex_radio = 30.0
 box_width = 160
@@ -39,7 +39,7 @@ color_white = [255.0 / 255, 255.0 / 255, 255.0 / 255]
 
 
 class GraphDrawer:
-    def __init__(self, area):
+    def __init__(self):
         #### Objects to show #####
         self.dynamic_arrow = None
         # circles
@@ -66,7 +66,7 @@ class GraphDrawer:
         ##Viewer mode
         self.viewer_mode = True
 
-        self.area = area
+        self.area = Gtk.DrawingArea()
         self.area.connect("motion-notify-event", self.on_motion_event)
         self.area.connect("draw", self.on_drawing_area_draw)
         self.area.connect("scroll-event", self.on_scroll)
@@ -78,7 +78,10 @@ class GraphDrawer:
         #Mouse events
         self.button_pressed = False
         self.clicked_point = None
+        self.area.set_visible(True)
 
+    def get_drawing_area(self):
+        return self.area
 
     def transform_point(self, p):
         """ Transform a point based on applied scale.
@@ -134,7 +137,7 @@ class GraphDrawer:
         #    self.area.queue_draw()
 
         # translate world  is not None  and
-        if self.viewer_mode:
+        if self.viewer_mode and self.button_pressed:
             p = [event.x, event.y]
 
             dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
@@ -251,6 +254,9 @@ class GraphDrawer:
             cairo.fill()
 
     def draw_selected_edge(self, cairo, selected_edge, vertex_locations):
+        if selected_edge is None:
+            return
+
         if selected_edge[1] in vertex_locations and selected_edge[0] in vertex_locations:
             x1, y1 = vertex_locations[selected_edge[0]]
             x2, y2 = vertex_locations[selected_edge[1]]
@@ -265,6 +271,9 @@ class GraphDrawer:
             print "Error drawing selected edge"
 
     def draw_selected_vertex(self, cairo, selected_vertex, vertex_locations):
+        if selected_vertex is None:
+            return
+
         ## selected node
         if selected_vertex in vertex_locations:
             point = vertex_locations[selected_vertex]
