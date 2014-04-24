@@ -251,7 +251,13 @@ class BoxDiscreteBN(Gtk.Box):
         Estimate good places to draw each vertex of the graph.
         """
         self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
-        self.area.queue_draw()
+
+        # Draw
+        if Mode.edit == self.mode:
+            self.drawer.set_vertices(self.vertex_locations)
+        if Mode.run == self.mode:
+            self.drawer.set_boxes(self.vertex_locations)
+        self.drawer.repaint()
 
     def on_delete(self, *widget):
         # Delete vertex
