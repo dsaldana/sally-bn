@@ -80,6 +80,9 @@ class GraphDrawer:
         self.clicked_point = None
         self.area.set_visible(True)
 
+    def do_realize(self):
+        print "realize"
+
     def get_drawing_area(self):
         return self.area
 
