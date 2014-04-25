@@ -25,53 +25,11 @@ import math
 from random import shuffle
 from gi.repository import Gtk
 
-from lib_sallybn import GraphDrawer
+from lib_sallybn.drawer import GraphDrawer
 
 
-def point_in_line(p, vertex_locations, edges):
-    """
-    Identify if a point is in one of the set of edges
-    :param p point = [x,y]
-    :param terminal points of the edges, is a dictionary {"v1":[x,y]}
-    :param edges set of lines represented by two points each. ex [["v1","v2"],["v3","v2"]]
-    """
-    px, py = p
-
-    for e in edges:
-        x1, y1 = vertex_locations[e[0]]
-        x2, y2 = vertex_locations[e[1]]
-
-        # distance from p1 to p
-        d1_p = math.hypot(x1 - px, y1 - py)
-        # distance from p to p2
-        d2_p = math.hypot(x2 - px, y2 - py)
-
-        # distance prom p1 to p2
-        d1_2 = math.hypot(x2 - x1, y2 - y1)
-
-        # validate
-        if d1_p + d2_p - d1_2 < 0.5:
-            return e
-
-    return None
 
 
-def point_in_circle(p, vertices):
-    """
-    Serach if there is a node in the clicked point
-
-    :param p: point
-    :param vertices: nodes
-    :return: the vertex
-    """
-    radious = GraphDrawer.vertex_radio
-    vertex = None
-    for k, point in vertices.items():
-        if math.hypot(p[0] - point[0], p[1] - point[1]) < radious:
-            vertex = k
-            break
-
-    return vertex
 
 
 def create_widget(glade_file, widget_names, handler=None):

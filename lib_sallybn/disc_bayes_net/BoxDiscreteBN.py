@@ -26,12 +26,16 @@ import math
 
 from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
+from lib_sallybn.drawer.GraphDrawer import GraphDrawer
+from lib_sallybn.drawer.GArrow import GArrow
+from lib_sallybn.drawer.GVertex import GVertex
+
 from lib_sallybn.util import ugraphic
 from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
-from lib_sallybn.GraphDrawer import GraphDrawer
 import lib_sallybn.util.resources as res
+
 
 
 
@@ -85,7 +89,7 @@ class BoxDiscreteBN(Gtk.Box):
 
         # Temporal vertex for edge
         self.vertex_1 = None
-        self.selected_vetex = None
+        self.selected_vertex = None
         self.selected_edge = None
         self.marginals = None
         self.evidences = {}
@@ -149,33 +153,33 @@ class BoxDiscreteBN(Gtk.Box):
 
         if self.mode == Mode.edit:
             # If there is a vertex in the clicked point
-            self.selected_vetex = ugraphic.point_in_circle(trf_p, self.vertex_locations)
+            self.selected_vertex = ugraphic.point_in_circle(trf_p, self.vertex_locations)
             self.selected_edge = None
 
             # If there is a edge in the clicked point
-            if self.selected_vetex is None:
+            if self.selected_vertex is None:
                 self.selected_edge = ugraphic.point_in_line(trf_p, self.vertex_locations,
                                                             self.disc_bn.get_edges())
 
             # Draw selected edge or vertex
-            self.drawer.set_selected_vertices([self.selected_vetex])
+            self.drawer.set_selected_vertices([self.selected_vertex])
             self.drawer.set_selected_edges([self.selected_edge])
             self.drawer.repaint()
 
             ## Right click for edit and delete
-            if event.button == 3 and (self.selected_vetex
+            if event.button == 3 and (self.selected_vertex
                                       is not None or self.selected_edge is not None):
                 self.show_edit_popup(event)
                 self.clicked_point = None
 
             ## double click, open the dialog
             elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS and \
-                            self.selected_vetex is not None:
+                            self.selected_vertex is not None:
                 # Show cpt dialog
                 self.show_edit_var_dialog()
 
                 self.clicked_point = None
-                self.selected_vetex = None
+                self.selected_vertex = None
                 return
 
         elif self.mode == Mode.run:
@@ -251,10 +255,11 @@ class BoxDiscreteBN(Gtk.Box):
         if self.mode == Mode.edit:
             self.toolbar_edit.set_visible(True)
             self.bclear_evidence.set_visible_horizontal(False)
+            self.draw_mode_edit()
         elif self.mode == Mode.run:
             self.toolbar_edit.set_visible(False)
             self.bclear_evidence.set_visible_horizontal(True)
-
+            self.draw_mode_run()
 
 
     def on_organize(self, widget):
@@ -272,14 +277,14 @@ class BoxDiscreteBN(Gtk.Box):
 
     def on_delete(self, *widget):
         # Delete vertex
-        if self.selected_vetex is not None:
-            self.vertex_locations.pop(self.selected_vetex)
+        if self.selected_vertex is not None:
+            self.vertex_locations.pop(self.selected_vertex)
 
             # Delete from model
-            self.disc_bn.remove_vertex(self.selected_vetex)
+            self.disc_bn.remove_vertex(self.selected_vertex)
 
             # Non selected vertex
-            self.selected_vetex = None
+            self.selected_vertex = None
             #Draw
             self.drawer.set_selected_vertices([])
 
@@ -309,7 +314,7 @@ class BoxDiscreteBN(Gtk.Box):
 
         # No selections
         self.selected_edge = None
-        self.selected_vetex = None
+        self.selected_vertex = None
         self.drawer.set_selected_vertices([])
         self.drawer.set_selected_edges([])
         self.drawer.repaint()
@@ -327,18 +332,29 @@ class BoxDiscreteBN(Gtk.Box):
         return new_name
 
     def draw_mode_edit(self):
-        # Configure drawer
-        self.drawer.set_boxes({})
-        self.drawer.set_edges_type_box([])
+        ## Configure drawer
+        vl = self.vertex_locations
 
-        if self.selected_edge is not None:
-            self.drawer.set_selected_edges([self.selected_edge])
-        if self.selected_vetex is not None:
-            self.drawer.set_selected_vertices([self.selected_vetex])
+        # Graphic elements
+        gelements = []
+        # Edges
+        for e in self.disc_bn.get_edges():
+            arrow = GArrow(vl[e[0]], vl[e[1]])
 
-        self.drawer.set_vertices(self.vertex_locations)
-        self.drawer.set_edges_type_vertex(self.disc_bn.get_edges())
+            if e == self.selected_edge:
+                arrow.set_selected(True)
 
+            gelements.append(arrow)
+
+        # Vertices
+        for vname, p in vl.items():
+            v = GVertex(p, vname)
+
+            if self.selected_vertex == vname:
+                v.set_selected(True)
+            gelements.append(v)
+
+        self.drawer.set_graphic_objects(gelements)
         self.drawer.repaint()
 
     def draw_mode_run(self):
@@ -369,7 +385,7 @@ class BoxDiscreteBN(Gtk.Box):
             ## Mode edit VERTEX
             if self.mode_edit == ModeEdit.vertex:
                 # Create new Vertex
-                if self.selected_vetex is None and self.selected_edge is None:
+                if self.selected_vertex is None and self.selected_edge is None:
                     vname = self.get_new_vertex_name()
                     # new vertex
                     self.vertex_locations[vname] = p
@@ -379,21 +395,21 @@ class BoxDiscreteBN(Gtk.Box):
             elif self.mode_edit == ModeEdit.edge:
 
                 # If there is not a initial vertex selected
-                if self.vertex_1 is None and self.selected_vetex is not None:
-                    self.vertex_1 = self.selected_vetex
+                if self.vertex_1 is None and self.selected_vertex is not None:
+                    self.vertex_1 = self.selected_vertex
 
                 # If there is an initial vertex
-                elif self.vertex_1 is not None and self.selected_vetex is None:
+                elif self.vertex_1 is not None and self.selected_vertex is None:
                     #Select anything
                     self.vertex_1 = None
                     # draw a dynamic arrow
                     self.drawer.set_dynamic_arrow(self.selected_edge)
-                elif self.vertex_1 is not None and self.selected_vetex is not None:
-                    if not self.vertex_1 == self.selected_vetex and self.selected_vetex is not None:
-                        self.disc_bn.add_edge([self.vertex_1, self.selected_vetex])
+                elif self.vertex_1 is not None and self.selected_vertex is not None:
+                    if not self.vertex_1 == self.selected_vertex and self.selected_vertex is not None:
+                        self.disc_bn.add_edge([self.vertex_1, self.selected_vertex])
 
                         self.vertex_1 = None
-                        self.selected_vetex = None
+                        self.selected_vertex = None
                 self.tmp_arrow = None
 
         ##### Mode run
@@ -409,8 +425,8 @@ class BoxDiscreteBN(Gtk.Box):
         self.disc_bn.change_vertex_name(old_name, new_name)
 
         #selected vertex
-        if self.selected_vetex == old_name:
-            self.selected_vetex = new_name
+        if self.selected_vertex == old_name:
+            self.selected_vertex = new_name
 
     def show_edit_popup(self, event):
         #Draw selected node
@@ -425,7 +441,7 @@ class BoxDiscreteBN(Gtk.Box):
         menuitem.set_submenu(menu)
 
         # Edit selected vertex
-        if self.selected_vetex is not None:
+        if self.selected_vertex is not None:
             menu_it = Gtk.MenuItem("Edit Variable")
 
             # Click on edit vertex data.
@@ -448,7 +464,7 @@ class BoxDiscreteBN(Gtk.Box):
         cpt_dialog = CptDialog()
         # Create clone of disc_bn
         new_disc_bn = self.disc_bn.clone()
-        cpt_dialog.show_cpt_dialog(self.window, new_disc_bn, self.selected_vetex)
+        cpt_dialog.show_cpt_dialog(self.window, new_disc_bn, self.selected_vertex)
 
         new_var_name = cpt_dialog.get_var_name()
 
@@ -458,8 +474,8 @@ class BoxDiscreteBN(Gtk.Box):
 
         self.disc_bn = new_disc_bn
 
-        if not new_var_name == self.selected_vetex:
-            self.change_vertex_name_h(self.selected_vetex, new_var_name)
+        if not new_var_name == self.selected_vertex:
+            self.change_vertex_name_h(self.selected_vertex, new_var_name)
 
     def save_bn_to_file(self, file_name):
         # if does not have extension
@@ -495,9 +511,8 @@ class BoxDiscreteBN(Gtk.Box):
                 self.vertex_locations = json_data["vertex_loc"]
             else:
                 self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
-
-            self.draw_mode_edit()
         except Exception:
-            ugraphic.show_warning(self.window, "Error loading the Bayesian Network")
+            ugraphic.show_warning(self.window, "Error loading the Bayesian Network", Exception)
             return
 
+        self.draw_mode_edit()
