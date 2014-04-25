@@ -1,7 +1,8 @@
 import math
-from lib_sallybn.drawer.GVertex import DEFAULT_VERTEX_RADIO
 
+from lib_sallybn.drawer.GVertex import DEFAULT_VERTEX_RADIO
 from lib_sallybn.drawer.GraphicObject import GraphicObject
+
 
 SELECT_TOLERANCE = 0.5
 
@@ -10,6 +11,7 @@ class GArrow(GraphicObject):
     """
     Graphic Vertex
     """
+
     def __init__(self, p1, p2, headarrow_d=DEFAULT_VERTEX_RADIO):
         """
         :p1: initinal point GPoint
@@ -65,9 +67,6 @@ class GArrow(GraphicObject):
             dx = 1
 
         cairo.set_source_rgb(0, 0, 0.0)
-        cairo.move_to(x1, y1)
-        cairo.line_to(x2, y2)
-        cairo.stroke()
 
         #draw arrow
         d = math.hypot(dx, dy) - self.headarrow_d
@@ -78,11 +77,11 @@ class GArrow(GraphicObject):
             s = -1.0
 
         # arrow head (triangle)
-        a = DEFAULT_VERTEX_RADIO / 2.0
-        b = DEFAULT_VERTEX_RADIO / 3.5
-
-        xt1 = x1 + s * d * math.cos(theta)
-        yt1 = y1 + s * d * math.sin(theta)
+        a = DEFAULT_VERTEX_RADIO / 2.5
+        b = DEFAULT_VERTEX_RADIO / 5
+        # Final point
+        xf = x1 + s * d * math.cos(theta)
+        yf = y1 + s * d * math.sin(theta)
 
         xt2 = x1 + s * (d - a) * math.cos(theta) - s * b * math.sin(theta)
         yt2 = y1 + s * (d - a) * math.sin(theta) + s * b * math.cos(theta)
@@ -91,9 +90,19 @@ class GArrow(GraphicObject):
         xt3 = x1 + s * (d - a) * math.cos(theta) - s * b * math.sin(theta)
         yt3 = y1 + s * (d - a) * math.sin(theta) + s * b * math.cos(theta)
 
-        cairo.move_to(xt1, yt1)
+        cairo.move_to(xf, yf)
         cairo.line_to(xt2, yt2)
         cairo.line_to(xt3, yt3)
-        cairo.line_to(xt1, yt1)
-
+        cairo.line_to(xf, yf)
         cairo.fill()
+
+        # initial point
+        xi = x1 + s * DEFAULT_VERTEX_RADIO * math.cos(theta)
+        yi = y1 + s * DEFAULT_VERTEX_RADIO * math.sin(theta)
+        # Final point
+        xf = x1 + s * (d-2) * math.cos(theta)
+        yf = y1 + s * (d-2) * math.sin(theta)
+
+        cairo.move_to(xi, yi)
+        cairo.line_to(xf, yf)
+        cairo.stroke()

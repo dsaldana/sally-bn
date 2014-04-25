@@ -8,16 +8,16 @@ delta_state = 30
 title_height = delta_state + 5
 
 
-class GStateBox(GraphicObject, GPoint):
+class GStateBox(GraphicObject):
 
-    def __init__(self, center, name, marginals, evidence):
+    def __init__(self, gpoint, name, marginals, evidence):
         """
           :param vertex_locations dic with name and point, ex. {"v1":[x,y]}
         :param marginals dic with marginal probabilities to all variables
             ex. {"v1":{"state1": 0.5, "state2": 0.5}}
         :param evidence is a dictionary with vertex name and state {"vertex_name":"state"}
         """
-        self.x, self.y = center
+        self.center = gpoint
         self.marginals = marginals
         self.evidence = evidence
         self.name = name
@@ -36,7 +36,7 @@ class GStateBox(GraphicObject, GPoint):
         v_states = marginals.keys()
         is_evidence = vname in evidence
         # Rectangles
-        px, py = self.x, self.y
+        px, py = self.center.x, self.center.y
         box_heigh = self.get_box_height(v_states)
         x_corner = px - box_width / 2.0
         y_corner = py - box_heigh / 2.0
@@ -140,14 +140,16 @@ class GStateBox(GraphicObject, GPoint):
         box_heigh = GStateBox.get_box_height(v_states)
 
         # go to left-upper corner
-        x_corner = self.x - box_width / 2.0
-        y_corner = self.y - box_heigh / 2.0
+        x_corner = self.center.x - box_width / 2.0
+        y_corner = self.center.y - box_heigh / 2.0
 
         #if point.x is not in range
         if not x_corner < x <= x_corner + box_width:
             return False
 
         #if title
+        if y_corner <= y < y_corner + title_height:
+            return True
 
 
         # evaluate each state for p.y

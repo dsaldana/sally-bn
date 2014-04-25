@@ -3,8 +3,8 @@
 * Documentation
 
 ----TO FIX----
-- dynamic arrow
-- translation bug
+- select arrow
+- multiple selections arrow and vertex
 
 --- Next release ---
 * New BN, multiple BNs with tabs

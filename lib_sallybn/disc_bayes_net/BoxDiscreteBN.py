@@ -20,9 +20,10 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # ----------------------------------------------------------------------------
-
+from gi.repository import Gtk, Gdk
 from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
+from lib_sallybn.drawer.GPoint import GPoint
 from lib_sallybn.drawer.GStateBox import GStateBox
 from lib_sallybn.drawer.GraphDrawer import GraphDrawer
 from lib_sallybn.drawer.GArrow import GArrow
@@ -33,9 +34,6 @@ from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 import lib_sallybn.util.resources as res
-
-
-from gi.repository import Gtk, Gdk
 
 
 
@@ -115,18 +113,54 @@ class BoxDiscreteBN(Gtk.Box):
             # Crate vertex
             vname = self.get_new_vertex_name()
             # new vertex
-            self.vertex_locations[vname] = p
+            self.vertex_locations[vname] = GPoint(p[0], p[1])
             self.disc_bn.add_vertex(vname)
 
-            # Draw
-            self.draw_mode_edit()
+        elif self.mode == Mode.edit_edge:
+            self.drawer.dynamic_arrow = None
+            self.selected_vertex = None
 
+        self.draw_graph()
 
     def right_clicked_elem(self, elem, event):
         if self.mode == Mode.edit_vertex or self.mode == Mode.edit_edge:
             if isinstance(elem, GVertex) or isinstance(elem, GArrow):
                 self.show_edit_popup(event)
 
+    def clicked_element(self, gelement):
+        if self.mode == Mode.edit_vertex:
+            gelement.selected = True
+
+            # False others
+            if isinstance(gelement, GVertex):
+                self.selected_vertex = gelement.name
+
+        elif self.mode == Mode.edit_edge:
+            if isinstance(gelement, GVertex):
+                new_selection = gelement.name
+
+                if self.selected_vertex is None:
+                    self.selected_vertex = new_selection
+                    self.drawer.dynamic_arrow = self.vertex_locations[new_selection]
+                else:
+                    self.disc_bn.add_edge([self.selected_vertex, new_selection])
+                    self.selected_vertex = None
+                    self.drawer.dynamic_arrow = None
+
+            # elif isinstance(gelement, GArrow):
+            #     self.selected_edge = G
+
+        elif self.mode == Mode.run:
+            # get selected state for evidence
+            if isinstance(gelement, GStateBox):
+                new_evidence = gelement.selected_state
+                if new_evidence is not None:
+                    self.evidences[gelement.name] = new_evidence
+                    # compute marginals again
+                    self.marginals = self.disc_bn.compute_marginals(self.evidences)
+                    self.draw_graph()
+
+        self.drawer.repaint()
 
     def on_clear_evidence(self, button):
         """
@@ -141,25 +175,6 @@ class BoxDiscreteBN(Gtk.Box):
         Zoom event by button.
         """
         self.drawer.restore_zoom()
-
-    def clicked_element(self, gelement):
-        if self.mode == Mode.edit_vertex:
-            gelement.selected = True
-
-            #False others
-            self.selected_vertex = gelement.name
-
-        if self.mode == Mode.run:
-            # get selected state for evidence
-            if isinstance(gelement, GStateBox):
-                new_evidence = gelement.selected_state
-                print new_evidence
-                if new_evidence is not None:
-                    self.evidences[gelement.name] = new_evidence
-                    # compute marginals again
-                    self.marginals = self.disc_bn.compute_marginals(self.evidences)
-
-        self.drawer.repaint()
 
     def on_key_press(self, widget, event):
         """
@@ -219,25 +234,34 @@ class BoxDiscreteBN(Gtk.Box):
         if self.mode == Mode.edit_edge or self.mode == Mode.edit_vertex:
             self.toolbar_edit.set_visible(True)
             self.bclear_evidence.set_visible_horizontal(False)
-            self.draw_mode_edit()
+
         elif self.mode == Mode.run:
             self.toolbar_edit.set_visible(False)
             self.bclear_evidence.set_visible_horizontal(True)
-            self.draw_mode_run()
+
+        self.selected_vertex = None
+        self.selected_edge = None
+        self.draw_graph()
 
 
     def on_organize(self, widget):
         """
         Estimate good places to draw each vertex of the graph.
         """
-        self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
+        v_locts = ugraphic.create_vertex_locations(self.disc_bn)
+        self.dict_to_gpoints(v_locts)
+        self.draw_graph()
 
-        # Draw
-        if Mode.edit == self.mode:
-            self.drawer.set_vertices(self.vertex_locations)
-        if Mode.run == self.mode:
-            self.drawer.set_boxes(self.vertex_locations)
-        self.drawer.repaint()
+    def dict_to_gpoints(self, v_locts):
+        for vname, point in v_locts.items():
+            self.vertex_locations[vname] = GPoint(point[0], point[1])
+
+    def gpoints_to_dict(self):
+        l_loc = {}
+        for vname, gpoint in self.vertex_locations.items():
+            l_loc[vname] = gpoint
+
+        return l_loc
 
     def on_delete(self, *widget):
         # Delete vertex
@@ -263,26 +287,6 @@ class BoxDiscreteBN(Gtk.Box):
         # Draw
         self.drawer.repaint()
 
-    def on_edit_mode(self, radiotool):
-        if not radiotool.get_active():
-            return True
-        # Radio selected
-        if radiotool.get_label() == "bvertex":
-            self.mode_edit = ModeEdit.vertex
-        elif radiotool.get_label() == "bedge":
-            self.mode_edit = ModeEdit.edge
-        elif radiotool.get_label() == "bmanual":
-            self.mode_edit = ModeEdit.manual
-        else:
-            print "not supported"
-
-        # No selections
-        self.selected_edge = None
-        self.selected_vertex = None
-        self.drawer.set_selected_vertices([])
-        self.drawer.set_selected_edges([])
-        self.drawer.repaint()
-
     def get_new_vertex_name(self):
         """ Vertex name generator to create incremental variables and does not generate
         incompatibility with assigned names by user .
@@ -295,32 +299,33 @@ class BoxDiscreteBN(Gtk.Box):
             new_name = DEFAULT_NODE_NAME + ' ' + str(counter)
         return new_name
 
+    def draw_graph(self):
+        if self.mode == Mode.edit_vertex or self.mode == Mode.edit_edge:
+            self.draw_mode_edit()
+        else:
+            self.draw_mode_run()
+
     def draw_mode_edit(self):
         ## Configure drawer
         vl = self.vertex_locations
 
         # Graphic elements
-        gvertices = []
-        gpoints = {}
+        gelements = []
+        # Edges
+        for e in self.disc_bn.get_edges():
+            arrow = GArrow(self.vertex_locations[e[0]], self.vertex_locations[e[1]])
+            if e == self.selected_edge:
+                arrow.selected = True
+            gelements.append(arrow)
         # Vertices
         for vname, p in vl.items():
             v = GVertex(p, vname)
-            gpoints[vname] = v
             v.translatable = True
             if self.selected_vertex == vname:
                 v.selected = True
-            gvertices.append(v)
+            gelements.append(v)
 
-        gedges = []
-        # Edges
-        for e in self.disc_bn.get_edges():
-            arrow = GArrow(gpoints[e[0]], gpoints[e[1]])
-            if e == self.selected_edge:
-                arrow.selected = True
-
-            gedges.append(arrow)
-
-        self.drawer.set_graphic_objects(gedges + gvertices)
+        self.drawer.set_graphic_objects(gelements)
         self.drawer.repaint()
 
     def draw_mode_run(self):
@@ -328,8 +333,11 @@ class BoxDiscreteBN(Gtk.Box):
         vl = self.vertex_locations
 
         # Graphic elements
-        gvertices = []
-        gpoints = {}
+        gelements = []
+        # Edges
+        for e in self.disc_bn.get_edges():
+            arrow = GArrow(self.vertex_locations[e[0]], self.vertex_locations[e[1]])
+            gelements.append(arrow)
 
         for vname, p in vl.items():
 
@@ -338,19 +346,28 @@ class BoxDiscreteBN(Gtk.Box):
                 evidence = self.evidences[vname]
             b = GStateBox(p, vname, self.marginals[vname], evidence)
             b.translatable = True
-            gpoints[vname] = b
-            gvertices.append(b)
+            gelements.append(b)
 
-        #TODO edges
-        gedges = []
-        # Edges
-        for e in self.disc_bn.get_edges():
-            arrow = GArrow(gpoints[e[0]], gpoints[e[1]])
-            gedges.append(arrow)
-
-        self.drawer.set_graphic_objects(gedges + gvertices)
+        self.drawer.set_graphic_objects(gelements)
         self.drawer.repaint()
 
+    def on_edit_mode(self, radiotool):
+        if not radiotool.get_active():
+            return True
+        # Radio selected
+        if radiotool.get_label() == "bvertex":
+            self.mode = Mode.edit_vertex
+        elif radiotool.get_label() == "bedge":
+            self.mode = Mode.edit_edge
+        elif radiotool.get_label() == "bmanual":
+            pass
+        else:
+            print "not supported"
+
+        # No selections
+        self.selected_edge = None
+        self.selected_vertex = None
+        self.drawer.repaint()
 
     def editing_action(self, p):
         """
@@ -388,8 +405,8 @@ class BoxDiscreteBN(Gtk.Box):
             self.tmp_arrow = None
 
         ##### Mode run
-        elif self.mode == Mode.run:
-            self.draw_mode_run()
+        # elif self.mode == Mode.run:
+        #     self.draw_mode_run()
 
         self.drawer.repaint()
 
@@ -452,13 +469,14 @@ class BoxDiscreteBN(Gtk.Box):
         if not new_var_name == self.selected_vertex:
             self.change_vertex_name_h(self.selected_vertex, new_var_name)
 
+
     def save_bn_to_file(self, file_name):
         # if does not have extension
         if not file_name.endswith(FILE_EXTENSION):
             file_name += FILE_EXTENSION
 
         bn = {
-            "vertex_loc": self.vertex_locations,
+            "vertex_loc": self.gpoints_to_dict(),
             "E": self.disc_bn.get_edges(),
             "V": self.disc_bn.get_vertices(),
             "Vdata": self.disc_bn.get_vdata()}
@@ -483,9 +501,11 @@ class BoxDiscreteBN(Gtk.Box):
             json_data = dic_from_json_file(file_name)
             # Vertex locations
             if "vertex_loc" in json_data.keys():
-                self.vertex_locations = json_data["vertex_loc"]
+                self.dict_to_gpoints(json_data["vertex_loc"])
             else:
-                self.vertex_locations = ugraphic.create_vertex_locations(self.disc_bn)
+                vl = ugraphic.create_vertex_locations(self.disc_bn)
+                self.dict_to_gpoints(vl)
+
         except Exception:
             ugraphic.show_warning(self.window, "Error loading the Bayesian Network", Exception)
             return
