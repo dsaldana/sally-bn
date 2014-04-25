@@ -10,21 +10,16 @@ class GArrow(GraphicObject):
     """
     Graphic Vertex
     """
-
     def __init__(self, p1, p2, headarrow_d=DEFAULT_VERTEX_RADIO):
         """
-        :p1: initinal point
-        :p2: final point
+        :p1: initinal point GPoint
+        :p2: final point GPoint
         :head_distance: distance of the head
         """
-        self.selected = False
         self.p1 = p1
         self.p2 = p2
 
         self.headarrow_d = headarrow_d
-
-    def set_selected(self, val):
-        self.selected = val
 
     def is_on_point(self, p):
         """
@@ -33,8 +28,8 @@ class GArrow(GraphicObject):
         """
         px, py = p
 
-        x1, y1 = self.p1
-        x2, y2 = self.p2
+        x1, y1 = self.p1.x, self.p1.y
+        x2, y2 = self.p2.x, self.p2.y
 
         # distance from p1 to p
         d1_p = math.hypot(x1 - px, y1 - py)
@@ -47,13 +42,12 @@ class GArrow(GraphicObject):
         # validate, if it is near
         return d1_p + d2_p - d1_2 < SELECT_TOLERANCE
 
-
     def draw(self, cairo):
         """
         Draw arrow
         """
-        x1, y1 = self.p1
-        x2, y2 = self.p2
+        x1, y1 = self.p1.x, self.p1.y
+        x2, y2 = self.p2.x, self.p2.y
 
         # selected arrow
         if self.selected:

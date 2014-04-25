@@ -2,8 +2,9 @@
 from abc import ABCMeta, abstractmethod
 
 class GraphicObject:
-    def __init__(self):
-        __metaclass__ = ABCMeta
+
+    selected = False
+    translatable = False
 
 
     @abstractmethod

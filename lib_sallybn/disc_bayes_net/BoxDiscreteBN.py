@@ -21,11 +21,9 @@
 #
 # ----------------------------------------------------------------------------
 
-from gi.repository import Gtk, Gdk
-import math
-
 from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
+from lib_sallybn.drawer.GStateBox import GStateBox
 from lib_sallybn.drawer.GraphDrawer import GraphDrawer
 from lib_sallybn.drawer.GArrow import GArrow
 from lib_sallybn.drawer.GVertex import GVertex
@@ -37,7 +35,7 @@ from libpgm.nodedata import NodeData
 import lib_sallybn.util.resources as res
 
 
-
+from gi.repository import Gtk, Gdk
 
 
 
@@ -53,15 +51,9 @@ KEY_R_CODE = 114
 ## Enumerations
 # Mode for
 class Mode:
-    edit = 0
-    run = 1
-
-
-# Mode for edition
-class ModeEdit:
-    manual = 0
-    vertex = 1
-    edge = 2
+    edit_vertex = 0
+    edit_edge = 1
+    run = 2
 
 
 class BoxDiscreteBN(Gtk.Box):
@@ -81,11 +73,7 @@ class BoxDiscreteBN(Gtk.Box):
         self.drawer = GraphDrawer()
         self.drawing_box.pack_start(self.drawer.get_drawing_area(), True, True, 0)
 
-        self.drawer.get_drawing_area().connect("button-press-event", self.on_button_press)
-        self.drawer.get_drawing_area().connect("button-release-event", self.on_button_release)
-
-        self.mode_edit = ModeEdit.vertex
-        self.mode = Mode.edit
+        self.mode = Mode.edit_vertex
 
         # Temporal vertex for edge
         self.vertex_1 = None
@@ -106,6 +94,39 @@ class BoxDiscreteBN(Gtk.Box):
         self.clicked_point = None
         self.button_pressed = False
 
+        # connect listeners
+        self.drawer.clicked_element_listener = self.clicked_element
+        self.drawer.clicked_clear_space_listener = self.clicked_clear_space
+        self.drawer.right_click_elem_listener = self.right_clicked_elem
+        self.drawer.double_clicked_element_listener = self.double_click_on_elem
+
+
+    def double_click_on_elem(self, elem):
+        print "ouble click"
+        # Show cpt dialog
+        self.show_edit_var_dialog()
+
+        self.clicked_point = None
+        self.selected_vertex = None
+
+
+    def clicked_clear_space(self, p):
+        if self.mode == Mode.edit_vertex:
+            # Crate vertex
+            vname = self.get_new_vertex_name()
+            # new vertex
+            self.vertex_locations[vname] = p
+            self.disc_bn.add_vertex(vname)
+
+            # Draw
+            self.draw_mode_edit()
+
+
+    def right_clicked_elem(self, elem, event):
+        if self.mode == Mode.edit_vertex or self.mode == Mode.edit_edge:
+            if isinstance(elem, GVertex) or isinstance(elem, GArrow):
+                self.show_edit_popup(event)
+
 
     def on_clear_evidence(self, button):
         """
@@ -121,81 +142,24 @@ class BoxDiscreteBN(Gtk.Box):
         """
         self.drawer.restore_zoom()
 
-    def on_button_release(self, widget, event):
-        """
-        Button release on the drawing area.
-        """
-        self.button_pressed = False
+    def clicked_element(self, gelement):
+        if self.mode == Mode.edit_vertex:
+            gelement.selected = True
 
-        # Right click or middle click does not matter
-        if event.button > 1:
-            return
+            #False others
+            self.selected_vertex = gelement.name
 
-        p = [event.x, event.y]
-
-        dx, dy = [self.clicked_point[0] - p[0], self.clicked_point[1] - p[1]]
-        click_distance = math.hypot(dx, dy)
-        # normal click
-        if click_distance < 10.0:
-            self.editing_action(p)
-
-        self.clicked_point = None
-
-    def on_button_press(self, widget, event):
-        """
-        Button pressed on drawing area.
-        """
-        self.button_pressed = True
-        p = [event.x, event.y]
-        #transformed point
-        #trf_p = self.transform.transform_point(p[0],p[1])
-        trf_p = self.drawer.transform_point(p)
-
-        if self.mode == Mode.edit:
-            # If there is a vertex in the clicked point
-            self.selected_vertex = ugraphic.point_in_circle(trf_p, self.vertex_locations)
-            self.selected_edge = None
-
-            # If there is a edge in the clicked point
-            if self.selected_vertex is None:
-                self.selected_edge = ugraphic.point_in_line(trf_p, self.vertex_locations,
-                                                            self.disc_bn.get_edges())
-
-            # Draw selected edge or vertex
-            self.drawer.set_selected_vertices([self.selected_vertex])
-            self.drawer.set_selected_edges([self.selected_edge])
-            self.drawer.repaint()
-
-            ## Right click for edit and delete
-            if event.button == 3 and (self.selected_vertex
-                                      is not None or self.selected_edge is not None):
-                self.show_edit_popup(event)
-                self.clicked_point = None
-
-            ## double click, open the dialog
-            elif event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS and \
-                            self.selected_vertex is not None:
-                # Show cpt dialog
-                self.show_edit_var_dialog()
-
-                self.clicked_point = None
-                self.selected_vertex = None
-                return
-
-        elif self.mode == Mode.run:
+        if self.mode == Mode.run:
             # get selected state for evidence
-            new_evidence = self.drawer.point_in_state(trf_p, self.vertex_locations, self.marginals)
+            if isinstance(gelement, GStateBox):
+                new_evidence = gelement.selected_state
+                print new_evidence
+                if new_evidence is not None:
+                    self.evidences[gelement.name] = new_evidence
+                    # compute marginals again
+                    self.marginals = self.disc_bn.compute_marginals(self.evidences)
 
-            if new_evidence is not None:
-                v_evid, s_evid = new_evidence
-                self.evidences[v_evid] = s_evid
-                # compute marginals again
-                self.marginals = self.disc_bn.compute_marginals(self.evidences)
-
-        # Normal click
-        if event.button == 1:
-            self.clicked_point = p
-
+        self.drawer.repaint()
 
     def on_key_press(self, widget, event):
         """
@@ -221,7 +185,7 @@ class BoxDiscreteBN(Gtk.Box):
             return True
 
         if radio_tool.get_label() == "bedit":
-            self.set_mode(Mode.edit)
+            self.set_mode(Mode.edit_vertex)
 
         if radio_tool.get_label() == "brun":
             # Validate BN
@@ -252,7 +216,7 @@ class BoxDiscreteBN(Gtk.Box):
         Select Edit or Run mode.
         """
         self.mode = mode
-        if self.mode == Mode.edit:
+        if self.mode == Mode.edit_edge or self.mode == Mode.edit_vertex:
             self.toolbar_edit.set_visible(True)
             self.bclear_evidence.set_visible_horizontal(False)
             self.draw_mode_edit()
@@ -336,37 +300,56 @@ class BoxDiscreteBN(Gtk.Box):
         vl = self.vertex_locations
 
         # Graphic elements
-        gelements = []
-        # Edges
-        for e in self.disc_bn.get_edges():
-            arrow = GArrow(vl[e[0]], vl[e[1]])
-
-            if e == self.selected_edge:
-                arrow.set_selected(True)
-
-            gelements.append(arrow)
-
+        gvertices = []
+        gpoints = {}
         # Vertices
         for vname, p in vl.items():
             v = GVertex(p, vname)
-
+            gpoints[vname] = v
+            v.translatable = True
             if self.selected_vertex == vname:
-                v.set_selected(True)
-            gelements.append(v)
+                v.selected = True
+            gvertices.append(v)
 
-        self.drawer.set_graphic_objects(gelements)
+        gedges = []
+        # Edges
+        for e in self.disc_bn.get_edges():
+            arrow = GArrow(gpoints[e[0]], gpoints[e[1]])
+            if e == self.selected_edge:
+                arrow.selected = True
+
+            gedges.append(arrow)
+
+        self.drawer.set_graphic_objects(gedges + gvertices)
         self.drawer.repaint()
 
     def draw_mode_run(self):
-        # Configure drawer
-        self.drawer.set_selected_edges([])
-        self.drawer.set_selected_vertices([])
-        self.drawer.set_vertices({})
-        self.drawer.set_edges_type_vertex([])
+        ## Configure drawer
+        vl = self.vertex_locations
 
-        # todo boxes contains more information
-        self.drawer.set_boxes(self.vertex_locations)
-        self.drawer.set_edges_type_box(self.disc_bn.get_edges())
+        # Graphic elements
+        gvertices = []
+        gpoints = {}
+
+        for vname, p in vl.items():
+
+            evidence = {}
+            if vname in self.evidences:
+                evidence = self.evidences[vname]
+            b = GStateBox(p, vname, self.marginals[vname], evidence)
+            b.translatable = True
+            gpoints[vname] = b
+            gvertices.append(b)
+
+        #TODO edges
+        gedges = []
+        # Edges
+        for e in self.disc_bn.get_edges():
+            arrow = GArrow(gpoints[e[0]], gpoints[e[1]])
+            gedges.append(arrow)
+
+        self.drawer.set_graphic_objects(gedges + gvertices)
+        self.drawer.repaint()
 
 
     def editing_action(self, p):
@@ -378,39 +361,31 @@ class BoxDiscreteBN(Gtk.Box):
         # p = [p[0] - self.translation[0], p[1] - self.translation[1]]
 
         #### Mode Edit #####
-        if self.mode == Mode.edit:
+        self.draw_mode_edit()
 
-            self.draw_mode_edit()
+        ## Mode edit VERTEX
 
-            ## Mode edit VERTEX
-            if self.mode_edit == ModeEdit.vertex:
-                # Create new Vertex
-                if self.selected_vertex is None and self.selected_edge is None:
-                    vname = self.get_new_vertex_name()
-                    # new vertex
-                    self.vertex_locations[vname] = p
-                    self.disc_bn.add_vertex(vname)
 
-            ####### MODE EDIT EDGE
-            elif self.mode_edit == ModeEdit.edge:
+        ####### MODE EDIT EDGE
+        if self.mode_edit == Mode.edge:
 
-                # If there is not a initial vertex selected
-                if self.vertex_1 is None and self.selected_vertex is not None:
-                    self.vertex_1 = self.selected_vertex
+            # If there is not a initial vertex selected
+            if self.vertex_1 is None and self.selected_vertex is not None:
+                self.vertex_1 = self.selected_vertex
 
-                # If there is an initial vertex
-                elif self.vertex_1 is not None and self.selected_vertex is None:
-                    #Select anything
+            # If there is an initial vertex
+            elif self.vertex_1 is not None and self.selected_vertex is None:
+                #Select anything
+                self.vertex_1 = None
+                # draw a dynamic arrow
+                self.drawer.set_dynamic_arrow(self.selected_edge)
+            elif self.vertex_1 is not None and self.selected_vertex is not None:
+                if not self.vertex_1 == self.selected_vertex and self.selected_vertex is not None:
+                    self.disc_bn.add_edge([self.vertex_1, self.selected_vertex])
+
                     self.vertex_1 = None
-                    # draw a dynamic arrow
-                    self.drawer.set_dynamic_arrow(self.selected_edge)
-                elif self.vertex_1 is not None and self.selected_vertex is not None:
-                    if not self.vertex_1 == self.selected_vertex and self.selected_vertex is not None:
-                        self.disc_bn.add_edge([self.vertex_1, self.selected_vertex])
-
-                        self.vertex_1 = None
-                        self.selected_vertex = None
-                self.tmp_arrow = None
+                    self.selected_vertex = None
+            self.tmp_arrow = None
 
         ##### Mode run
         elif self.mode == Mode.run:
