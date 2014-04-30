@@ -71,6 +71,8 @@ class GraphDrawer:
         self.clicked_clear_space_listener = None
         self.right_click_elem_listener = None
 
+        self.relative_trans_obj = None
+
     def get_drawing_area(self):
         return self.area
 
@@ -163,22 +165,33 @@ class GraphDrawer:
         self.mouse_position = p
 
         if self.dynamic_arrow is not None:
-                self.area.queue_draw()
+            self.area.queue_draw()
 
-        if self.clicked_point is None:
-            return
-
-        if not self.button_pressed:
+        if self.clicked_point is None or self.clicked_point is None:
+            # relative trans when no object motion
+            self.relative_trans_obj = None
             return
 
         # Move the object
         if self.selected_object is not None:
             if self.selected_object.translatable and self.button_pressed:
-                self.selected_object.center.x, self.selected_object.center.y = p
+                # Relative trans
+                if self.relative_trans_obj is None:
+                    self.relative_trans_obj = p[0] - self.selected_object.center.x, p[1] - self.selected_object.center.y
+                    # first try does not move
+                    return
+
+                # print dx, dy
+                print self.relative_trans_obj
+                self.selected_object.center.x = p[0] - self.relative_trans_obj[0]
+                self.selected_object.center.y = p[1] - self.relative_trans_obj[1]
                 self.repaint()
 
         # MOve the world
         else:
+            # relative trans when no object motion
+            self.relative_trans_obj = None
+
             # translate world  is not None  and
             if self.viewer_mode:
                 p = [event.x, event.y]
@@ -223,7 +236,7 @@ class GraphDrawer:
         if not self.button_pressed and \
                         self.dynamic_arrow is not None:
             p = GPoint(*self.mouse_position)
-            GArrow(self.dynamic_arrow, p,headarrow_d=0).draw(cairo)
+            GArrow(self.dynamic_arrow, p, headarrow_d=0).draw(cairo)
 
 
         # show objects
