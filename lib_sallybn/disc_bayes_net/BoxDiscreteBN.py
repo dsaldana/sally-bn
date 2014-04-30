@@ -20,10 +20,10 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # ----------------------------------------------------------------------------
-import math
 
 from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
+from lib_sallybn.drawer.GBoxArrow import GBoxArrow
 from lib_sallybn.drawer.GPoint import GPoint
 from lib_sallybn.drawer.GStateBox import GStateBox
 from lib_sallybn.drawer.GraphDrawer import GraphDrawer
@@ -331,15 +331,8 @@ class BoxDiscreteBN(Gtk.Box):
         vl = self.vertex_locations
 
         # Graphic elements
-        gelements = []
-        # Edges
-        for e in self.disc_bn.get_edges():
-            p1 = self.vertex_locations[e[0]]
-            p2 = self.vertex_locations[e[1]]
-            dist = math.hypot(p1.x - p2.x, p1.y - p2.y) /2
-
-            arrow = GArrow(self.vertex_locations[e[0]], self.vertex_locations[e[1]], headarrow_d=dist)
-            gelements.append(arrow)
+        boxes = []
+        dboxes = {}
 
         for vname, p in vl.items():
 
@@ -348,9 +341,17 @@ class BoxDiscreteBN(Gtk.Box):
                 evidence = self.evidences[vname]
             b = GStateBox(p, vname, self.marginals[vname], evidence)
             b.translatable = True
-            gelements.append(b)
+            dboxes[vname] = b
+            boxes.append(b)
 
-        self.drawer.set_graphic_objects(gelements)
+
+        # Edges
+        bedges = []
+        for e in self.disc_bn.get_edges():
+            arrow = GBoxArrow(dboxes[e[0]], dboxes[e[1]])
+            bedges.append(arrow)
+
+        self.drawer.set_graphic_objects(bedges + boxes)
         self.drawer.repaint()
 
     def on_edit_mode(self, radiotool):

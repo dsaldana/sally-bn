@@ -13,7 +13,7 @@ class GArrow(GraphicObject):
     """
     def __init__(self, p1, p2, headarrow_d=DEFAULT_VERTEX_RADIO):
         """
-        :p1: initinal point GPoint
+        :p1: initial point GPoint
         :p2: final point GPoint
         :head_distance: distance of the head
         """
@@ -21,6 +21,10 @@ class GArrow(GraphicObject):
         self.p2 = p2
 
         self.headarrow_d = headarrow_d
+
+        self.a_side = DEFAULT_VERTEX_RADIO / 2.5
+        self.b_side = DEFAULT_VERTEX_RADIO / 5.0
+
 
     def is_on_point(self, p):
         """
@@ -76,8 +80,8 @@ class GArrow(GraphicObject):
             s = -1.0
 
         # arrow head (triangle)
-        a = DEFAULT_VERTEX_RADIO / 2.5
-        b = DEFAULT_VERTEX_RADIO / 5.0
+        a = self.a_side
+        b = self.b_side
         # Final point
         xf = x1 + s * d * math.cos(theta)
         yf = y1 + s * d * math.sin(theta)
