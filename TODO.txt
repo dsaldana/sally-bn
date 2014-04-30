@@ -4,7 +4,8 @@
 
 ----TO FIX----
 - select arrow
-- multiple selections arrow and vertex
+- delete evidence
+
 
 --- Next release ---
 * New BN, multiple BNs with tabs

@@ -11,7 +11,6 @@ class GArrow(GraphicObject):
     """
     Graphic Vertex
     """
-
     def __init__(self, p1, p2, headarrow_d=DEFAULT_VERTEX_RADIO):
         """
         :p1: initinal point GPoint
@@ -78,7 +77,7 @@ class GArrow(GraphicObject):
 
         # arrow head (triangle)
         a = DEFAULT_VERTEX_RADIO / 2.5
-        b = DEFAULT_VERTEX_RADIO / 5
+        b = DEFAULT_VERTEX_RADIO / 5.0
         # Final point
         xf = x1 + s * d * math.cos(theta)
         yf = y1 + s * d * math.sin(theta)
@@ -100,9 +99,9 @@ class GArrow(GraphicObject):
         xi = x1 + s * DEFAULT_VERTEX_RADIO * math.cos(theta)
         yi = y1 + s * DEFAULT_VERTEX_RADIO * math.sin(theta)
         # Final point
-        xf = x1 + s * (d-2) * math.cos(theta)
-        yf = y1 + s * (d-2) * math.sin(theta)
+        # xf = x1 + s * (d - 2) * math.cos(theta)
+        # yf = y1 + s * (d - 2) * math.sin(theta)
 
         cairo.move_to(xi, yi)
-        cairo.line_to(xf, yf)
+        cairo.line_to(x2, y2)
         cairo.stroke()

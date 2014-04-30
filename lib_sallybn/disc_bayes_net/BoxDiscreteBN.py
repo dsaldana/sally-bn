@@ -20,7 +20,8 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # ----------------------------------------------------------------------------
-from gi.repository import Gtk, Gdk
+import math
+
 from lib_sallybn.disc_bayes_net.CptDialog import CptDialog
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 from lib_sallybn.drawer.GPoint import GPoint
@@ -28,15 +29,12 @@ from lib_sallybn.drawer.GStateBox import GStateBox
 from lib_sallybn.drawer.GraphDrawer import GraphDrawer
 from lib_sallybn.drawer.GArrow import GArrow
 from lib_sallybn.drawer.GVertex import GVertex
-
 from lib_sallybn.util import ugraphic
 from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 import lib_sallybn.util.resources as res
-
-
-
+from gi.repository import Gtk, Gdk
 
 ## Constants
 FILE_EXTENSION = ".sly"
@@ -106,7 +104,8 @@ class BoxDiscreteBN(Gtk.Box):
 
         self.clicked_point = None
         self.selected_vertex = None
-
+        self.drawer.dynamic_arrow = None
+        self.draw_graph()
 
     def clicked_clear_space(self, p):
         if self.mode == Mode.edit_vertex:
@@ -147,8 +146,8 @@ class BoxDiscreteBN(Gtk.Box):
                     self.selected_vertex = None
                     self.drawer.dynamic_arrow = None
 
-            # elif isinstance(gelement, GArrow):
-            #     self.selected_edge = G
+                    # elif isinstance(gelement, GArrow):
+                    #     self.selected_edge = G
 
         elif self.mode == Mode.run:
             # get selected state for evidence
@@ -160,7 +159,7 @@ class BoxDiscreteBN(Gtk.Box):
                     self.marginals = self.disc_bn.compute_marginals(self.evidences)
                     self.draw_graph()
 
-        self.drawer.repaint()
+        self.draw_graph()
 
     def on_clear_evidence(self, button):
         """
@@ -225,6 +224,7 @@ class BoxDiscreteBN(Gtk.Box):
             self.marginals = self.disc_bn.compute_marginals(self.evidences)
             self.set_mode(Mode.run)
 
+        self.draw_graph()
 
     def set_mode(self, mode):
         """
@@ -285,7 +285,7 @@ class BoxDiscreteBN(Gtk.Box):
             self.drawer.set_selected_edges([])
 
         # Draw
-        self.drawer.repaint()
+        self.draw_graph()
 
     def get_new_vertex_name(self):
         """ Vertex name generator to create incremental variables and does not generate
@@ -336,7 +336,11 @@ class BoxDiscreteBN(Gtk.Box):
         gelements = []
         # Edges
         for e in self.disc_bn.get_edges():
-            arrow = GArrow(self.vertex_locations[e[0]], self.vertex_locations[e[1]])
+            p1 = self.vertex_locations[e[0]]
+            p2 = self.vertex_locations[e[1]]
+            dist = math.hypot(p1.x - p2.x, p1.y - p2.y) /2
+
+            arrow = GArrow(self.vertex_locations[e[0]], self.vertex_locations[e[1]], headarrow_d=dist)
             gelements.append(arrow)
 
         for vname, p in vl.items():
@@ -367,7 +371,7 @@ class BoxDiscreteBN(Gtk.Box):
         # No selections
         self.selected_edge = None
         self.selected_vertex = None
-        self.drawer.repaint()
+        self.draw_graph()
 
     def editing_action(self, p):
         """
@@ -408,7 +412,7 @@ class BoxDiscreteBN(Gtk.Box):
         # elif self.mode == Mode.run:
         #     self.draw_mode_run()
 
-        self.drawer.repaint()
+        self.draw_graph()
 
     def change_vertex_name_h(self, old_name, new_name):
         #vertex locations
@@ -469,6 +473,9 @@ class BoxDiscreteBN(Gtk.Box):
         if not new_var_name == self.selected_vertex:
             self.change_vertex_name_h(self.selected_vertex, new_var_name)
 
+        self.selected_edge = None
+        self.selected_vertex = None
+        self.draw_graph()
 
     def save_bn_to_file(self, file_name):
         # if does not have extension
