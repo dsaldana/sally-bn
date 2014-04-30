@@ -39,6 +39,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         else:
             super(DiscreteBayesianNetworkExt, self).__init__(skel, nd)
 
+    #todo delete and replace by property all of these get
     def get_edges(self):
         return self.E
 
@@ -84,6 +85,10 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         return str_pstates
 
+
+    def set_vertices(self, names):
+        for v in names:
+            self.add_vertex(v)
 
     def add_vertex(self, name):
         # new vertex

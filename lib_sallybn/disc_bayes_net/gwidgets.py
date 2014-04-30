@@ -116,7 +116,7 @@ class StatesTable:
 
 
 class GraphicCptTable:
-    def __init__(self, disc_bn, query_v, view):
+    def __init__(self, disc_bn, query_v, view=Gtk.TreeView()):
         """
         Create a tree view for the CPT of the node query_v
         :param query_v:

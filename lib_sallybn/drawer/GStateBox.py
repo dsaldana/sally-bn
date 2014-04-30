@@ -34,7 +34,6 @@ class GStateBox(GraphicObject):
         evidence = self.evidence
 
         v_states = marginals.keys()
-        is_evidence = vname in evidence
         # Rectangles
         px, py = self.center.x, self.center.y
         box_heigh = self.get_box_height(v_states)
@@ -42,16 +41,16 @@ class GStateBox(GraphicObject):
         y_corner = py - box_heigh / 2.0
 
         #Background for evidence
-        if is_evidence:
+        if evidence:
             cairo.set_source_rgb(*gray)
-            cairo.rectangle(x_corner - 3, y_corner - 3, box_width + 6, box_heigh + 6)
+            cairo.rectangle(x_corner - 5, y_corner - 5, box_width + 10, box_heigh + 10)
             cairo.fill()
 
         # Background
         cairo.set_source_rgb(*light_green)  # light green
 
         ## if is evidence
-        if is_evidence:
+        if evidence:
             cairo.set_source_rgb(*light_gray)  # light gray
 
         cairo.rectangle(x_corner, y_corner, box_width, box_heigh)

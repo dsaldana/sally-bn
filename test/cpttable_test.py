@@ -1,10 +1,10 @@
-
 ### Graphic widgets
 
 from gi.repository import Gtk
 import sys
 
 from lib_sallybn.disc_bayes_net import gwidgets
+from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 
 
 class MyApplication(Gtk.Application):
@@ -22,7 +22,16 @@ class MyApplication(Gtk.Application):
                   "D": ["1", "2", "3"]}
 
         cpt_v = "D"
-        gtable = gwidgets.GraphicCptTable(vertices, edges, states, cpt_v, view=Gtk.TreeView())
+        disc_bn = DiscreteBayesianNetworkExt()
+        disc_bn.set_vertices(vertices)
+        disc_bn.E = edges
+
+        # States
+        for s, iss in states.items():
+            for i in iss:
+                disc_bn.add_state(s, i)
+
+        gtable = gwidgets.GraphicCptTable(disc_bn, cpt_v)
         # table = gwidgets.create_treeview_for_cpt(vertices, edges, states, cpt_v)
 
 
@@ -37,7 +46,7 @@ class MyApplication(Gtk.Application):
 
         # a grid to attach the widgets
         grid = Gtk.Grid()
-        grid.attach(gtable.get_widget(), 0, 0, 1, 1)
+        grid.attach(gtable.view, 0, 0, 1, 1)
         grid.attach(label, 0, 1, 1, 1)
 
         # attach the grid to the window
@@ -49,6 +58,7 @@ class MyApplication(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+
 
 app = MyApplication()
 exit_status = app.run(sys.argv)

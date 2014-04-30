@@ -98,7 +98,9 @@ class BoxDiscreteBN(Gtk.Box):
 
 
     def double_click_on_elem(self, elem):
-        print "ouble click"
+        if self.mode == Mode.run:
+            return
+
         # Show cpt dialog
         self.show_edit_var_dialog()
 
@@ -167,7 +169,7 @@ class BoxDiscreteBN(Gtk.Box):
         """
         self.evidences = {}
         self.marginals = self.disc_bn.compute_marginals(self.evidences)
-        self.drawer.repaint()
+        self.draw_graph()
 
     def on_zoom(self, button):
         """
@@ -271,19 +273,15 @@ class BoxDiscreteBN(Gtk.Box):
             # Delete from model
             self.disc_bn.remove_vertex(self.selected_vertex)
 
-            # Non selected vertex
-            self.selected_vertex = None
-            #Draw
-            self.drawer.set_selected_vertices([])
-
         # Delete edge
         elif self.selected_edge is not None:
             # Delete from model
             self.disc_bn.remove_edge(self.selected_edge)
-            # Non selected
-            self.selected_edge = None
-            self.drawer.set_selected_edges([])
 
+        # Non selected
+        self.selected_vertex = None
+        self.selected_edge = None
+        self.drawer.dynamic_arrow = None
         # Draw
         self.draw_graph()
 
