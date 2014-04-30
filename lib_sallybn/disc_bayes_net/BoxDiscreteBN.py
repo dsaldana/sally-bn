@@ -31,9 +31,8 @@ from lib_sallybn.drawer.GArrow import GArrow
 from lib_sallybn.drawer.GVertex import GVertex
 from lib_sallybn.util import ugraphic
 from lib_sallybn.util.ufile import dic_from_json_file, dic_to_file
-from libpgm.graphskeleton import GraphSkeleton
-from libpgm.nodedata import NodeData
 import lib_sallybn.util.resources as res
+#from gi.repository import Gtk, Gdk
 from gi.repository import Gtk, Gdk
 
 ## Constants
@@ -53,7 +52,8 @@ class Mode:
 
 
 class BoxDiscreteBN(Gtk.Box):
-    def __init__(self, window):
+
+    def __init__(self, window, disc_bn=DiscreteBayesianNetworkExt()):
         self.window = window
 
         # Create graphic widgets
@@ -82,7 +82,7 @@ class BoxDiscreteBN(Gtk.Box):
         self.tmp_arrow = None
 
         # Graph
-        self.disc_bn = DiscreteBayesianNetworkExt()
+        self.disc_bn = disc_bn
 
         # Vertex locations to draw
         self.vertex_locations = {}
@@ -98,7 +98,7 @@ class BoxDiscreteBN(Gtk.Box):
 
 
     def double_click_on_elem(self, elem):
-        if self.mode == Mode.run:
+        if self.mode == Mode.run or self.selected_vertex is None:
             return
 
         # Show cpt dialog
@@ -299,11 +299,11 @@ class BoxDiscreteBN(Gtk.Box):
 
     def draw_graph(self):
         if self.mode == Mode.edit_vertex or self.mode == Mode.edit_edge:
-            self.draw_mode_edit()
+            self._draw_mode_edit()
         else:
-            self.draw_mode_run()
+            self._draw_mode_run()
 
-    def draw_mode_edit(self):
+    def _draw_mode_edit(self):
         ## Configure drawer
         vl = self.vertex_locations
 
@@ -326,7 +326,7 @@ class BoxDiscreteBN(Gtk.Box):
         self.drawer.set_graphic_objects(gelements)
         self.drawer.repaint()
 
-    def draw_mode_run(self):
+    def _draw_mode_run(self):
         ## Configure drawer
         vl = self.vertex_locations
 
@@ -381,7 +381,7 @@ class BoxDiscreteBN(Gtk.Box):
         # p = [p[0] - self.translation[0], p[1] - self.translation[1]]
 
         #### Mode Edit #####
-        self.draw_mode_edit()
+        self._draw_mode_edit()
 
         ## Mode edit VERTEX
 
@@ -490,18 +490,14 @@ class BoxDiscreteBN(Gtk.Box):
         dic_to_file(bn, file_name)
 
     def load_bn_from_file(self, file_name):
+        """
+        Load a bayesian network to show.
+        Initially, the bn can be loaded by itself, but vertex positions must be loaded independently.
+        """
         try:
-            #### Load BN
-            nd = NodeData()
-            skel = GraphSkeleton()
-            nd.load(file_name)  # any input file
-            skel.load(file_name)
-
-            # topologically order graphskeleton
-            skel.toporder()
-
             # load bayesian network
-            self.disc_bn = DiscreteBayesianNetworkExt(skel, nd)
+            self.disc_bn = DiscreteBayesianNetworkExt()
+            self.disc_bn.load(file_name)
 
             ### Load Vertex locations
             json_data = dic_from_json_file(file_name)
@@ -516,4 +512,4 @@ class BoxDiscreteBN(Gtk.Box):
             ugraphic.show_warning(self.window, "Error loading the Bayesian Network", Exception)
             return
 
-        self.draw_mode_edit()
+        self._draw_mode_edit()

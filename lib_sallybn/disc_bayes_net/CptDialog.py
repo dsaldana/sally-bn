@@ -48,7 +48,7 @@ class CptDialog:
                                 "bremove_state"])
 
 
-        cpt_dialog.set_parent(window)
+        # cpt_dialog.set_parent(window)
         cpt_dialog.set_modal(True)
         text_var_name.set_text(selected_vetex)
 

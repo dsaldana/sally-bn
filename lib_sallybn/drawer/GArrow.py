@@ -25,7 +25,6 @@ class GArrow(GraphicObject):
         self.a_side = DEFAULT_VERTEX_RADIO / 2.5
         self.b_side = DEFAULT_VERTEX_RADIO / 5.0
 
-
     def is_on_point(self, p):
         """
          Identify if  the arrow is on the point p

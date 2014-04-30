@@ -22,9 +22,13 @@
 # ----------------------------------------------------------------------------
 
 import copy
+
+from libpgm.graphskeleton import GraphSkeleton
+from libpgm.nodedata import NodeData
 from lib_sallybn.util import ulist
 from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.tablecpdfactorization import TableCPDFactorization
+
 
 DEFAULT_STATES = ["true", "false"]
 
@@ -96,7 +100,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         # Vertex data
         vdata = {}
-        vdata["vals"] = list(DEFAULT_STATES)
+        vdata["vals"] = list(DEFAULT_STATES)#TODO dont do this by default
         vdata["numoutcomes"] = 2
         vdata["cprob"] = [.0, .0]
         vdata["parents"] = []  # just based in libpgm model. but normally None
@@ -175,6 +179,19 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
                 new_cprob[str_parent_mtx[j]] = cpt[j]
 
             self.Vdata[child]["cprob"] = new_cprob
+
+    def set_cprob(self, vertex_name, cprob):
+        """
+        Assign a conditional probability table for a variable (vertex).
+
+        :param vertex_name: vertex name
+        :param cprob: conditional probability, it is a dictionary with the following format.
+            {"['easy', 'low']": [.3, .4, .3],
+                "['easy', 'high']": [.9, .08, .02],
+                "['hard', 'low']": [.05, .25, .7],
+                "['hard', 'high']": [.5, .3, .2]}
+        """
+        self.Vdata[vertex_name]["cprob"] = cprob
 
 
     def change_vertex_name(self, old_name, new_name):
@@ -317,3 +334,16 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
 
         return marginals
 
+
+    def load(self, file_name):
+        #### Load BN
+        nd = NodeData()
+        skel = GraphSkeleton()
+        nd.load(file_name)  # any input file
+        skel.load(file_name)
+
+        # topologically order graphskeleton
+        skel.toporder()
+
+        super(DiscreteBayesianNetworkExt, self).__init__(skel, nd)
+        ##TODO load evidence
