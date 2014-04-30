@@ -94,13 +94,13 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         for v in names:
             self.add_vertex(v)
 
-    def add_vertex(self, name):
+    def add_vertex(self, name, states=DEFAULT_STATES):
         # new vertex
         self.V.append(name)
 
         # Vertex data
         vdata = {}
-        vdata["vals"] = list(DEFAULT_STATES)#TODO dont do this by default
+        vdata["vals"] = list(states)
         vdata["numoutcomes"] = 2
         vdata["cprob"] = [.0, .0]
         vdata["parents"] = []  # just based in libpgm model. but normally None
