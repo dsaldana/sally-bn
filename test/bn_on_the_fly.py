@@ -4,6 +4,7 @@ import random
 from lib_sallybn.disc_bayes_net.DiscreteBayesianNetworkExt import DiscreteBayesianNetworkExt
 from lib_sallybn.disc_bayes_net.BoxDiscreteBN import BoxDiscreteBN
 
+
 # Create window
 window = Gtk.Window()
 window.set_size_request(800, 600)
@@ -38,26 +39,22 @@ box = BoxDiscreteBN(window, disc_bn=disc_bn)
 box.on_organize(None)
 window.add(box)
 
-print "2a"
 
 new_vertices = []
 
 def opa():
-    print "op"
     # time.sleep(2)
     new_vertex = "D " + str(random.random())
     disc_bn.add_vertex(new_vertex)
     new_vertices.append(new_vertex)
     ## edges
-    if len(new_vertices) >2:
-        de =random.sample(new_vertices,2)
+    if len(new_vertices) > 2:
+        de = random.sample(new_vertices, 2)
         disc_bn.add_edge(de)
-        de =random.sample(new_vertices,2)
+        de = random.sample(new_vertices, 2)
         disc_bn.add_edge(de)
 
     box.on_organize(None)
-    print "opa"
-    # GObject.idle_add(done, *((task_id,) + args))
 
 
 for i in range(100):

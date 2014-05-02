@@ -30,6 +30,7 @@ from lib_sallybn.drawer.GPoint import GPoint
 
 
 class GraphDrawer:
+
     def __init__(self):
         #### Objects to show #####
         self.objects_to_show = []

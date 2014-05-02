@@ -52,7 +52,6 @@ class Mode:
 
 
 class BoxDiscreteBN(Gtk.Box):
-
     def __init__(self, window, disc_bn=DiscreteBayesianNetworkExt()):
         self.window = window
 
@@ -96,6 +95,8 @@ class BoxDiscreteBN(Gtk.Box):
         self.drawer.right_click_elem_listener = self.right_clicked_elem
         self.drawer.double_clicked_element_listener = self.double_click_on_elem
 
+        # Graphical objects in the background
+        self.background_gobjs = []
 
     def double_click_on_elem(self, elem):
         if self.mode == Mode.run or self.selected_vertex is None:
@@ -308,7 +309,7 @@ class BoxDiscreteBN(Gtk.Box):
         vl = self.vertex_locations
 
         # Graphic elements
-        gelements = []
+        gelements = list(self.background_gobjs)
         # Edges
         for e in self.disc_bn.get_edges():
             arrow = GArrow(self.vertex_locations[e[0]], self.vertex_locations[e[1]])
@@ -351,7 +352,7 @@ class BoxDiscreteBN(Gtk.Box):
             arrow = GBoxArrow(dboxes[e[0]], dboxes[e[1]])
             bedges.append(arrow)
 
-        self.drawer.set_graphic_objects(bedges + boxes)
+        self.drawer.set_graphic_objects(self.background_gobjs + bedges + boxes)
         self.drawer.repaint()
 
     def on_edit_mode(self, radiotool):
