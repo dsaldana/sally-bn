@@ -30,7 +30,6 @@ class GRectangle(GraphicObject):
     """
     Graphic Vertex
     """
-
     def __init__(self, gpoint_origin, width, height, name):
         self.name = name
         self.width = width

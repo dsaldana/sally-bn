@@ -32,7 +32,7 @@ class GraphicObject:
 
     selected = False
     translatable = False
-    fill_color = color.white
+    fill_color = color.light_gray
     border_color = color.black
 
     @abstractmethod
