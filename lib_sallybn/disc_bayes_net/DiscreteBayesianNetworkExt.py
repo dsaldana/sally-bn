@@ -305,35 +305,39 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         """
         marginals = {}
         for v in self.V:
-
-            query = {v: ''}
-
-            vertex_marginals = {}
-            states = self.get_states(v)
-
             ## if evidence node
-            if v in evidence:
-                vals = []
-                s_evidence = evidence[v]
-                for s in states:
-                    if s == s_evidence:
-                        vertex_marginals[s] = 1.0
-                    else:
-                        vertex_marginals[s] = 0.0
-            # if query node.
-            else:
-                #marginal values
-                fn = TableCPDFactorization(self.clone())
-                mar_vals = fn.condprobve(query, evidence)
-
-                # Associate marginals with values
-                for i in range(len(states)):
-                    vertex_marginals[states[i]] = mar_vals.vals[i]
-
+            vertex_marginals = self.compute_vertex_marginal(v, evidence)
             marginals[v] = vertex_marginals
 
         return marginals
 
+    def compute_vertex_marginal(self, v, evidence):
+        """
+        :return: a dictionary with: state name -> marginal values
+            ex. {"state1": 0.5, "state2": 0.5}
+        """
+        query = {v: ''}
+        vertex_marginals = {}
+        states = self.get_states(v)
+
+        if v in evidence:
+            vals = []
+            s_evidence = evidence[v]
+            for s in states:
+                if s == s_evidence:
+                    vertex_marginals[s] = 1.0
+                else:
+                    vertex_marginals[s] = 0.0
+        # if query node.
+        else:
+            #marginal values
+            fn = TableCPDFactorization(self.clone())
+            mar_vals = fn.condprobve(query, evidence)
+
+            # Associate marginals with values
+            for i in range(len(states)):
+                vertex_marginals[states[i]] = mar_vals.vals[i]
+        return vertex_marginals
 
     def load(self, file_name):
         #### Load BN
