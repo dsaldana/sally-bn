@@ -284,6 +284,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
             else:
                 return True
         # Has parents
+        print vertex_name
         for k, v in cprob.iteritems():
             # must sum 1
             if 1 - sum(v) > 0.001:

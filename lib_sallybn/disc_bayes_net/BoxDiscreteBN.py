@@ -205,6 +205,21 @@ class BoxDiscreteBN(Gtk.Box):
             self.set_mode(Mode.edit_vertex)
 
         if radio_tool.get_label() == "brun":
+            self.set_mode(Mode.run)
+
+    def set_mode(self, mode):
+        """
+        Select Edit or Run mode.
+        """
+        self.mode = mode
+        if self.mode == Mode.edit_edge or self.mode == Mode.edit_vertex:
+            self.bedit.set_active(True)
+
+            self.toolbar_edit.set_visible(True)
+            self.bclear_evidence.set_visible_horizontal(False)
+
+        elif self.mode == Mode.run:
+            self.brun.set_active(True)
             # Validate BN
             for v in self.disc_bn.get_vertices():
                 # Validate cycles
@@ -225,27 +240,13 @@ class BoxDiscreteBN(Gtk.Box):
                     return
             # compute marginals
             self.marginals = self.disc_bn.compute_marginals(self.evidences)
-            self.set_mode(Mode.run)
 
-        self.draw_graph()
-
-    def set_mode(self, mode):
-        """
-        Select Edit or Run mode.
-        """
-        self.mode = mode
-        if self.mode == Mode.edit_edge or self.mode == Mode.edit_vertex:
-            self.toolbar_edit.set_visible(True)
-            self.bclear_evidence.set_visible_horizontal(False)
-
-        elif self.mode == Mode.run:
             self.toolbar_edit.set_visible(False)
             self.bclear_evidence.set_visible_horizontal(True)
 
         self.selected_vertex = None
         self.selected_edge = None
         self.draw_graph()
-
 
     def on_organize(self, widget):
         """

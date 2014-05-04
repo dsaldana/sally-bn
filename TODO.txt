@@ -1,10 +1,11 @@
 
 --- Priority TODO ---
 * Documentation
+- Organize nodes by separated graphs
 
 ----TO FIX----
 - select arrow
-- delete evidence
+- Translated node after a world translation
 
 
 --- Next release ---
