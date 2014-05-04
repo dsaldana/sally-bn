@@ -37,11 +37,11 @@ import math
 from lib_sallybn.util import ulist
 
 
+class StatesTable(object):
+    """
+    Shows a table with variable's states.
+    """
 
-NEW_STATE_NAME = "-Click here for new state-"
-
-
-class StatesTable:
     def __init__(self, disc_bn, selected_vetex,
                  state_changed_func, view, badd_state, bremove_state):
 
@@ -115,7 +115,11 @@ class StatesTable:
         self.state_changed_func()
 
 
-class GraphicCptTable:
+class GraphicCptTable(object):
+    """
+    Shows a Conditional Probability Distribution to edit.
+    """
+
     def __init__(self, disc_bn, query_v, view=Gtk.TreeView()):
         """
         Create a tree view for the CPT of the node query_v
@@ -254,18 +258,10 @@ class GraphicCptTable:
             parents = self.disc_bn.getparents(self.query_v)
             svals = line[len(parents):]
             fvals = [float(s) for s in svals]
-            # state values must sum 100 with precision of 0.001
-            if not math.fabs(sum(fvals) - 100.0) < 0.001:
+            # state values must sum 100 OR 1 with precision of 0.001
+            if math.fabs(sum(fvals) - 100.0) > 0.001 and math.fabs(sum(fvals) - 1.0) > 0.001:
                 return False
         return True
-
-    # def get_cpt(self):
-    #     cpt = []
-    #     for line in self.model:
-    #         svals = line[len(self.parents):]
-    #         fvals = [float(s) for s in svals]
-    #         cpt.append(fvals)
-    #     return cpt
 
     def get_cprob_from_table(self):
         cprob = {}
