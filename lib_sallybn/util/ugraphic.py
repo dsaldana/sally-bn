@@ -47,7 +47,7 @@ def create_widget(glade_file, widget_names, handler=None):
     return [builder.get_object(wname) for wname in widget_names]
 
 
-def create_vertex_locations(graph_skeleton, dx=220, dy=180):
+def create_vertex_locations(graph_skeleton, dx=220, dy=180, random=True):
     """
     Organize the graph in order to show it.
     """
@@ -60,7 +60,7 @@ def create_vertex_locations(graph_skeleton, dx=220, dy=180):
             roots.append(v)
 
     ## Bread first search for each node
-    # Initinal distances
+    # Initial distances
     dist = {r: 0 for r in roots}
     level = {0: list(roots)}
     # maintain a queue of paths
@@ -68,7 +68,8 @@ def create_vertex_locations(graph_skeleton, dx=220, dy=180):
     queue = roots
 
     # random order for roots
-    shuffle(queue)
+    if random:
+        shuffle(queue)
 
     while queue:
         # get the first path from the queue
@@ -99,7 +100,10 @@ def create_vertex_locations(graph_skeleton, dx=220, dy=180):
     # for each level
     for lk in level.keys():
         lvertices = level[lk]
-        shuffle(lvertices)
+
+        if random:
+            shuffle(lvertices)
+
         len_level = len(lvertices)
         for i in range(len_level):
             #vertex pos

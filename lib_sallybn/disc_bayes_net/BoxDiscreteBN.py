@@ -252,7 +252,10 @@ class BoxDiscreteBN(Gtk.Box):
         """
         Estimate good places to draw each vertex of the graph.
         """
-        v_locts = ugraphic.create_vertex_locations(self.disc_bn)
+        self.organize_graph()
+
+    def organize_graph(self, random=True):
+        v_locts = ugraphic.create_vertex_locations(self.disc_bn, random=random)
         self.dict_to_gpoints(v_locts)
         self.draw_graph()
 
