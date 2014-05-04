@@ -4,7 +4,6 @@
 
 ----TO FIX----
 - select arrow
-- Maximum text in boxes.
 
 --- Next release ---
 * New BN, multiple BNs with tabs
@@ -22,6 +21,7 @@
 
 
 --- FIXED -----
+- Maximum text in boxes.
 - Translated node after a world translation
 - Translating is unstable when a node is selected
 - Translate node is not working after drawer separation

@@ -9,6 +9,9 @@ title_height = delta_state + 5
 
 
 class GStateBox(GraphicObject):
+    """
+    This is an special box that draws a variable with its states and its probabilities.
+    """
 
     def __init__(self, gpoint, name, marginals, evidence):
         """
@@ -66,7 +69,7 @@ class GStateBox(GraphicObject):
         cairo.set_source_rgb(*dark_green)  # dark green
         cairo.move_to(x_corner + 5, y_corner + 25)
         cairo.set_font_size(17)
-        cairo.show_text(vname)
+        cairo.show_text(vname[:15])
 
         # Background rectangle for prob value box
         rwidth = (box_width / 2 - 10)
