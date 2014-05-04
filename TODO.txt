@@ -1,11 +1,9 @@
 
 --- Priority TODO ---
 * Documentation
-- Organize nodes by separated graphs
 
 ----TO FIX----
 - select arrow
-- Translated node after a world translation
 - Maximum text in boxes.
 
 --- Next release ---
@@ -24,6 +22,7 @@
 
 
 --- FIXED -----
+- Translated node after a world translation
 - Translating is unstable when a node is selected
 - Translate node is not working after drawer separation
 - radiobox fatal error

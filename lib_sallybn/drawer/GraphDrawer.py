@@ -176,14 +176,13 @@ class GraphDrawer:
         # Move the object
         if self.selected_object is not None:
             if self.selected_object.translatable and self.button_pressed:
+                self._translation = [0, 0]
                 # Relative trans
                 if self.relative_trans_obj is None:
                     self.relative_trans_obj = p[0] - self.selected_object.center.x, p[1] - self.selected_object.center.y
                     # first try does not move
                     return
 
-                # print dx, dy
-                print self.relative_trans_obj
                 self.selected_object.center.x = p[0] - self.relative_trans_obj[0]
                 self.selected_object.center.y = p[1] - self.relative_trans_obj[1]
                 self.repaint()
@@ -221,7 +220,7 @@ class GraphDrawer:
         ty = self._translation[1] + self._last_translation[1]
         cairo.translate(tx, ty)
 
-        # print (tx, ty), self._last_translation
+        # print self._translation, self._last_translation
 
         # Get transformation
         self._transform = cairo.get_matrix()
@@ -238,7 +237,6 @@ class GraphDrawer:
                         self.dynamic_arrow is not None:
             p = GPoint(*self.mouse_position)
             GArrow(self.dynamic_arrow, p, headarrow_d=0).draw(cairo)
-
 
         # show objects
         for o in self.objects_to_show:
