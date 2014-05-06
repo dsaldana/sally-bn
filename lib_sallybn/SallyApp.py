@@ -28,6 +28,7 @@ from gi.repository import Gtk
 from lib_sallybn import MainWindowHandler
 # FIXME Not here
 import lib_sallybn.util.resources as res
+from lib_sallybn.util.splash import show_splash
 
 
 class SallyApp(Gtk.Application):
@@ -35,7 +36,6 @@ class SallyApp(Gtk.Application):
         Gtk.Application.__init__(self)
 
     def do_startup(self):
-        print "startup"
         Gtk.Application.do_startup(self)
 
     def do_activate(self):
@@ -43,6 +43,10 @@ class SallyApp(Gtk.Application):
         builder = Gtk.Builder()
         builder.add_from_file(res.MAIN_WINDOW_GLADE)
 
+        try:
+            show_splash()
+        except:
+            print "Not splash"
         #Get the Main Window, and connect the "destroy" event
         window = builder.get_object("MainWindow")
         window.set_size_request(800, 600)

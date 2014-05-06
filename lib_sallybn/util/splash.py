@@ -20,22 +20,31 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # ----------------------------------------------------------------------------
+import Tkinter as tk
+
+from lib_sallybn.util import resources
 
 
-# Colors
-green = [204.0 / 255, 229.0 / 255, 204.0 / 255]
-dark_green = [5.0 / 255, 138.0 / 255, 0.0 / 255]
-light_green = [230.0 / 255, 242.0 / 255, 230.0 / 255]
+def show_splash(time=2):
+    # create a splash screen, 80% of display screen size, centered,
+    # displaying a GIF image with needed info, disappearing after 5 seconds
+    splash_width = 500
+    splash_height = 234
 
-gray = 152.0 / 255, 152.0 / 255, 152.0 / 255
-light_gray = 235 / 255.0, 235 / 255.0, 235 / 255.0
-
-white = [255.0 / 255, 255.0 / 255, 255.0 / 255]
-
-yellow = [1, 0.8, 0.0]
-
-light_blue = [0.61, 0.75, 1.0]
-blue = [0.22, 0.30, 0.66]
-dark_blue = [0.12, 0.20, 0.56]
-
-black = [0.0, 0.0, 0.0]
+    root = tk.Tk()
+    # show no frame
+    root.overrideredirect(True)
+    width = root.winfo_screenwidth()
+    height = root.winfo_screenheight()
+    root.geometry(
+        '%dx%d+%d+%d' % (splash_width, splash_height, width / 2.0 - splash_width, height / 2.0 - splash_height))
+    # root.geometry('%dx%d+%d+%d' % (800, 600, 1160, 380))
+    image_file = resources.SPLASH_IMG
+    # # use Tkinter's PhotoImage for .gif files
+    image = tk.PhotoImage(file=image_file)
+    canvas = tk.Canvas(root, height=splash_height, width=splash_width, bg="blue")
+    canvas.create_image(splash_width / 2.0, splash_height / 2.0, image=image)
+    canvas.pack()
+    # show the splash screen for 5000 milliseconds then destroy
+    root.after(time * 1000, root.destroy)
+    root.mainloop()
