@@ -12,5 +12,5 @@ setup(name="sallybn",
       scripts=["sallybn"],
       packages=["lib_sallybn", "lib_sallybn.drawer", "lib_sallybn.util", "lib_sallybn.disc_bayes_net",
         "resources",'libpgm', 'libpgm.CPDtypes'],
-      package_data={'resources': ['gui/*.glade', 'gui/images/*.png', 'images/*.gif','images/*.png']}
+      package_data={'resources': ['gui/*.glade', 'gui/images/*.png', 'image/*.gif','image/*.png']}
 )
