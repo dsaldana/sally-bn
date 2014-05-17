@@ -25,7 +25,12 @@ from abc import ABCMeta, abstractmethod
 from lib_sallybn.drawer import color
 
 
-class GraphicObject:
+class GraphicObject(object):
+
+    """
+    An abstract and generic graphic object.
+
+    """
 
     def __init__(self):
         pass
