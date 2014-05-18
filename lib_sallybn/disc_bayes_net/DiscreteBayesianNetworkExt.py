@@ -22,12 +22,15 @@
 # ----------------------------------------------------------------------------
 
 import copy
-
+import logging
 from libpgm.graphskeleton import GraphSkeleton
 from libpgm.nodedata import NodeData
 from lib_sallybn.util import ulist
 from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.tablecpdfactorization import TableCPDFactorization
+
+# logger
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_STATES = ["true", "false"]
@@ -304,6 +307,7 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
         :return: a dictionary with: vertexname -> state name -> marginal values
             ex. {"v1":{"state1": 0.5, "state2": 0.5}}
         """
+        logger.debug("marginvals for %s", str(self.V))
         marginals = {}
         for v in self.V:
             ## if evidence node
