@@ -32,6 +32,9 @@ from lib_sallybn.util.splash import show_splash
 
 
 class SallyApp(Gtk.Application):
+    """
+    GTK Application.
+    """
     def __init__(self):
         Gtk.Application.__init__(self)
 

@@ -37,6 +37,10 @@ DEFAULT_STATES = ["true", "false"]
 
 
 class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
+    """
+    Discrete Bayesian Network. It extends some functionalists from DiscreteBayesianNetwork.
+    """
+
     def __init__(self, skel=None, nd=None):
         if skel is None and nd is None:
             # Create a clean graph

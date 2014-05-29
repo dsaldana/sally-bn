@@ -5,6 +5,9 @@
 ----TO FIX----
 - select arrow
 
+
+
+
 --- Next release ---
 * New BN, multiple BNs with tabs
 * Edit Color for node
@@ -21,6 +24,8 @@
 
 
 --- FIXED -----
+- coming back to edit, node-mode must be activated
+- arrow to the same node
 - Maximum text in boxes.
 - Translated node after a world translation
 - Translating is unstable when a node is selected

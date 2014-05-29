@@ -31,7 +31,11 @@ from lib_sallybn.util import ugraphic
 
 
 ## Class
-class MainWindowHandler:
+class MainWindowHandler(object):
+    """
+    Manager for events such as: save as, save, open, and new.
+    """
+
     def __init__(self, window, tabber):
         self.window = window
         self.tabber = tabber
@@ -55,8 +59,6 @@ class MainWindowHandler:
 
         # Save
         disc_bn.save_bn_to_file(file_path)
-
-
 
 
     def on_save_as(self, widget):
