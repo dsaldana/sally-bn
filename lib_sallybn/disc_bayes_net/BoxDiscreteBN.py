@@ -150,46 +150,6 @@ class BoxDiscreteBN(Gtk.Box):
             if isinstance(elem, GVertex) or isinstance(elem, GArrow):
                 self.show_edit_popup(event)
 
-    def clicked_element(self, gelement):
-        if self.mode == Mode.edit_vertex:
-            gelement.selected = True
-
-            # False others
-            if isinstance(gelement, GVertex):
-                self.selected_vertex = gelement.name
-
-        elif self.mode == Mode.edit_edge:
-            if isinstance(gelement, GVertex):
-                new_selection = gelement.name
-
-                # if there is not selected a source vertex.
-                if self.selected_vertex is None:
-                    self.selected_vertex = new_selection
-                    self.drawer.dynamic_arrow = self.vertex_locations[new_selection]
-
-                # the second vertex was selected.
-                else:
-                    # first and second vertex can be the same
-                    if self.selected_vertex == new_selection:
-                        return
-
-                    # Create the new vertex
-                    self.disc_bn.add_edge([self.selected_vertex, new_selection])
-                    self.selected_vertex = None
-                    self.drawer.dynamic_arrow = None
-
-        elif self.mode == Mode.run:
-            # get selected state for evidence
-            if isinstance(gelement, GStateBox):
-                new_evidence = gelement.selected_state
-                if new_evidence is not None:
-                    self.evidences[gelement.name] = new_evidence
-                    # compute marginals again
-                    self.marginals = self.disc_bn.compute_marginals(self.evidences)
-                    self.draw_graph()
-
-        self.draw_graph()
-
     def organize_graph(self, random=True):
         v_locts = ugraphic.create_vertex_locations(self.disc_bn, random=random)
         self.dict_to_gpoints(v_locts)
@@ -286,9 +246,6 @@ class BoxDiscreteBN(Gtk.Box):
         #### Mode Edit #####
         self._draw_mode_edit()
 
-        ## Mode edit VERTEX
-
-
         ####### MODE EDIT EDGE
         if self.mode_edit == Mode.edge:
 
@@ -309,10 +266,6 @@ class BoxDiscreteBN(Gtk.Box):
                     self.vertex_1 = None
                     self.selected_vertex = None
             self.tmp_arrow = None
-
-        ##### Mode run
-        # elif self.mode == Mode.run:
-        #     self.draw_mode_run()
 
         self.draw_graph()
 
@@ -357,6 +310,50 @@ class BoxDiscreteBN(Gtk.Box):
 
         menu.show_all()
         menu.popup(None, None, None, None, event.button, event.time)
+
+    def set_mode(self, mode):
+        """
+        Select Edit or Run mode.
+        """
+        self.mode = mode
+        if self.mode == Mode.edit_edge or self.mode == Mode.edit_vertex:
+            self.bedit.set_active(True)
+
+            self.toolbar_edit.set_visible(True)
+            self.bclear_evidence.set_visible_horizontal(False)
+
+            if self.mode == Mode.edit_vertex:
+                self.bvertex.set_active(True)
+
+        elif self.mode == Mode.run:
+            self.brun.set_active(True)
+            # Validate BN
+            for v in self.disc_bn.get_vertices():
+                # Validate cycles
+                try:
+                    self.disc_bn.toporder()
+                except Exception:
+                    ugraphic.show_warning(self.window,
+                                          "The Bayesian Network contains cycles.")
+                    return
+
+                # Validate that the BN has all the cpts
+                ok = self.disc_bn.validate_cprob(v)
+                if not ok:
+                    ugraphic.show_warning(self.window,
+                                          v + " is not valid.",
+                                          "please, check the probability table.")
+                    self.bedit.set_active(True)
+                    return
+            # compute marginals
+            self.marginals = self.disc_bn.compute_marginals(self.evidences)
+
+            self.toolbar_edit.set_visible(False)
+            self.bclear_evidence.set_visible_horizontal(True)
+
+        self.selected_vertex = None
+        self.selected_edge = None
+        self.draw_graph()
 
     def show_edit_var_dialog(self):
         cpt_dialog = CptDialog()
@@ -509,46 +506,57 @@ class BoxDiscreteBN(Gtk.Box):
         # Draw
         self.draw_graph()
 
-    def set_mode(self, mode):
-        """
-        Select Edit or Run mode.
-        """
-        self.mode = mode
-        if self.mode == Mode.edit_edge or self.mode == Mode.edit_vertex:
-            self.bedit.set_active(True)
+    def clicked_element(self, gelement):
+        # Edge is clicked
+        if isinstance(gelement, GArrow):
+            if self.mode == Mode.edit_vertex or self.mode == Mode.edit_edge:
+                # Selected edge
+                edge = []
+                for vname, p in self.vertex_locations.iteritems():
+                    if p == gelement.p1:
+                        edge.append(vname)
+                        break
 
-            self.toolbar_edit.set_visible(True)
-            self.bclear_evidence.set_visible_horizontal(False)
+                for vname, p in self.vertex_locations.iteritems():
+                    if p == gelement.p2:
+                        edge.append(vname)
+                        break
+
+                gelement.selected = True
+                self.selected_edge = edge
+                self.selected_vertex = None
+
+        # Vertex is clicked
+        if isinstance(gelement, GVertex):
+            self.selected_edge = None
 
             if self.mode == Mode.edit_vertex:
-                self.bvertex.set_active(True)
+                gelement.selected = True
+                self.selected_vertex = gelement.name
 
-        elif self.mode == Mode.run:
-            self.brun.set_active(True)
-            # Validate BN
-            for v in self.disc_bn.get_vertices():
-                # Validate cycles
-                try:
-                    self.disc_bn.toporder()
-                except Exception:
-                    ugraphic.show_warning(self.window,
-                                          "The Bayesian Network contains cycles.")
-                    return
+            elif self.mode == Mode.edit_edge:
+                new_selection = gelement.name
 
-                # Validate that the BN has all the cpts
-                ok = self.disc_bn.validate_cprob(v)
-                if not ok:
-                    ugraphic.show_warning(self.window,
-                                          v + " is not valid.",
-                                          "please, check the probability table.")
-                    self.bedit.set_active(True)
-                    return
-            # compute marginals
-            self.marginals = self.disc_bn.compute_marginals(self.evidences)
+                # if there is not selected a source vertex.
+                if self.selected_vertex is None:
+                    self.selected_vertex = new_selection
+                    self.drawer.dynamic_arrow = self.vertex_locations[new_selection]
 
-            self.toolbar_edit.set_visible(False)
-            self.bclear_evidence.set_visible_horizontal(True)
+                # the second vertex was selected.
+                else:
+                    # Create the new vertex
+                    self.disc_bn.add_edge([self.selected_vertex, new_selection])
+                    self.selected_vertex = None
+                    self.drawer.dynamic_arrow = None
 
-        self.selected_vertex = None
-        self.selected_edge = None
+
+        # get selected state for evidence. only works on run_mode.
+        if isinstance(gelement, GStateBox):
+            new_evidence = gelement.selected_state
+            if new_evidence is not None:
+                self.evidences[gelement.name] = new_evidence
+                # compute marginals again
+                self.marginals = self.disc_bn.compute_marginals(self.evidences)
+                self.draw_graph()
+
         self.draw_graph()

@@ -227,9 +227,13 @@ class DiscreteBayesianNetworkExt(DiscreteBayesianNetwork):
     def add_edge(self, edge):
         parent, child = edge
 
-        # validate if exits in the contrary orientation
-        if [child, parent] in self.E:
+        # parent and child can not be the same
+        if parent == child:
             return
+        # validate if exits in the contrary orientation
+        elif [child, parent] in self.E:
+            return
+        # validate if the edge already exists.
         elif edge in self.E:
             return
 

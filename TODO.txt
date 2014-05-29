@@ -3,7 +3,7 @@
 * Documentation
 
 ----TO FIX----
-- select arrow
+
 
 
 
@@ -24,6 +24,7 @@
 
 
 --- FIXED -----
+- select arrow
 - coming back to edit, node-mode must be activated
 - arrow to the same node
 - Maximum text in boxes.
