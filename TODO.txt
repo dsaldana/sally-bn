@@ -3,7 +3,7 @@
 * Documentation
 
 ----TO FIX----
-
+- double click on vertex, in edit edge mode does not work.
 
 
 
