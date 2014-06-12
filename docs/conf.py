@@ -252,7 +252,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'SallyBN', u'Sally BN Documentation',
-   u'David Saldaña', 'SallyBN', 'One line description of project.',
+   u'David Saldaña', 'SallyBN', 'An Open-Source Framework for Bayesian Networks.',
    'Miscellaneous'),
 ]
 

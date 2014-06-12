@@ -19,7 +19,9 @@
     <property name="license" translatable="yes">The Sally BN is licensed under the terms of the GNU GPL version 2 license.
 (Some parts of Sally BN, especially libraries, may also be released under other licenses as well.) </property>
     <property name="authors">David Saldaña.
-http://homepages.dcc.ufmg.br/~saldana/</property>
+http://homepages.dcc.ufmg.br/~saldana/
+VerLab Laboratory
+http://verlab.dcc.ufmg.br/</property>
     <property name="logo">images/logo.png</property>
     <property name="wrap_license">True</property>
     <property name="license_type">gpl-2-0</property>
