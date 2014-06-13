@@ -78,9 +78,9 @@ class BoxDiscreteBN(Gtk.Box):
 
         # Create graphic widgets
         self.box_disc_bn, self.drawing_box, self.toolbar_edit, self.bedit, self.brun, self.bvertex, \
-            self.bclear_evidence = ugraphic.create_widget(
-                res.TAB_DISC_BAYES_NET_GLADE,
-                [BOX_DISC_BN, DRAWING_BOX, TB_EDIT_BN, RB_EDIT, RB_RUN, RB_VERTEX, RB_CLEAR_EVIDENCE], self)
+        self.bclear_evidence = ugraphic.create_widget(
+            res.TAB_DISC_BAYES_NET_GLADE,
+            [BOX_DISC_BN, DRAWING_BOX, TB_EDIT_BN, RB_EDIT, RB_RUN, RB_VERTEX, RB_CLEAR_EVIDENCE], self)
 
         super(BoxDiscreteBN, self).__init__(spacing=1)
         self.pack_start(self.box_disc_bn, True, True, 0)
@@ -162,7 +162,7 @@ class BoxDiscreteBN(Gtk.Box):
     def gpoints_to_dict(self):
         l_loc = {}
         for vname, gpoint in self.vertex_locations.items():
-            l_loc[vname] = gpoint
+            l_loc[vname] = [gpoint.x, gpoint.y]
 
         return l_loc
 

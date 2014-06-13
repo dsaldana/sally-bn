@@ -4,7 +4,7 @@
 
 ----TO FIX----
 - double click on vertex, in edit edge mode does not work.
-
+- bug: modifying name and error in validation.
 
 
 
