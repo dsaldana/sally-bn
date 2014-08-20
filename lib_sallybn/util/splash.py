@@ -25,7 +25,11 @@ import Tkinter as tk
 from lib_sallybn.util import resources
 
 
-def show_splash(time=2):
+def show_splash(time=800):
+    """
+    Show a splash.
+    :param time: time to show the splash, in milliseconds.
+    """
     # create a splash screen, 80% of display screen size, centered,
     # displaying a GIF image with needed info, disappearing after 5 seconds
     splash_width = 500
@@ -46,5 +50,5 @@ def show_splash(time=2):
     canvas.create_image(splash_width / 2.0, splash_height / 2.0, image=image)
     canvas.pack()
     # show the splash screen for 5000 milliseconds then destroy
-    root.after(time * 1000, root.destroy)
+    root.after(time, root.destroy)
     root.mainloop()

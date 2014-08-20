@@ -55,7 +55,6 @@ class SallyApp(Gtk.Application):
         window.set_size_request(800, 600)
         window.set_application(self)
 
-
         #notebook_main
         tabber = builder.get_object("notebook_main")
         tabber.remove_page(0)

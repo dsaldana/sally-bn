@@ -56,6 +56,7 @@ RB_EDGE = 'bedge'
 RB_CLEAR_EVIDENCE = "bclear_evidence"
 # Toolbar
 TB_EDIT_BN = "toolbar_edit_bn"
+TB_EVIDENCE = "toolbar_evidence"
 # Gtk Box
 BOX_DISC_BN = "box_disc_bn"
 DRAWING_BOX = "drawing_box"
@@ -77,13 +78,14 @@ class BoxDiscreteBN(Gtk.Box):
         self.window = window
 
         # Create graphic widgets
-        self.box_disc_bn, self.drawing_box, self.toolbar_edit, self.bedit, self.brun, self.bvertex, \
-        self.bclear_evidence = ugraphic.create_widget(
-            res.TAB_DISC_BAYES_NET_GLADE,
-            [BOX_DISC_BN, DRAWING_BOX, TB_EDIT_BN, RB_EDIT, RB_RUN, RB_VERTEX, RB_CLEAR_EVIDENCE], self)
+        self.box_disc_bn, self.drawing_box, self.toolbar_edit, self.toolbar_evidence, self.bedit, self.brun, self.bvertex, \
+            self.bclear_evidence = ugraphic.create_widget(
+                res.TAB_DISC_BAYES_NET_GLADE,
+                [BOX_DISC_BN, DRAWING_BOX, TB_EDIT_BN, TB_EVIDENCE, RB_EDIT, RB_RUN, RB_VERTEX, RB_CLEAR_EVIDENCE], self)
 
         super(BoxDiscreteBN, self).__init__(spacing=1)
         self.pack_start(self.box_disc_bn, True, True, 0)
+
         self.set_visible(True)
 
         self.drawer = GraphDrawer()
@@ -320,13 +322,15 @@ class BoxDiscreteBN(Gtk.Box):
             self.bedit.set_active(True)
 
             self.toolbar_edit.set_visible(True)
-            self.bclear_evidence.set_visible_horizontal(False)
+            self.toolbar_evidence.set_visible(False)
+
 
             if self.mode == Mode.edit_vertex:
                 self.bvertex.set_active(True)
 
         elif self.mode == Mode.run:
             self.brun.set_active(True)
+
             # Validate BN
             for v in self.disc_bn.get_vertices():
                 # Validate cycles
@@ -349,7 +353,9 @@ class BoxDiscreteBN(Gtk.Box):
             self.marginals = self.disc_bn.compute_marginals(self.evidences)
 
             self.toolbar_edit.set_visible(False)
+            self.toolbar_evidence.set_visible(True)
             self.bclear_evidence.set_visible_horizontal(True)
+            print "aqui pasa"
 
         self.selected_vertex = None
         self.selected_edge = None
