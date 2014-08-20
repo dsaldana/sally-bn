@@ -14,14 +14,3 @@ Contents:
    intro
    installation/installation
    tutorial/tutorial
-
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

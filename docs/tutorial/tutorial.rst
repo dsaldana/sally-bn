@@ -18,17 +18,17 @@ The main window and the buttons descriptions are the next:
 .. image:: images/desc.png
 
 
-1. Defining vertices
+1. Creating variables
 =================
 
-The initial step is defining the variables (represented as vertices) of the bayesian network.
+The initial step is defining the variables (represented as vertices) of the Bayesian Network.
 Just click on the button "Add vertices" and click on the white space to create a node.
 The result of doing it five times looks like this:
 
 .. image:: images/vertices.png
 
 
-2. Connecting vertices
+2. Connecting variables
 ===================
 
 Click on the button "Add edges". Then, click on the source vertex (cause) and click on the target node (effect).
@@ -38,7 +38,7 @@ The result should look like this:
 .. image:: images/edges.png
 
 
-3. Defining vertex name and distributions
+3. Defining variable names and distributions
 =========================================
 To edit the vertex attributes, double click on vertex "Variable 1". It must show the window:
 
@@ -63,7 +63,7 @@ Click on the button *solve mode* to validate the network and compute the margina
 
 5. Add evidences
 ================
-Simply click over the state that you want to add evidence. For example, click on the state **False** of the variable *Letter*.
+Simply click over the state that you want to add evidence. For example, click on the state **False** of the variable **Letter**.
 Then, all the marginal probabilities are updated automatically:
 
 .. image:: images/evidence.png
