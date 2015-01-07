@@ -1,11 +1,12 @@
 #SallyBN
 An Open-Source Framework for Bayesian Networks
 
+Official website:
 
-## Website
 http://dsaldana.github.io/sallybn/
 
 Follow us on Facebok:
+
 https://www.facebook.com/frameworksallybn
 
 ## Requirements
