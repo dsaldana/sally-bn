@@ -2,9 +2,11 @@
 An Open-Source Framework for Bayesian Networks
 
 
-## Official Website
+## Website
 http://dsaldana.github.io/sallybn/
 
+Follow us on Facebok:
+https://www.facebook.com/frameworksallybn
 
 ## Requirements
 * Python 2.7+
